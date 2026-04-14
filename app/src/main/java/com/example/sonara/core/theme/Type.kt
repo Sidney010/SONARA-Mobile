@@ -9,10 +9,8 @@ val AppTypography = Typography(
     titleLarge = TextStyle(
         fontSize = 26.sp,
         fontWeight = FontWeight.Bold,
-        color = AppColors.PrimaryOrange
     ),
     bodySmall = TextStyle(
         fontSize = 12.sp,
-        color = AppColors.PrimaryOrange
     )
 )
