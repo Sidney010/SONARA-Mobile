@@ -1,4 +1,4 @@
-package com.example.sonara.features.login.components.logincard
+package com.example.sonara.core.ui.components
 
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.Icon
@@ -22,7 +22,8 @@ import com.example.sonara.R
 @Composable
 fun AppPasswordField(
     value: String,
-    onValueChange: (String) -> Unit
+    onValueChange: (String) -> Unit,
+    modifier: Modifier = Modifier
 ) {
     var visible by remember { mutableStateOf(false) }
 

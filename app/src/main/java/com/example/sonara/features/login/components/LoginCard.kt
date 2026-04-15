@@ -16,11 +16,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.example.sonara.core.theme.LocalGradients
-import com.example.sonara.features.login.components.logincard.AppPasswordField
-import com.example.sonara.features.login.components.logincard.AppTextField
+import com.example.sonara.core.ui.components.AppButton
+import com.example.sonara.core.ui.components.AppCard
+import com.example.sonara.core.ui.components.AppCardHeader
+import com.example.sonara.core.ui.components.AppPasswordField
+import com.example.sonara.core.ui.components.AppTextField
 import com.example.sonara.features.login.components.logincard.ForgotPasswordRow
-import com.example.sonara.features.login.components.logincard.LoginButton
-import com.example.sonara.features.login.components.logincard.LoginHeader
 import com.example.sonara.features.login.components.logincard.SignUpRow
 
 @Composable
@@ -34,48 +35,29 @@ fun LoginCard(
     onForgotClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val gradients = LocalGradients.current
-
-    Card(
-        modifier = modifier
+    AppCard(
+        modifier = Modifier
             .fillMaxWidth()
-            .height(440.dp),
-        shape = MaterialTheme.shapes.medium,
-        elevation = CardDefaults.cardElevation(4.dp)
+
     ) {
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(gradients.primaryCard)
-                .padding(32.dp)
-        ) {
-            Column(
-                verticalArrangement = Arrangement.spacedBy(24.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
+        AppCardHeader("Bem vindo de volta!")
 
-                LoginHeader("Bem vindo de volta!")
+        AppTextField(
+            value = email,
+            onValueChange = onEmailChange,
+            placeholder = "Email"
+        )
+        AppPasswordField(
+            value = password,
+            onValueChange = onPasswordChange
+        )
+        AppButton(
+            text = "Entrar",
+            onClick = onLoginClick
+        )
 
-                AppTextField(
-                    value = email,
-                    onValueChange = onEmailChange,
-                    placeholder = "Email",
-                )
+        SignUpRow(onClick = onSignUpClick )
 
-                AppPasswordField(
-                    value = password,
-                    onValueChange = onPasswordChange
-                )
-
-                LoginButton(
-                    text = "Entrar",
-                    onClick = onLoginClick
-                )
-
-                SignUpRow(onClick = onSignUpClick)
-
-                ForgotPasswordRow(onClick = onForgotClick)
-            }
-        }
+        ForgotPasswordRow(onClick = onForgotClick)
     }
 }

@@ -1,13 +1,12 @@
-package com.example.sonara.features.login.components.logincard
+package com.example.sonara.core.ui.components
 
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.sp
 
 @Composable
-fun LoginHeader(
+fun AppCardHeader(
     title: String
 ) {
     Text(

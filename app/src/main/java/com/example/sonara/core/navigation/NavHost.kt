@@ -7,6 +7,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.sonara.core.animation.NavigationAnimations
 import com.example.sonara.features.inicial.ui.StartBemVindoScreen
 import com.example.sonara.features.login.ui.LoginScreen
+import com.example.sonara.features.recuperarsenha.ui.RecuperarSenhaScreen
 
 @Composable
 fun AppNavigation() {
@@ -32,7 +33,21 @@ fun AppNavigation() {
             popEnterTransition = { NavigationAnimations.popEnter() },
             popExitTransition = { NavigationAnimations.popExit() }
         ) {
-            LoginScreen()
+            LoginScreen(
+                onNavigateToRecoverPassword = {
+                    navController.navigate(Routes.RECOVER_PASSWORD)
+                }
+            )
+        }
+
+        composable(
+            route = Routes.RECOVER_PASSWORD,
+            enterTransition = { NavigationAnimations.enter() },
+            exitTransition = { NavigationAnimations.exit() },
+            popEnterTransition = { NavigationAnimations.popEnter() },
+            popExitTransition = { NavigationAnimations.popExit() }
+        ) {
+            RecuperarSenhaScreen()
         }
     }
 }

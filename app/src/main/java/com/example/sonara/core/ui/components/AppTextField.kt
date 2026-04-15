@@ -1,4 +1,4 @@
-package com.example.sonara.features.login.components.logincard
+package com.example.sonara.core.ui.components
 
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.MaterialTheme
@@ -13,7 +13,9 @@ import androidx.compose.ui.graphics.Color
 fun AppTextField(
     value: String,
     onValueChange: (String) -> Unit,
-    placeholder: String
+    placeholder: String,
+    isError: Boolean = false,
+    modifier: Modifier = Modifier
 ) {
     TextField(
         modifier = Modifier.fillMaxWidth(),
@@ -30,11 +32,11 @@ fun AppTextField(
         colors = TextFieldDefaults.colors(
             focusedContainerColor = MaterialTheme.colorScheme.surface,
             unfocusedContainerColor = MaterialTheme.colorScheme.surface,
+            focusedIndicatorColor = if (isError) MaterialTheme.colorScheme.error else Color.Transparent,
+            unfocusedIndicatorColor = if (isError) MaterialTheme.colorScheme.error else Color.Transparent,
             focusedTextColor = MaterialTheme.colorScheme.onSurface,
             unfocusedTextColor = MaterialTheme.colorScheme.onSurface,
             cursorColor = MaterialTheme.colorScheme.primary,
-            focusedIndicatorColor = Color.Transparent,
-            unfocusedIndicatorColor = Color.Transparent
         )
     )
 }

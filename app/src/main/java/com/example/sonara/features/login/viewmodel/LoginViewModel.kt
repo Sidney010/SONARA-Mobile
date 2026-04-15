@@ -44,7 +44,9 @@ class LoginViewModel : ViewModel() {
     }
 
     private fun validateEmail(email: String): Boolean {
-        return email.contains("@") && email.length >= 5
+        return android.util.Patterns.EMAIL_ADDRESS
+            .matcher(email)
+            .matches()
     }
 
     private fun validatePassword(password: String): Boolean {
