@@ -5,9 +5,12 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.sonara.core.animation.NavigationAnimations
-import com.example.sonara.features.inicial.ui.StartBemVindoScreen
+import com.example.sonara.features.inicial.ui.StartWelcomeScreen
 import com.example.sonara.features.login.ui.LoginScreen
-import com.example.sonara.features.recuperarsenha.ui.RecuperarSenhaScreen
+import com.example.sonara.features.recuperarsenha.ui.RecoverPasswordScreen
+import com.example.sonara.features.trocarrsenha.components.RedefinedPasswordCard
+import com.example.sonara.features.trocarrsenha.ui.RedefinedPasswordScreen
+
 
 @Composable
 fun AppNavigation() {
@@ -19,7 +22,7 @@ fun AppNavigation() {
     ) {
 
         composable(Routes.START) {
-            StartBemVindoScreen(
+            StartWelcomeScreen(
                 onNavigateToLogin = {
                     navController.navigate(Routes.LOGIN)
                 }
@@ -47,7 +50,24 @@ fun AppNavigation() {
             popEnterTransition = { NavigationAnimations.popEnter() },
             popExitTransition = { NavigationAnimations.popExit() }
         ) {
-            RecuperarSenhaScreen()
+            RecoverPasswordScreen(
+                onNavigateToRedefinedPassword = {
+                    navController.navigate(Routes.REDEFINED_PASSWORD)
+                }
+            )
+        }
+        composable(
+            route = Routes.REDEFINED_PASSWORD,
+            enterTransition = { NavigationAnimations.enter() },
+            exitTransition = { NavigationAnimations.exit() },
+            popEnterTransition = { NavigationAnimations.popEnter() },
+            popExitTransition = { NavigationAnimations.popExit() }
+        ) {
+            RedefinedPasswordScreen(
+                onNavigateToLogin = {
+                    navController.navigate(Routes.LOGIN)
+                }
+            )
         }
     }
 }

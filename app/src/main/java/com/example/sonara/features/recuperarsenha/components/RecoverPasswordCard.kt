@@ -1,14 +1,15 @@
 package com.example.sonara.features.recuperarsenha.components
 
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import com.example.sonara.core.ui.components.AppButton
 import com.example.sonara.core.ui.components.AppCard
 import com.example.sonara.core.ui.components.AppCardHeader
 import com.example.sonara.core.ui.components.AppTextField
-import androidx.compose.material3.Text
-import androidx.compose.material3.MaterialTheme
+
 @Composable
 fun RecoverPasswordCard(
     email: String,

@@ -4,29 +4,33 @@ import android.util.Patterns
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.example.sonara.features.recuperarsenha.event.RecoverPasswordEvent
 import com.example.sonara.features.recuperarsenha.model.RecoverPasswordUiState
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.launch
 
 class RecoverPasswordViewModel : ViewModel() {
 
     private val _uiState = mutableStateOf(RecoverPasswordUiState())
     val uiState: State<RecoverPasswordUiState> get() = _uiState
+    private val _event = MutableSharedFlow<RecoverPasswordEvent>()
+    val event = _event.asSharedFlow()
 
     fun onEmailChange(newEmail: String) {
         if (newEmail.length <= 50) {
             _uiState.value = _uiState.value.copy(
                 email = newEmail,
                 isEmailValid = validateEmail(newEmail),
-                errorMessage = null // limpa erro ao digitar
             )
         }
     }
-
     fun onEmailAgainChange(newEmailAgain: String) {
         if (newEmailAgain.length <= 50) {
             _uiState.value = _uiState.value.copy(
                 emailAgain = newEmailAgain,
                 isEmailAgainValid = validateEmail(newEmailAgain),
-                errorMessage = null // limpa erro ao digitar
             )
         }
     }
@@ -34,33 +38,30 @@ class RecoverPasswordViewModel : ViewModel() {
     fun onRecoverPasswordClick() {
         val state = _uiState.value
 
-        if (!state.isEmailValid) {
-            _uiState.value = state.copy(
-                errorMessage = "Email inválido"
-            )
+        if (!validateEmail(state.email)) {
+            emitError("Email inválido")
             return
         }
 
-        if (!state.isEmailAgainValid) {
-            _uiState.value = state.copy(
-                errorMessage = "Confirmação de email inválida"
-            )
+        if (!validateEmail(state.emailAgain)) {
+            emitError("Confirmação inválida")
             return
         }
 
         if (state.email != state.emailAgain) {
-            _uiState.value = state.copy(
-                errorMessage = "Os emails não coincidem"
-            )
+            emitError("Emails não coincidem")
             return
         }
 
-        _uiState.value = state.copy(
-            isLoading = true,
-            errorMessage = null
-        )
+        viewModelScope.launch {
+            _event.emit(RecoverPasswordEvent.NavigateToRedefinedPassword)
+        }
+    }
 
-        // API / Firebase / backend
+    private fun emitError(message: String) {
+        viewModelScope.launch {
+            _event.emit(RecoverPasswordEvent.ShowError(message))
+        }
     }
 
     private fun validateEmail(email: String): Boolean {

@@ -1,18 +1,35 @@
 package com.example.sonara.features.recuperarsenha.ui
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.sonara.core.layout.ScreenContainer
 import com.example.sonara.core.ui.components.SonaraLogo
 import com.example.sonara.features.recuperarsenha.components.RecoverPasswordCard
+import com.example.sonara.features.recuperarsenha.event.RecoverPasswordEvent
 import com.example.sonara.features.recuperarsenha.viewmodel.RecoverPasswordViewModel
 
 @Composable
-fun RecuperarSenhaScreen(
-    viewModel: RecoverPasswordViewModel = viewModel()
+fun RecoverPasswordScreen(
+    viewModel: RecoverPasswordViewModel = viewModel(),
+    onNavigateToRedefinedPassword: () -> Unit
 ) {
     val uiState by viewModel.uiState
+    LaunchedEffect(Unit) {
+        viewModel.event.collect { event ->
+            when (event) {
+
+                is RecoverPasswordEvent.NavigateToRedefinedPassword -> {
+                    onNavigateToRedefinedPassword()
+                }
+
+                is RecoverPasswordEvent.ShowError -> {
+                    // snackbar futuramente
+                }
+            }
+        }
+    }
 
     ScreenContainer{
 

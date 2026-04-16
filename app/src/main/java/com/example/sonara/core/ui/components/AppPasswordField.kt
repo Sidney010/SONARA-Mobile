@@ -23,6 +23,7 @@ import com.example.sonara.R
 fun AppPasswordField(
     value: String,
     onValueChange: (String) -> Unit,
+    isError: Boolean = false,
     modifier: Modifier = Modifier
 ) {
     var visible by remember { mutableStateOf(false) }
@@ -44,8 +45,8 @@ fun AppPasswordField(
             focusedTextColor = MaterialTheme.colorScheme.onSurface,
             unfocusedTextColor = MaterialTheme.colorScheme.onSurface,
             cursorColor = MaterialTheme.colorScheme.primary,
-            focusedIndicatorColor = Color.Transparent,
-            unfocusedIndicatorColor = Color.Transparent
+            focusedIndicatorColor = if (isError) MaterialTheme.colorScheme.error else Color.Transparent,
+            unfocusedIndicatorColor = if (isError) MaterialTheme.colorScheme.error else Color.Transparent,
         ),
         visualTransformation = if (visible)
             VisualTransformation.None

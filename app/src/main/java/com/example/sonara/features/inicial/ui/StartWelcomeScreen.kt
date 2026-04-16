@@ -12,7 +12,7 @@ import com.example.sonara.features.inicial.components.EnterButton
 import com.example.sonara.features.inicial.components.WelcomeHeader
 
 @Composable
-fun StartBemVindoScreen(
+fun StartWelcomeScreen(
     onNavigateToLogin: () -> Unit
 ) {
     ScreenContainer() {

@@ -1,10 +1,9 @@
 package com.example.sonara.features.login.viewmodel
 
+import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import com.example.sonara.features.login.model.LoginUiState
-import androidx.compose.runtime.State
-import androidx.compose.runtime.mutableStateOf
 
 class LoginViewModel : ViewModel() {
 
@@ -50,6 +49,6 @@ class LoginViewModel : ViewModel() {
     }
 
     private fun validatePassword(password: String): Boolean {
-        return password.length >= 6
+        return password.length >= 8
     }
 }
