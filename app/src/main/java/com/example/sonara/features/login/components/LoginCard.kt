@@ -16,7 +16,7 @@ fun LoginCard(
     email: String,
     password: String,
     onEmailChange: (String) -> Unit,
-    isEmailValid: Boolean,
+    emailError: String?,
     onPasswordChange: (String) -> Unit,
     onLoginClick: () -> Unit,
     onSignUpClick: () -> Unit,
@@ -34,7 +34,8 @@ fun LoginCard(
             value = email,
             onValueChange = onEmailChange,
             placeholder = "Email",
-            isError = !isEmailValid
+            isError = emailError != null,
+            errorMessage = emailError
         )
         AppPasswordField(
             value = password,

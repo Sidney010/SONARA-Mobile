@@ -1,10 +1,9 @@
 package com.example.sonara.features.login.model
 
+import com.example.sonara.core.ui.state.FieldState
+
 data class LoginUiState(
-    val email: String = "",
-    val password: String = "",
-    val isEmailValid: Boolean = true,
-    val isPasswordValid: Boolean = true,
+    val email: FieldState = FieldState(),
+    val password: FieldState = FieldState(),
     val isLoading: Boolean = false,
-    val errorMessage: String? = null
 )
