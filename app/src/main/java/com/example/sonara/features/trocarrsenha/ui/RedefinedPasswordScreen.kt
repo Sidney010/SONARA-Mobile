@@ -42,11 +42,11 @@ fun RedefinedPasswordScreen(
         SonaraLogo()
 
         RedefinedPasswordCard(
-            password = uiState.password,
-            passwordAgain = uiState.passwordAgain,
+            password = uiState.password.value,
+            passwordAgain = uiState.passwordAgain.value,
 
-            passwordError = uiState.passwordError,
-            passwordAgainError = uiState.passwordAgainError,
+            passwordError = uiState.password.error,
+            passwordAgainError = uiState.passwordAgain.error,
 
             onPasswordChange = viewModel::onPasswordChange,
             onPasswordAgainChange = viewModel::onPasswordAgainChange,

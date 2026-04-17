@@ -6,12 +6,12 @@ plugins {
 android {
     namespace = "com.example.sonara"
 
-    compileSdk = 36
+    compileSdk = 35   // API 35 era o stable em Set/2024
 
     defaultConfig {
         applicationId = "com.example.sonara"
         minSdk = 27
-        targetSdk = 36
+        targetSdk = 35  // Alinhado com compileSdk
 
         versionCode = 1
         versionName = "1.0"
@@ -22,14 +22,21 @@ android {
     }
 
     composeOptions {
+        // Kotlin 1.9.24 → Compose Compiler 1.5.14 ✓ (compatível)
         kotlinCompilerExtensionVersion = "1.5.14"
     }
 
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
+        // AGP 8.x exige Java 17 mínimo
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
 }
+
+kotlin {
+    jvmToolchain(17)  // Alinhado com compileOptions acima
+}
+
 dependencies {
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
@@ -51,6 +58,5 @@ dependencies {
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)
     debugImplementation(libs.androidx.compose.ui.tooling)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
-
-
 }
+
