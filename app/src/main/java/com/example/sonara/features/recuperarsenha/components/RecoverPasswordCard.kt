@@ -14,9 +14,8 @@ import com.example.sonara.core.ui.components.AppTextField
 fun RecoverPasswordCard(
     email: String,
     emailAgain: String,
-    isEmailValid: Boolean,
-    isEmailAgainValid: Boolean,
-    errorMessage: String?,
+    emailError: String?,
+    emailAgainError: String?,
     onEmailChange: (String) -> Unit,
     onEmailAgainChange: (String) -> Unit,
     onRecoverPasswordClick: () -> Unit,
@@ -30,22 +29,16 @@ fun RecoverPasswordCard(
             value = email,
             onValueChange = onEmailChange,
             placeholder = "Email",
-            isError = !isEmailValid
+            isError = emailError != null,
+            errorMessage = emailError
         )
-
         AppTextField(
             value = emailAgain,
             onValueChange = onEmailAgainChange,
             placeholder = "Confirmar email",
-            isError = !isEmailAgainValid
+            isError = emailAgainError != null,
+            errorMessage = emailAgainError
         )
-        errorMessage?.let {
-            Text(
-                text = it,
-                color = MaterialTheme.colorScheme.error,
-                style = MaterialTheme.typography.bodySmall
-            )
-        }
         AppButton(
             modifier = Modifier.fillMaxWidth(0.7f),
             text = "Recuperar Senha",

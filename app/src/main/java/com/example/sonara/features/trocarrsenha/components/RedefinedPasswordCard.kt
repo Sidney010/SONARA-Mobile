@@ -14,41 +14,36 @@ import com.example.sonara.core.ui.components.AppPasswordField
 fun RedefinedPasswordCard(
     password: String,
     passwordAgain: String,
-    isPasswordValid: Boolean,
-    isPasswordAgainValid: Boolean,
-    errorMessage: String?,
+    passwordError: String?,
+    passwordAgainError: String?,
     onPasswordChange: (String) -> Unit,
     onPasswordAgainChange: (String) -> Unit,
     onRedefinedPasswordClick: () -> Unit,
-){
-    AppCard (
-        modifier = Modifier
-            .fillMaxWidth()
+) {
+    AppCard(
+        modifier = Modifier.fillMaxWidth()
     ) {
+
         AppCardHeader("Alterar sua Senha")
+
         AppPasswordField(
             value = password,
             onValueChange = onPasswordChange,
-            isError = !isPasswordValid,
+            isError = passwordError != null,
+            errorMessage = passwordError
         )
+
         AppPasswordField(
             value = passwordAgain,
             onValueChange = onPasswordAgainChange,
-            isError = !isPasswordAgainValid
+            isError = passwordAgainError != null,
+            errorMessage = passwordAgainError
         )
-        errorMessage?.let {
-            Text(
-                text = it,
-                color = MaterialTheme.colorScheme.error,
-                style = MaterialTheme.typography.bodySmall
-            )
-        }
+
         AppButton(
             modifier = Modifier.fillMaxWidth(0.7f),
             text = "Redefinir Senha",
             onClick = onRedefinedPasswordClick
         )
-
     }
-
 }

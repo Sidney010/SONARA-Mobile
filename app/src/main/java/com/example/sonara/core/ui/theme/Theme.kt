@@ -1,10 +1,9 @@
-package com.example.sonara.core.theme
+package com.example.sonara.core.ui.theme
 
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.ui.Modifier
 import androidx.compose.runtime.staticCompositionLocalOf
 
 val LocalGradients = staticCompositionLocalOf {

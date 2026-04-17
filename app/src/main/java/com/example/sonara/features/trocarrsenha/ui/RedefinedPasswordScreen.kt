@@ -45,9 +45,8 @@ fun RedefinedPasswordScreen(
             password = uiState.password,
             passwordAgain = uiState.passwordAgain,
 
-            isPasswordValid = uiState.isPasswordValid,
-            isPasswordAgainValid = uiState.isPasswordAgainValid,
-            errorMessage = uiState.errorMessage,
+            passwordError = uiState.passwordError,
+            passwordAgainError = uiState.passwordAgainError,
 
             onPasswordChange = viewModel::onPasswordChange,
             onPasswordAgainChange = viewModel::onPasswordAgainChange,

@@ -1,4 +1,4 @@
-package com.example.sonara.core.theme
+package com.example.sonara.core.ui.theme
 
 import androidx.compose.material3.Typography
 import androidx.compose.ui.text.TextStyle

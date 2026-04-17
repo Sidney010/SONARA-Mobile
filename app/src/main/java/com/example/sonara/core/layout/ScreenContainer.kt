@@ -13,7 +13,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.example.sonara.core.theme.LocalGradients
+import com.example.sonara.core.ui.theme.LocalGradients
 
 @Composable
 fun ScreenContainer(

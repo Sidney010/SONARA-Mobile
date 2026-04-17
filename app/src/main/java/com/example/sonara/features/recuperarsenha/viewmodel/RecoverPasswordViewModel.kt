@@ -1,10 +1,12 @@
 package com.example.sonara.features.recuperarsenha.viewmodel
 
-import android.util.Patterns
+
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.sonara.core.validation.EmailValidator
+import com.example.sonara.core.validation.getErrorOrNull
 import com.example.sonara.features.recuperarsenha.event.RecoverPasswordEvent
 import com.example.sonara.features.recuperarsenha.model.RecoverPasswordUiState
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -15,56 +17,58 @@ class RecoverPasswordViewModel : ViewModel() {
 
     private val _uiState = mutableStateOf(RecoverPasswordUiState())
     val uiState: State<RecoverPasswordUiState> get() = _uiState
+
     private val _event = MutableSharedFlow<RecoverPasswordEvent>()
     val event = _event.asSharedFlow()
 
     fun onEmailChange(newEmail: String) {
-        if (newEmail.length <= 50) {
-            _uiState.value = _uiState.value.copy(
-                email = newEmail,
-                isEmailValid = validateEmail(newEmail),
+        val current = _uiState.value.email
+        val error = EmailValidator.validate(newEmail).getErrorOrNull()
+
+        _uiState.value = _uiState.value.copy(
+            email = current.copy(
+                value = newEmail,
+                error = error
             )
-        }
+        )
     }
+
     fun onEmailAgainChange(newEmailAgain: String) {
-        if (newEmailAgain.length <= 50) {
-            _uiState.value = _uiState.value.copy(
-                emailAgain = newEmailAgain,
-                isEmailAgainValid = validateEmail(newEmailAgain),
+        val current = _uiState.value.emailAgain
+        val error = EmailValidator.validate(newEmailAgain).getErrorOrNull()
+
+        _uiState.value = _uiState.value.copy(
+            emailAgain = current.copy(
+                value = newEmailAgain,
+                error = error
             )
-        }
+        )
     }
 
     fun onRecoverPasswordClick() {
         val state = _uiState.value
 
-        if (!validateEmail(state.email)) {
-            emitError("Email inválido")
-            return
-        }
+        val emailError = EmailValidator.validate(state.email.value).getErrorOrNull()
+        val emailAgainError = EmailValidator.validate(state.emailAgain.value).getErrorOrNull()
 
-        if (!validateEmail(state.emailAgain)) {
-            emitError("Confirmação inválida")
-            return
-        }
+        val updatedState = state.copy(
+            email = state.email.copy(error = emailError),
+            emailAgain = state.emailAgain.copy(error = emailAgainError)
+        )
 
-        if (state.email != state.emailAgain) {
-            emitError("Emails não coincidem")
-            return
-        }
+        _uiState.value = updatedState
+
+        if (!isFormValid(updatedState)) return
 
         viewModelScope.launch {
             _event.emit(RecoverPasswordEvent.NavigateToRedefinedPassword)
         }
     }
 
-    private fun emitError(message: String) {
-        viewModelScope.launch {
-            _event.emit(RecoverPasswordEvent.ShowError(message))
-        }
+    private fun isFormValid(state: RecoverPasswordUiState): Boolean {
+        return state.email.error == null &&
+                state.emailAgain.error == null &&
+                state.email.value == state.emailAgain.value
     }
 
-    private fun validateEmail(email: String): Boolean {
-        return Patterns.EMAIL_ADDRESS.matcher(email).matches()
-    }
 }

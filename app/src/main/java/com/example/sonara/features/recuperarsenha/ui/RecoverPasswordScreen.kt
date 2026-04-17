@@ -36,17 +36,16 @@ fun RecoverPasswordScreen(
         SonaraLogo()
 
         RecoverPasswordCard(
-            email = uiState.email,
-            emailAgain = uiState.emailAgain,
-
-            isEmailValid = uiState.isEmailValid,
-            isEmailAgainValid = uiState.isEmailAgainValid,
-            errorMessage = uiState.errorMessage,
+            email = uiState.email.value,
+            emailAgain = uiState.emailAgain.value,
 
             onEmailChange = viewModel::onEmailChange,
             onEmailAgainChange = viewModel::onEmailAgainChange,
-            onRecoverPasswordClick = viewModel::onRecoverPasswordClick,
-        )
 
+            onRecoverPasswordClick = viewModel::onRecoverPasswordClick,
+
+            emailError = uiState.email.error,
+            emailAgainError = uiState.emailAgain.error
+        )
     }
 }
