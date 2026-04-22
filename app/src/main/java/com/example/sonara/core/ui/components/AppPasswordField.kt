@@ -27,6 +27,7 @@ fun AppPasswordField(
     value: String,
     onValueChange: (String) -> Unit,
     isError: Boolean = false,
+    placeholder: String = "Senha",
     errorMessage: String? = null,
     modifier: Modifier = Modifier
 ) {
@@ -38,7 +39,7 @@ fun AppPasswordField(
             onValueChange = onValueChange,
             placeholder = {
                 Text(
-                    text ="Senha",
+                    text = placeholder,
                     color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
                 ) },
             singleLine = true,

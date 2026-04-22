@@ -42,10 +42,10 @@ fun RecoverPasswordScreen(
             onEmailChange = viewModel::onEmailChange,
             onEmailAgainChange = viewModel::onEmailAgainChange,
 
-            onRecoverPasswordClick = viewModel::onRecoverPasswordClick,
-
             emailError = uiState.email.error,
-            emailAgainError = uiState.emailAgain.error
+            emailAgainError = uiState.emailAgain.error,
+
+            onRecoverPasswordClick = viewModel::onRecoverPasswordClick
         )
     }
 }

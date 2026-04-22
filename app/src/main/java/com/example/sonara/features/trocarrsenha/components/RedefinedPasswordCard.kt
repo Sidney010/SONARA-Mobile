@@ -34,6 +34,7 @@ fun RedefinedPasswordCard(
         )
 
         AppPasswordField(
+            placeholder = "Confirmar senha",
             value = passwordAgain,
             onValueChange = onPasswordAgainChange,
             isError = passwordAgainError != null,
