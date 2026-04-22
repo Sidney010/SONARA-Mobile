@@ -14,7 +14,8 @@ import com.example.sonara.features.trocarrsenha.event.RedefinedPasswordEvent
 @Composable
 fun LoginScreen(
     viewModel: LoginViewModel = viewModel(),
-    onNavigateToRecoverPassword: () -> Unit
+    onNavigateToRecoverPassword: () -> Unit,
+    onNavigateSignUp: () -> Unit
 ) {
 
     val uiState by viewModel.uiState
@@ -24,6 +25,10 @@ fun LoginScreen(
 
                 is LoginEvent.NavigateToRecoverPassword -> {
                    onNavigateToRecoverPassword()
+                }
+
+                is LoginEvent.NavigateToSignUp -> {
+                    onNavigateSignUp()
                 }
 
                 is LoginEvent.ShowError -> {
@@ -46,7 +51,7 @@ fun LoginScreen(
             onPasswordChange = viewModel::onPasswordChange,
 
             onLoginClick = viewModel::onLoginClick,
-            onSignUpClick = { /* TODO navegar */ },
+            onSignUpClick = viewModel::onSignUpClick,
             onForgotClick = viewModel::onForgotClick
         )
     }

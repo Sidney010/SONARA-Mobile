@@ -5,6 +5,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.sonara.core.animation.NavigationAnimations
+import com.example.sonara.features.cadastrar.ui.SignUpScreen
 import com.example.sonara.features.inicial.ui.StartWelcomeScreen
 import com.example.sonara.features.login.ui.LoginScreen
 import com.example.sonara.features.recuperarsenha.ui.RecoverPasswordScreen
@@ -39,6 +40,9 @@ fun AppNavigation() {
             LoginScreen(
                 onNavigateToRecoverPassword = {
                     navController.navigate(Routes.RECOVER_PASSWORD)
+                },
+                onNavigateSignUp = {
+                    navController.navigate(Routes.SIGN_UP)
                 }
             )
         }
@@ -68,6 +72,15 @@ fun AppNavigation() {
                     navController.navigate(Routes.LOGIN)
                 }
             )
+        }
+        composable(
+            route = Routes.SIGN_UP,
+            enterTransition = { NavigationAnimations.enter() },
+            exitTransition = { NavigationAnimations.exit() },
+            popEnterTransition = { NavigationAnimations.popEnter() },
+            popExitTransition = { NavigationAnimations.popExit() }
+        ){
+            SignUpScreen()
         }
     }
 }

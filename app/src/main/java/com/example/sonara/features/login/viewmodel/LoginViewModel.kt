@@ -68,4 +68,9 @@ class LoginViewModel : ViewModel() {
             _event.emit(LoginEvent.NavigateToRecoverPassword)
         }
     }
+    fun onSignUpClick() {
+        viewModelScope.launch {
+            _event.emit(LoginEvent.NavigateToSignUp)
+        }
+    }
 }
