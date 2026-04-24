@@ -9,10 +9,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -21,8 +17,8 @@ import com.example.sonara.core.ui.components.AppCard
 import com.example.sonara.core.ui.components.AppCardHeader
 import com.example.sonara.core.ui.components.AppPasswordField
 import com.example.sonara.core.ui.components.AppTextField
-import com.example.sonara.features.cadastrar.components.signupcard.UserSelectorRadioButton
 import com.example.sonara.domain.model.UserType
+import com.example.sonara.features.cadastrar.components.signupcard.UserSelectorRadioButton
 
 @Composable
 fun SignUpCard(
