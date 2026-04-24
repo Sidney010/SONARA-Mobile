@@ -1,4 +1,4 @@
-package com.example.sonara.core.ui.state
+package com.example.sonara.core.form
 
 data class FieldState(
     val value: String = "",

@@ -7,7 +7,9 @@ import com.example.sonara.core.validation.EmailValidator
 import com.example.sonara.core.validation.NomeValidator
 import com.example.sonara.core.validation.PasswordValidator
 import com.example.sonara.core.validation.getErrorOrNull
+import com.example.sonara.domain.model.UserType
 import com.example.sonara.features.cadastrar.model.SignUpUIState
+import com.example.sonara.features.cadastrar.validation.UserTypeValidator
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 
@@ -20,11 +22,11 @@ class SignUpViewModel: ViewModel() {
     val event = _event.asSharedFlow()
 
     fun onNomeChange(newNome: String) {
-        val current = _uiState.value.email
+        val current = _uiState.value.nome
         val error = NomeValidator.validate(newNome).getErrorOrNull()
 
         _uiState.value = _uiState.value.copy(
-            email = current.copy(
+            nome = current.copy(
                 value = newNome,
                 error = error
             )
@@ -78,4 +80,51 @@ class SignUpViewModel: ViewModel() {
             )
         )
     }
+    fun onUserTypeChange(type: UserType) {
+        val current = _uiState.value.userType
+
+        _uiState.value = _uiState.value.copy(
+            userType = current.copy(
+                value = type,
+                error = null,
+                isTouched = true
+            )
+        )
+    }
+
+    fun validateAll(): Boolean {
+
+        val nomeError = NomeValidator.validate(_uiState.value.nome.value).getErrorOrNull()
+        val emailError = EmailValidator.validate(_uiState.value.email.value).getErrorOrNull()
+        val passwordError = PasswordValidator.validate(_uiState.value.password.value).getErrorOrNull()
+        val userTypeResult = UserTypeValidator.validate(_uiState.value.userType.value)
+
+        val emailAgainError =
+            if (_uiState.value.emailAgain.value != _uiState.value.email.value)
+                "Emails não conferem"
+            else null
+
+        val passwordAgainError =
+            if (_uiState.value.passwordAgain.value != _uiState.value.password.value)
+                "Senhas não conferem"
+            else null
+
+        _uiState.value = _uiState.value.copy(
+            nome = _uiState.value.nome.copy(error = nomeError),
+            email = _uiState.value.email.copy(error = emailError),
+            password = _uiState.value.password.copy(error = passwordError),
+            userType = _uiState.value.userType.copy(error = userTypeResult.getErrorOrNull())
+        )
+
+        return listOf(
+            nomeError,
+            emailError,
+            passwordError,
+            emailAgainError,
+            passwordAgainError,
+            userTypeResult.getErrorOrNull()
+        ).all { it == null }
+    }
+
+
 }

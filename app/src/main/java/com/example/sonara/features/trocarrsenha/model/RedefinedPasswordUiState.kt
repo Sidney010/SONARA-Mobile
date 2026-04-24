@@ -1,6 +1,6 @@
 package com.example.sonara.features.trocarrsenha.model
 
-import com.example.sonara.core.ui.state.FieldState
+import com.example.sonara.core.form.FieldState
 
 
 data class RedefinedPasswordUiState(

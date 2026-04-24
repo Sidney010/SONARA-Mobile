@@ -1,6 +1,6 @@
 package com.example.sonara.features.login.model
 
-import com.example.sonara.core.ui.state.FieldState
+import com.example.sonara.core.form.FieldState
 
 data class LoginUiState(
     val email: FieldState = FieldState(),

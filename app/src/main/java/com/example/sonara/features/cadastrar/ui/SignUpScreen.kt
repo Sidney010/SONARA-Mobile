@@ -42,6 +42,8 @@ fun SignUpScreen(
             onEmailAgainChange = viewModel::onEmailAgainChange,
 
             onNomeChange = viewModel::onNomeChange,
+            userType = uiState.userType.value,
+            onUserTypeChange = viewModel::onUserTypeChange
         )
 
     }
