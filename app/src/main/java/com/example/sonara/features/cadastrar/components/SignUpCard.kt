@@ -7,16 +7,19 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.example.sonara.core.ui.components.AppButton
 import com.example.sonara.core.ui.components.AppCard
 import com.example.sonara.core.ui.components.AppCardHeader
 import com.example.sonara.core.ui.components.AppPasswordField
 import com.example.sonara.core.ui.components.AppTextField
+import com.example.sonara.core.ui.mask.CpfVisualTransformation
 import com.example.sonara.domain.model.UserType
 import com.example.sonara.features.cadastrar.components.signupcard.UserSelectorRadioButton
 
@@ -26,6 +29,10 @@ fun SignUpCard(
     nome: String,
     nomeError: String?,
     onNomeChange: (String) -> Unit,
+
+    cpf: String,
+    cpfError: String?,
+    onCpfChange: (String) -> Unit,
 
     email: String,
     emailAgain: String,
@@ -69,10 +76,31 @@ fun SignUpCard(
             )
 
             AppTextField(
+                value = cpf,
+                onValueChange = { input ->
+                    val filtered = input.filter { it.isDigit() }
+
+                    if (filtered.length <= 11) {
+                        onCpfChange(filtered)
+                    }
+                },
+                placeholder = "CPF",
+                visualTransformation = CpfVisualTransformation(),
+                keyboardOptions = KeyboardOptions(
+                    keyboardType = KeyboardType.Number
+                ),
+                isError = cpfError != null,
+                errorMessage = cpfError
+            )
+
+            AppTextField(
                 value = email,
                 onValueChange = onEmailChange,
                 placeholder = "Email",
                 isError = emailError != null,
+                keyboardOptions = KeyboardOptions(
+                    keyboardType = KeyboardType.Email
+                ),
                 errorMessage = emailError
             )
 
@@ -81,6 +109,9 @@ fun SignUpCard(
                 onValueChange = onEmailAgainChange,
                 placeholder = "Confirmar email",
                 isError = emailAgainError != null,
+                keyboardOptions = KeyboardOptions(
+                    keyboardType = KeyboardType.Email
+                ),
                 errorMessage = emailAgainError
             )
 

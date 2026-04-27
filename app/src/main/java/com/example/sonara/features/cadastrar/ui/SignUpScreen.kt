@@ -1,5 +1,6 @@
 package com.example.sonara.features.cadastrar.ui
 
+import android.R.attr.password
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
@@ -23,6 +24,9 @@ fun SignUpScreen(
             nome = uiState.nome.value,
             nomeError = uiState.nome.error,
 
+            cpf = uiState.cpf.value,
+            cpfError = uiState.cpf.error,
+
             email = uiState.email.value,
             emailAgain = uiState.emailAgain.value,
 
@@ -42,6 +46,7 @@ fun SignUpScreen(
             onEmailAgainChange = viewModel::onEmailAgainChange,
 
             onNomeChange = viewModel::onNomeChange,
+            onCpfChange = viewModel::onCpfChange,
             userType = uiState.userType.value,
             onUserTypeChange = viewModel::onUserTypeChange
         )

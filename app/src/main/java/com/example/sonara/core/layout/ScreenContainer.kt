@@ -23,7 +23,6 @@ fun ScreenContainer(
     content: @Composable ColumnScope.() -> Unit
 ) {
     val gradients = LocalGradients.current
-
     Box(
         modifier = modifier
             .fillMaxSize()

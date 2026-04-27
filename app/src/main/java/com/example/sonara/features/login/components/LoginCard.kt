@@ -1,8 +1,10 @@
 package com.example.sonara.features.login.components
 
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.input.KeyboardType
 import com.example.sonara.core.ui.components.AppButton
 import com.example.sonara.core.ui.components.AppCard
 import com.example.sonara.core.ui.components.AppCardHeader
@@ -35,6 +37,9 @@ fun LoginCard(
             onValueChange = onEmailChange,
             placeholder = "Email",
             isError = emailError != null,
+            keyboardOptions = KeyboardOptions(
+                keyboardType = KeyboardType.Email
+            ),
             errorMessage = emailError
         )
         AppPasswordField(
