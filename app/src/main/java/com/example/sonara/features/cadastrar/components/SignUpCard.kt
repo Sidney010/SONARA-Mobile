@@ -1,6 +1,7 @@
 package com.example.sonara.features.cadastrar.components
 
 
+import android.net.Uri
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -21,6 +22,7 @@ import com.example.sonara.core.ui.components.AppPasswordField
 import com.example.sonara.core.ui.components.AppTextField
 import com.example.sonara.core.ui.mask.CpfVisualTransformation
 import com.example.sonara.domain.model.UserType
+import com.example.sonara.features.cadastrar.components.signupcard.UserProfileImagePicker
 import com.example.sonara.features.cadastrar.components.signupcard.UserSelectorRadioButton
 
 @Composable
@@ -51,6 +53,11 @@ fun SignUpCard(
     userType: UserType?,
     onUserTypeChange: (UserType) -> Unit,
 
+    profileImageUri: Uri?,
+    profileImageError: String?,
+    onImageClick: () -> Unit,
+    onRegisterClick: () -> Unit
+
     ) {
 
     AppCard(
@@ -67,6 +74,12 @@ fun SignUpCard(
             verticalArrangement = Arrangement.spacedBy(24.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
         ){
+            UserProfileImagePicker(
+                imageUri = profileImageUri,
+                error = profileImageError,
+                onClick = onImageClick
+            )
+
             AppTextField(
                 value = nome,
                 onValueChange = onNomeChange,
@@ -137,7 +150,7 @@ fun SignUpCard(
             AppButton(
                 modifier = Modifier.fillMaxWidth(0.7f),
                 text = "Cadastrar-se",
-                onClick = {/*TODO*/}
+                onClick = onRegisterClick
             )
         }
     }

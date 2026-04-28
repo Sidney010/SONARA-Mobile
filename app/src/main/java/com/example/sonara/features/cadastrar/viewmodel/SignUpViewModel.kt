@@ -1,10 +1,12 @@
 package com.example.sonara.features.cadastrar.viewmodel
 
+import android.net.Uri
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import com.example.sonara.core.validation.CpfValidator
 import com.example.sonara.core.validation.EmailValidator
+import com.example.sonara.core.validation.ImageValidator
 import com.example.sonara.core.validation.NomeValidator
 import com.example.sonara.core.validation.PasswordValidator
 import com.example.sonara.core.validation.getErrorOrNull
@@ -60,6 +62,14 @@ class SignUpViewModel: ViewModel() {
         )
     }
 
+    fun onProfileImageSelected(uri: Uri?) {
+        val error = ImageValidator.validate(uri).getErrorOrNull()
+        _uiState.value = _uiState.value.copy(
+            profileImageUri = uri,
+            profileImageError = error
+        )
+    }
+
     fun onPasswordChange(newPassword: String) {
         val error = PasswordValidator.validate(newPassword).getErrorOrNull()
 
@@ -108,29 +118,32 @@ class SignUpViewModel: ViewModel() {
     }
 
     fun validateAll(): Boolean {
+        val current = _uiState.value
 
-        val nomeError = NomeValidator.validate(_uiState.value.nome.value).getErrorOrNull()
-        val emailError = EmailValidator.validate(_uiState.value.email.value).getErrorOrNull()
-        val cpfError = CpfValidator.validate(uiState.value.cpf.value).getErrorOrNull()
-        val passwordError = PasswordValidator.validate(_uiState.value.password.value).getErrorOrNull()
-        val userTypeResult = UserTypeValidator.validate(_uiState.value.userType.value)
+        val nomeError = NomeValidator.validate(current.nome.value).getErrorOrNull()
+        val emailError = EmailValidator.validate(current.email.value).getErrorOrNull()
+        val cpfError = CpfValidator.validate(current.cpf.value).getErrorOrNull()
+        val passwordError = PasswordValidator.validate(current.password.value).getErrorOrNull()
+        val imageError = ImageValidator.validate(current.profileImageUri).getErrorOrNull()
 
         val emailAgainError =
-            if (_uiState.value.emailAgain.value != _uiState.value.email.value)
-                "Emails não conferem"
-            else null
+            if (current.emailAgain.value != current.email.value)
+                "Emails não conferem" else null
 
         val passwordAgainError =
-            if (_uiState.value.passwordAgain.value != _uiState.value.password.value)
-                "Senhas não conferem"
-            else null
+            if (current.passwordAgain.value != current.password.value)
+                "Senhas não conferem" else null
 
-        _uiState.value = _uiState.value.copy(
-            nome = _uiState.value.nome.copy(error = nomeError),
-            email = _uiState.value.email.copy(error = emailError),
-            cpf = _uiState.value.cpf.copy(error = cpfError),
-            password = _uiState.value.password.copy(error = passwordError),
-            userType = _uiState.value.userType.copy(error = userTypeResult.getErrorOrNull())
+        val userTypeError =
+            UserTypeValidator.validate(current.userType.value).getErrorOrNull()
+
+        _uiState.value = current.copy(
+            nome = current.nome.copy(error = nomeError),
+            email = current.email.copy(error = emailError),
+            cpf = current.cpf.copy(error = cpfError),
+            password = current.password.copy(error = passwordError),
+            profileImageError = imageError,
+            userType = current.userType.copy(error = userTypeError)
         )
 
         return listOf(
@@ -140,8 +153,19 @@ class SignUpViewModel: ViewModel() {
             passwordError,
             emailAgainError,
             passwordAgainError,
-            userTypeResult.getErrorOrNull()
+            userTypeError,
+            imageError
         ).all { it == null }
+    }
+    fun onRegisterClick() {
+        if (!validateAll()) return
+
+        // Aqui vai:
+        // - chamada de UseCase (futuro)
+        // - ou emitir evento
+
+        // Exemplo simples:
+        // _event.emit(NavigateNext)
     }
 
 
