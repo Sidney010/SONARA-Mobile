@@ -3,6 +3,8 @@ package com.example.sonara.features.cadastrar.ui
 import android.Manifest
 import android.content.Context
 import android.net.Uri
+import android.os.Handler
+import android.os.Looper
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.clickable
@@ -12,6 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.core.content.FileProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.sonara.core.image.ImageUtils
 import com.example.sonara.core.layout.ScreenContainer
 import com.example.sonara.core.ui.components.SonaraLogo
 import com.example.sonara.features.cadastrar.components.SignUpCard
@@ -27,16 +30,18 @@ fun SignUpScreen(
     val context = LocalContext.current
 
     var showImageOptions by remember { mutableStateOf(false) }
-
-    // URI dinâmico (correção real do bug)
     var cameraUri by remember { mutableStateOf<Uri?>(null) }
 
     // CAMERA
     val cameraLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.TakePicture()
     ) { success ->
-        if (success) {
-            cameraUri?.let { viewModel.onProfileImageSelected(it) }
+        if (success && cameraUri != null) {
+
+            // Solução profissional
+            val fixedUri = ImageUtils.copyToCache(context, cameraUri!!)
+
+            viewModel.onProfileImageSelected(fixedUri)
         }
     }
 
@@ -44,7 +49,10 @@ fun SignUpScreen(
     val galleryLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.GetContent()
     ) { uri ->
-        viewModel.onProfileImageSelected(uri)
+        uri?.let {
+            val fixedUri = ImageUtils.copyToCache(context, it)
+            viewModel.onProfileImageSelected(fixedUri)
+        }
     }
 
     // PERMISSÃO
@@ -99,18 +107,20 @@ fun SignUpScreen(
             onDismissRequest = { showImageOptions = false }
         ) {
 
+            // Tirar foto
             ListItem(
                 headlineContent = { Text("Tirar foto") },
                 modifier = Modifier.clickable {
                     showImageOptions = false
 
-                    val newUri = createTempImageUri(context)
-                    cameraUri = newUri
+                    val uri = ImageUtils.createTempImageUri(context)
+                    cameraUri = uri
 
                     permissionLauncher.launch(Manifest.permission.CAMERA)
                 }
             )
 
+            // Galeria
             ListItem(
                 headlineContent = { Text("Escolher da galeria") },
                 modifier = Modifier.clickable {
@@ -120,13 +130,4 @@ fun SignUpScreen(
             )
         }
     }
-}
-
-fun createTempImageUri(context: Context): Uri {
-    val file = File.createTempFile("profile_", ".jpg", context.cacheDir)
-    return FileProvider.getUriForFile(
-        context,
-        "${context.packageName}.provider",
-        file
-    )
 }
