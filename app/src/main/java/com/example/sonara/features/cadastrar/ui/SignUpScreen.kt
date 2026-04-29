@@ -9,17 +9,26 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.sonara.core.image.ImageUtils
 import com.example.sonara.core.layout.ScreenContainer
 import com.example.sonara.core.ui.components.SonaraLogo
+import com.example.sonara.domain.usecase.ClearFormUseCase
+import com.example.sonara.domain.usecase.GetFormUseCase
+import com.example.sonara.domain.usecase.ProcessImageUseCase
+import com.example.sonara.domain.usecase.SaveFormUseCase
 import com.example.sonara.features.cadastrar.components.SignUpCard
 import com.example.sonara.features.cadastrar.viewmodel.SignUpViewModel
+import androidx.hilt.navigation.compose.hiltViewModel
+
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SignUpScreen(
-    viewModel: SignUpViewModel = viewModel()
+    viewModel: SignUpViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState
     val context = LocalContext.current

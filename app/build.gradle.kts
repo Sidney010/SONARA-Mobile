@@ -1,20 +1,44 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
+    alias(libs.plugins.hilt.android)
+    alias(libs.plugins.kotlin.kapt)
 }
 
 android {
     namespace = "com.example.sonara"
-
-    compileSdk = 35   // API 35 era o stable em Set/2024
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "com.example.sonara"
         minSdk = 27
-        targetSdk = 35  // Alinhado com compileSdk
-
+        targetSdk = 35
         versionCode = 1
         versionName = "1.0"
+
+        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        vectorDrawables {
+            useSupportLibrary = true
+        }
+    }
+
+    buildTypes {
+        release {
+            isMinifyEnabled = false
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
+            )
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
+    }
+
+    kotlin {
+        jvmToolchain(17)
     }
 
     buildFeatures {
@@ -22,22 +46,23 @@ android {
     }
 
     composeOptions {
-        // Kotlin 1.9.24 → Compose Compiler 1.5.14 ✓ (compatível)
         kotlinCompilerExtensionVersion = "1.5.14"
     }
 
-    compileOptions {
-        // AGP 8.x exige Java 17 mínimo
-        sourceCompatibility = JavaVersion.VERSION_17
-        targetCompatibility = JavaVersion.VERSION_17
+    packaging {
+        resources {
+            excludes += "/META-INF/{AL2.0,LGPL2.1}"
+        }
     }
 }
 
-kotlin {
-    jvmToolchain(17)  // Alinhado com compileOptions acima
-}
-
 dependencies {
+    // Hilt
+    implementation(libs.hilt.android)
+    kapt(libs.hilt.compiler)
+    implementation(libs.androidx.hilt.navigation.compose)
+
+    // AndroidX & Compose
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
@@ -51,9 +76,14 @@ dependencies {
     implementation(libs.androidx.navigation.compose)
     implementation(libs.androidx.compose.animation)
     implementation(libs.androidx.room.ktx)
+
+    // External Libs
     implementation("io.coil-kt:coil-compose:2.6.0")
     implementation("io.coil-kt:coil:2.6.0")
+    implementation("androidx.datastore:datastore-preferences:1.0.0")
     implementation(libs.androidx.exifinterface)
+
+    // Testing
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -62,4 +92,3 @@ dependencies {
     debugImplementation(libs.androidx.compose.ui.tooling)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
 }
-

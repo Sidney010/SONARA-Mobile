@@ -7,20 +7,78 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import coil.util.CoilUtils.result
 import com.example.sonara.core.common.AppResult
+import com.example.sonara.core.storage.FormData
 import com.example.sonara.core.validation.*
 import com.example.sonara.domain.model.UserType
+import com.example.sonara.domain.usecase.ClearFormUseCase
+import com.example.sonara.domain.usecase.GetFormUseCase
 import com.example.sonara.domain.usecase.ProcessImageUseCase
+import com.example.sonara.domain.usecase.SaveFormUseCase
 import com.example.sonara.features.cadastrar.model.SignUpUIState
 import com.example.sonara.features.cadastrar.validation.UserTypeValidator
+import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class SignUpViewModel(
-    private val processImageUseCase: ProcessImageUseCase = ProcessImageUseCase()
+@HiltViewModel
+class SignUpViewModel @Inject constructor(
+    private val processImageUseCase: ProcessImageUseCase,
+    private val saveFormUseCase: SaveFormUseCase,
+    private val getFormUseCase: GetFormUseCase,
+    private val clearFormUseCase: ClearFormUseCase
 ) : ViewModel() {
-
     private val _uiState = mutableStateOf(SignUpUIState())
     val uiState: State<SignUpUIState> = _uiState
+
+    private var saveJob: Job? = null
+
+    init {
+        restoreForm()
+    }
+
+    private fun restoreForm() {
+        viewModelScope.launch {
+            getFormUseCase().collect { data ->
+
+                _uiState.value = _uiState.value.copy(
+                    nome = _uiState.value.nome.copy(value = data.name),
+                    email = _uiState.value.email.copy(value = data.email),
+                    cpf = _uiState.value.cpf.copy(value = data.cpf),
+                    password = _uiState.value.password.copy(value = data.password),
+                    profileImageUri = data.image?.let { Uri.parse(it) },
+                    userType = _uiState.value.userType.copy(
+                        value = runCatching {
+                            UserType.valueOf(data.userType)
+                        }.getOrNull()
+                    )
+                )
+            }
+        }
+    }
+
+    // debounce profissional
+    private fun saveWithDelay() {
+        saveJob?.cancel()
+
+        saveJob = viewModelScope.launch {
+            kotlinx.coroutines.delay(500)
+
+            val state = _uiState.value
+
+            saveFormUseCase(
+                FormData(
+                    name = state.nome.value,
+                    email = state.email.value,
+                    cpf = state.cpf.value,
+                    password = state.password.value,
+                    image = state.profileImageUri?.toString(),
+                    userType = state.userType.value?.name ?: ""
+                )
+            )
+        }
+    }
 
 
     fun onImagePicked(context: Context, uri: Uri?) {
@@ -45,6 +103,7 @@ class SignUpViewModel(
                 profileImageError = null,
                 isImageLoading = false
             )
+            saveWithDelay()
         }
     }
 
@@ -53,6 +112,7 @@ class SignUpViewModel(
         _uiState.value = _uiState.value.copy(
             nome = _uiState.value.nome.copy(value = newNome, error = error)
         )
+        saveWithDelay()
     }
 
     fun onEmailChange(newEmail: String) {
@@ -60,6 +120,7 @@ class SignUpViewModel(
         _uiState.value = _uiState.value.copy(
             email = _uiState.value.email.copy(value = newEmail, error = error)
         )
+        saveWithDelay()
     }
 
     fun onEmailAgainChange(newEmailAgain: String) {
@@ -74,6 +135,7 @@ class SignUpViewModel(
         _uiState.value = _uiState.value.copy(
             password = _uiState.value.password.copy(value = newPassword, error = error, isTouched = true)
         )
+        saveWithDelay()
     }
 
     fun onPasswordAgainChange(newPasswordAgain: String) {
@@ -89,12 +151,14 @@ class SignUpViewModel(
         _uiState.value = _uiState.value.copy(
             cpf = _uiState.value.cpf.copy(value = newCpf, error = error)
         )
+        saveWithDelay()
     }
 
     fun onUserTypeChange(type: UserType) {
         _uiState.value = _uiState.value.copy(
             userType = _uiState.value.userType.copy(value = type, error = null, isTouched = true)
         )
+        saveWithDelay()
     }
 
     fun validateAll(): Boolean {
@@ -138,6 +202,11 @@ class SignUpViewModel(
 
     fun onRegisterClick() {
         if (!validateAll()) return
+        viewModelScope.launch {
+            runCatching {
+                clearFormUseCase()
+            }
+        }
         // futura integração com backend
     }
 }
