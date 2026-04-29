@@ -16,5 +16,6 @@ data class SignUpUIState (
     val userType: SelectionFieldState<UserType> = SelectionFieldState(),
     val profileImageUri: Uri? = null,
     val profileImageError: String? = null,
+    val isImageLoading: Boolean = false,
     val isLoading: Boolean = false
 )

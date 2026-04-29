@@ -1,10 +1,7 @@
 package com.example.sonara.features.cadastrar.ui
 
 import android.Manifest
-import android.content.Context
 import android.net.Uri
-import android.os.Handler
-import android.os.Looper
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.clickable
@@ -12,14 +9,12 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.core.content.FileProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.sonara.core.image.ImageUtils
 import com.example.sonara.core.layout.ScreenContainer
 import com.example.sonara.core.ui.components.SonaraLogo
 import com.example.sonara.features.cadastrar.components.SignUpCard
 import com.example.sonara.features.cadastrar.viewmodel.SignUpViewModel
-import java.io.File
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -32,30 +27,20 @@ fun SignUpScreen(
     var showImageOptions by remember { mutableStateOf(false) }
     var cameraUri by remember { mutableStateOf<Uri?>(null) }
 
-    // CAMERA
     val cameraLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.TakePicture()
     ) { success ->
-        if (success && cameraUri != null) {
-
-            // Solução profissional
-            val fixedUri = ImageUtils.copyToCache(context, cameraUri!!)
-
-            viewModel.onProfileImageSelected(fixedUri)
+        if (success) {
+            viewModel.onImagePicked(context, cameraUri)
         }
     }
 
-    // GALERIA
     val galleryLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.GetContent()
     ) { uri ->
-        uri?.let {
-            val fixedUri = ImageUtils.copyToCache(context, it)
-            viewModel.onProfileImageSelected(fixedUri)
-        }
+        viewModel.onImagePicked(context, uri)
     }
 
-    // PERMISSÃO
     val permissionLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.RequestPermission()
     ) { granted ->
@@ -101,26 +86,18 @@ fun SignUpScreen(
         )
     }
 
-    // BottomSheet
     if (showImageOptions) {
-        ModalBottomSheet(
-            onDismissRequest = { showImageOptions = false }
-        ) {
+        ModalBottomSheet(onDismissRequest = { showImageOptions = false }) {
 
-            // Tirar foto
             ListItem(
                 headlineContent = { Text("Tirar foto") },
                 modifier = Modifier.clickable {
                     showImageOptions = false
-
-                    val uri = ImageUtils.createTempImageUri(context)
-                    cameraUri = uri
-
+                    cameraUri = ImageUtils.createTempImageUri(context)
                     permissionLauncher.launch(Manifest.permission.CAMERA)
                 }
             )
 
-            // Galeria
             ListItem(
                 headlineContent = { Text("Escolher da galeria") },
                 modifier = Modifier.clickable {

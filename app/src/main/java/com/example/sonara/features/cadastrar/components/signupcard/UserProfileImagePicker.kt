@@ -1,7 +1,6 @@
 package com.example.sonara.features.cadastrar.components.signupcard
 
 import android.net.Uri
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
@@ -11,13 +10,12 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.key
 import androidx.compose.ui.*
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
+import coil.request.CachePolicy
 import coil.request.ImageRequest
 
 @Composable
@@ -39,20 +37,32 @@ fun UserProfileImagePicker(
         ) {
 
             if (imageUri != null) {
+
                 key(imageUri) {
+
+                    val request = ImageRequest.Builder(context)
+                        .data(imageUri)
+                        .crossfade(true)
+                        .memoryCachePolicy(CachePolicy.DISABLED)
+                        .diskCachePolicy(CachePolicy.ENABLED)
+                        .allowHardware(false)
+                        .build()
+
                     AsyncImage(
-                        model = coil.request.ImageRequest.Builder(context)
+                        model = ImageRequest.Builder(context)
                             .data(imageUri)
                             .crossfade(true)
-                            .memoryCachePolicy(coil.request.CachePolicy.DISABLED)
-                            .diskCachePolicy(coil.request.CachePolicy.DISABLED)
+                            .memoryCachePolicy(CachePolicy.DISABLED)
+                            .diskCachePolicy(CachePolicy.ENABLED)
                             .build(),
-                        contentDescription = "Profile Image",
+                        contentDescription = null,
                         modifier = Modifier.fillMaxSize(),
                         contentScale = ContentScale.Crop
                     )
                 }
+
             } else {
+
                 Icon(
                     imageVector = Icons.Default.Person,
                     contentDescription = "Placeholder"
