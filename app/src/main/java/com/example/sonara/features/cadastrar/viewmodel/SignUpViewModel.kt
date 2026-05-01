@@ -5,7 +5,6 @@ import android.net.Uri
 import androidx.compose.runtime.*
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import coil.util.CoilUtils.result
 import com.example.sonara.core.common.AppResult
 import com.example.sonara.core.storage.FormData
 import com.example.sonara.core.validation.*
@@ -63,7 +62,7 @@ class SignUpViewModel @Inject constructor(
         saveJob?.cancel()
 
         saveJob = viewModelScope.launch {
-            kotlinx.coroutines.delay(500)
+            delay(500)
 
             val state = _uiState.value
 

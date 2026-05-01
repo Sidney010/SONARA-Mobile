@@ -5,20 +5,22 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Matrix
 import android.net.Uri
+import android.os.Environment
 import androidx.core.content.FileProvider
 import androidx.core.net.toUri
 import androidx.exifinterface.media.ExifInterface
 import com.example.sonara.core.common.AppResult
 import java.io.File
 import java.io.FileOutputStream
+import java.util.*
 
 object ImageUtils {
 
     fun createTempImageUri(context: Context): Uri {
-        val directory = context.getExternalFilesDir("images")!!
-
+        // Usar o diretório de fotos padrão do App
+        val directory = context.getExternalFilesDir(Environment.DIRECTORY_PICTURES)
         val file = File.createTempFile(
-            "camera_",
+            "IMG_${System.currentTimeMillis()}_",
             ".jpg",
             directory
         )
@@ -30,66 +32,47 @@ object ImageUtils {
         )
     }
 
-    fun processImage(context: Context, uri: Uri): AppResult<Uri> {
+    suspend fun processImage(context: Context, uri: Uri): AppResult<Uri> {
         return try {
-
-            // 1. Copiar para cache
             val inputStream = context.contentResolver.openInputStream(uri)
-                ?: return AppResult.Error(Exception("InputStream null"))
+                ?: return AppResult.Error(Exception("Não foi possível abrir a imagem"))
 
-            val tempFile = File.createTempFile("raw_", ".jpg", context.cacheDir)
+            // Criar arquivo final no cache para o preview
+            val outputFile = File(context.cacheDir, "profile_preview_${UUID.randomUUID()}.jpg")
 
-            inputStream.use { input ->
-                tempFile.outputStream().use { output ->
-                    input.copyTo(output)
-                }
-            }
+            val bitmap = inputStream.use { input ->
+                BitmapFactory.decodeStream(input)
+            } ?: return AppResult.Error(Exception("Falha ao decodificar imagem"))
 
-            // 2. Decode bitmap
-            val bitmap = BitmapFactory.decodeFile(tempFile.absolutePath)
-                ?: return AppResult.Error(Exception("Bitmap null"))
+            // Corrigir rotação baseada nos metadados (importante para câmeras Samsung/Motorola)
+            val rotatedBitmap = fixRotation(context, uri, bitmap)
 
-            // 3. Corrigir rotação
-            val rotatedBitmap = fixRotation(tempFile, bitmap)
-
-            // 4. Compressão
-            val finalFile = File.createTempFile("final_", ".jpg", context.cacheDir)
-
-            FileOutputStream(finalFile).use { out ->
+            FileOutputStream(outputFile).use { out ->
                 rotatedBitmap.compress(Bitmap.CompressFormat.JPEG, 80, out)
             }
 
-            AppResult.Success(finalFile.toUri())
-
+            AppResult.Success(outputFile.toUri())
         } catch (e: Exception) {
             AppResult.Error(e)
         }
     }
 
-    private fun fixRotation(file: File, bitmap: Bitmap): Bitmap {
-        val exif = ExifInterface(file.absolutePath)
-
+    private fun fixRotation(context: Context, uri: Uri, bitmap: Bitmap): Bitmap {
+        val inputStream = context.contentResolver.openInputStream(uri) ?: return bitmap
+        val exif = ExifInterface(inputStream)
         val orientation = exif.getAttributeInt(
             ExifInterface.TAG_ORIENTATION,
             ExifInterface.ORIENTATION_NORMAL
         )
 
         val matrix = Matrix()
-
         when (orientation) {
             ExifInterface.ORIENTATION_ROTATE_90 -> matrix.postRotate(90f)
             ExifInterface.ORIENTATION_ROTATE_180 -> matrix.postRotate(180f)
             ExifInterface.ORIENTATION_ROTATE_270 -> matrix.postRotate(270f)
+            else -> return bitmap
         }
 
-        return Bitmap.createBitmap(
-            bitmap,
-            0,
-            0,
-            bitmap.width,
-            bitmap.height,
-            matrix,
-            true
-        )
+        return Bitmap.createBitmap(bitmap, 0, 0, bitmap.width, bitmap.height, matrix, true)
     }
 }

@@ -34,27 +34,31 @@ fun SignUpScreen(
     val context = LocalContext.current
 
     var showImageOptions by remember { mutableStateOf(false) }
-    var cameraUri by remember { mutableStateOf<Uri?>(null) }
+
+    // Guardar a URI da foto que está sendo tirada no momento
+    var currentPhotoUri by remember { mutableStateOf<Uri?>(null) }
 
     val cameraLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.TakePicture()
     ) { success ->
         if (success) {
-            viewModel.onImagePicked(context, cameraUri)
+            currentPhotoUri?.let { viewModel.onImagePicked(context, it) }
         }
     }
 
     val galleryLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.GetContent()
     ) { uri ->
-        viewModel.onImagePicked(context, uri)
+        uri?.let { viewModel.onImagePicked(context, it) }
     }
 
     val permissionLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.RequestPermission()
     ) { granted ->
-        if (granted && cameraUri != null) {
-            cameraLauncher.launch(cameraUri!!)
+        if (granted) {
+            val uri = ImageUtils.createTempImageUri(context)
+            currentPhotoUri = uri
+            cameraLauncher.launch(uri)
         }
     }
 
@@ -97,16 +101,14 @@ fun SignUpScreen(
 
     if (showImageOptions) {
         ModalBottomSheet(onDismissRequest = { showImageOptions = false }) {
-
             ListItem(
                 headlineContent = { Text("Tirar foto") },
                 modifier = Modifier.clickable {
                     showImageOptions = false
-                    cameraUri = ImageUtils.createTempImageUri(context)
+                    // Sempre pedir/verificar permissão antes de criar a URI
                     permissionLauncher.launch(Manifest.permission.CAMERA)
                 }
             )
-
             ListItem(
                 headlineContent = { Text("Escolher da galeria") },
                 modifier = Modifier.clickable {

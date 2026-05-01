@@ -1,6 +1,7 @@
 package com.example.sonara.core.di
 
 import android.content.Context
+import com.example.sonara.core.storage.FormDataStore
 import com.example.sonara.domain.usecase.*
 import dagger.Module
 import dagger.Provides
@@ -13,20 +14,27 @@ import dagger.hilt.components.SingletonComponent
 object AppModule {
 
     @Provides
+    fun provideFormDataStore(
+        @ApplicationContext context: Context
+    ): FormDataStore {
+        return FormDataStore(context)
+    }
+
+    @Provides
     fun provideProcessImageUseCase() = ProcessImageUseCase()
 
     @Provides
     fun provideSaveFormUseCase(
-        @ApplicationContext context: Context
-    ) = SaveFormUseCase(context)
+        store: FormDataStore
+    ) = SaveFormUseCase(store)
 
     @Provides
     fun provideGetFormUseCase(
-        @ApplicationContext context: Context
-    ) = GetFormUseCase(context)
+        store: FormDataStore
+    ) = GetFormUseCase(store)
 
     @Provides
     fun provideClearFormUseCase(
-        @ApplicationContext context: Context
-    ) = ClearFormUseCase(context)
+        store: FormDataStore
+    ) = ClearFormUseCase(store)
 }
