@@ -80,7 +80,11 @@ fun AppNavigation() {
             popEnterTransition = { NavigationAnimations.popEnter() },
             popExitTransition = { NavigationAnimations.popExit() }
         ){
-            SignUpScreen()
+            SignUpScreen(
+                onNavigateToLogin = {
+                    navController.navigate(Routes.LOGIN)
+                }
+            )
         }
     }
 }

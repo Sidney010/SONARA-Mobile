@@ -4,10 +4,8 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.room.util.copy
 import com.example.sonara.core.validation.PasswordValidator
 import com.example.sonara.core.validation.getErrorOrNull
-import com.example.sonara.features.recuperarsenha.model.RecoverPasswordUiState
 import com.example.sonara.features.trocarrsenha.event.RedefinedPasswordEvent
 import com.example.sonara.features.trocarrsenha.model.RedefinedPasswordUiState
 import kotlinx.coroutines.flow.MutableSharedFlow

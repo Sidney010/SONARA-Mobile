@@ -13,11 +13,15 @@ import com.example.sonara.domain.usecase.ClearFormUseCase
 import com.example.sonara.domain.usecase.GetFormUseCase
 import com.example.sonara.domain.usecase.ProcessImageUseCase
 import com.example.sonara.domain.usecase.SaveFormUseCase
+import com.example.sonara.features.cadastrar.event.SignUpEvent
 import com.example.sonara.features.cadastrar.model.SignUpUIState
 import com.example.sonara.features.cadastrar.validation.UserTypeValidator
+import com.example.sonara.features.trocarrsenha.event.RedefinedPasswordEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -30,6 +34,9 @@ class SignUpViewModel @Inject constructor(
 ) : ViewModel() {
     private val _uiState = mutableStateOf(SignUpUIState())
     val uiState: State<SignUpUIState> = _uiState
+
+    private val _event = MutableSharedFlow<SignUpEvent>()
+    val event = _event.asSharedFlow()
 
     private var saveJob: Job? = null
 
@@ -202,10 +209,16 @@ class SignUpViewModel @Inject constructor(
     fun onRegisterClick() {
         if (!validateAll()) return
         viewModelScope.launch {
+            // futura integração com backend
+            _event.emit(SignUpEvent.NavigateToLogin)
+        }
+        viewModelScope.launch {
             runCatching {
                 clearFormUseCase()
             }
         }
         // futura integração com backend
+        // sucesso
+
     }
 }
