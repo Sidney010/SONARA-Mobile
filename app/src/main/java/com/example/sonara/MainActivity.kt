@@ -8,6 +8,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.core.view.WindowInsetsControllerCompat
 import com.example.sonara.core.navigation.AppNavigation
 import com.example.sonara.core.ui.theme.SonaraTheme
+import com.example.sonara.features.menu.ui.MenuScreen
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -24,7 +25,8 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             SonaraTheme {
-                AppNavigation()
+                //AppNavigation()
+                MenuScreen()
             }
         }
     }
