@@ -25,7 +25,7 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             SonaraTheme {
-                //AppNavigation()
+                // AppNavigation()
                 MenuScreen()
             }
         }

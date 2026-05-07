@@ -91,12 +91,10 @@ class SignUpViewModel @Inject constructor(
         if (uri == null) return
 
         viewModelScope.launch {
-
+            delay(100)
             _uiState.value = _uiState.value.copy(isImageLoading = true)
 
-            // IMPORTANTE: espera câmera terminar
             delay(300)
-
             val result = processImageUseCase(context, uri)
 
             val finalUri = when (result) {

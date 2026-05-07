@@ -1,5 +1,7 @@
 package com.example.sonara.core.layout
 
+import android.R.attr.verticalSpacing
+import android.util.Log.i
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -19,10 +21,19 @@ import com.example.sonara.core.ui.theme.LocalGradients
 fun ScreenContainer(
     modifier: Modifier = Modifier,
     padding: PaddingValues = PaddingValues(24.dp, 36.dp),
+    verticalArrangement: Arrangement.Vertical = Arrangement.Center,
     verticalSpacing: Dp = 50.dp,
     content: @Composable ColumnScope.() -> Unit
 ) {
     val gradients = LocalGradients.current
+
+    // 1. Calculamos o arrangement antes de entrar no Column
+    val finalArrangement = if (verticalSpacing == 0.dp) {
+        verticalArrangement
+    } else {
+        Arrangement.spacedBy(verticalSpacing)
+    }
+
     Box(
         modifier = modifier
             .fillMaxSize()
@@ -34,7 +45,8 @@ fun ScreenContainer(
                 .fillMaxSize()
                 .padding(padding),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(verticalSpacing),
+            // 2. Passamos o valor já processado
+            verticalArrangement = finalArrangement,
             content = content
         )
     }
