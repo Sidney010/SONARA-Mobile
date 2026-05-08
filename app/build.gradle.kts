@@ -1,8 +1,8 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
-    alias(libs.plugins.hilt.android)
-    alias(libs.plugins.kotlin.kapt)
+    alias(libs.plugins.hilt.android) // Plugin do Hilt
+    alias(libs.plugins.kotlin.kapt)   // Kapt para processamento de anotações
 }
 
 android {
@@ -46,6 +46,7 @@ android {
     }
 
     composeOptions {
+        // Certifique-se que esta versão é compatível com sua versão do Kotlin no libs.versions.toml
         kotlinCompilerExtensionVersion = "1.5.14"
     }
 
@@ -57,12 +58,24 @@ android {
 }
 
 dependencies {
-    // Hilt
+    // --- REDE (RETROFIT & OKHTTP) ---
+    val retrofitVersion = "2.9.0"
+    val okHttpVersion = "4.12.0"
+    implementation("com.squareup.retrofit2:retrofit:$retrofitVersion")
+    implementation("com.squareup.retrofit2:converter-gson:$retrofitVersion")
+    implementation("com.squareup.okhttp3:okhttp:$okHttpVersion")
+    implementation("com.squareup.okhttp3:logging-interceptor:$okHttpVersion")
+
+    // --- COROUTINES ---
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
+
+    // --- INJEÇÃO DE DEPENDÊNCIA (HILT) ---
+    // Removidas as linhas manuais "2.48" para evitar conflito
     implementation(libs.hilt.android)
     kapt(libs.hilt.compiler)
     implementation(libs.androidx.hilt.navigation.compose)
 
-    // AndroidX & Compose
+    // --- ANDROIDX & COMPOSE (VIA BOM) ---
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
@@ -75,15 +88,14 @@ dependencies {
     implementation(libs.androidx.compose.foundation)
     implementation(libs.androidx.navigation.compose)
     implementation(libs.androidx.compose.animation)
-    implementation(libs.androidx.room.ktx)
 
-    // External Libs
-    implementation("io.coil-kt:coil-compose:2.6.0")
-    implementation("io.coil-kt:coil:2.6.0")
+    // --- STORAGE & UTILS ---
+    implementation(libs.androidx.room.ktx)
     implementation("androidx.datastore:datastore-preferences:1.0.0")
+    implementation("io.coil-kt:coil-compose:2.6.0")
     implementation(libs.androidx.exifinterface)
 
-    // Testing
+    // --- TESTES ---
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -91,4 +103,9 @@ dependencies {
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)
     debugImplementation(libs.androidx.compose.ui.tooling)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
+}
+
+// Opcional: Forçar o Kapt a ignorar erros de tipos não resolvidos durante o processamento
+kapt {
+    correctErrorTypes = true
 }

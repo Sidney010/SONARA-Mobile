@@ -1,10 +1,26 @@
 package com.example.sonara.core.navigation
 
-object Routes {
-    const val START = "start"
-    const val LOGIN = "login"
-    const val SIGN_UP = "sign_up"
-    const val RECOVER_PASSWORD = "recover_password"
-    const val REDEFINED_PASSWORD = "redefined_password"
-    const val MENU = "menu"
+sealed class Routes(val route: String) {
+
+    // AUTH
+    data object Start : Routes("start")
+
+    data object Login : Routes("login")
+
+    data object SignUp : Routes("sign_up")
+
+    data object RecoverPassword : Routes("recover_password")
+
+    data object RedefinedPassword : Routes("redefined_password")
+
+    // MAIN
+    data object Main : Routes("main")
+
+    data object Home : Routes("home")
+
+    data object Search : Routes("search")
+
+    data object Events : Routes("events")
+
+    data object Plans : Routes("plans")
 }

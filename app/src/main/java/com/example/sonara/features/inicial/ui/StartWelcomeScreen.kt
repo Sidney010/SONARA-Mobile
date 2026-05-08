@@ -13,7 +13,8 @@ import com.example.sonara.features.inicial.components.WelcomeHeader
 
 @Composable
 fun StartWelcomeScreen(
-    onNavigateToLogin: () -> Unit
+    onNavigateToLogin: () -> Unit,
+    onNavigateAnonymous: () -> Unit
 ) {
     ScreenContainer() {
 
@@ -29,7 +30,7 @@ fun StartWelcomeScreen(
         EnterButton(
             title = "Anonimo",
             icon = R.drawable.sonara_logo,
-            onClick = { /*TODO*/ }
+            onClick = onNavigateAnonymous
         )
 
         EnterButton(

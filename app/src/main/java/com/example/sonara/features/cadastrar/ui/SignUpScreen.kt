@@ -56,58 +56,63 @@ fun SignUpScreen(
         }
     }
 
+    val snackbarHostState = remember { SnackbarHostState() }
+
     LaunchedEffect(Unit) {
         viewModel.event.collect { event ->
             when (event) {
-
-                is SignUpEvent.NavigateToLogin -> {
-                    onNavigateToLogin
-                }
-
+                is SignUpEvent.NavigateToLogin -> onNavigateToLogin()
                 is SignUpEvent.ShowError -> {
-                    // mostrar snackbar futuramente
+                    // Exibe a mensagem recebida do ViewModel
+                    snackbarHostState.showSnackbar(
+                        message = event.message,
+                        duration = SnackbarDuration.Short
+                    )
                 }
-
             }
         }
     }
+    Scaffold(
+        snackbarHost = { SnackbarHost(snackbarHostState) }
+    ) { padding ->
+        ScreenContainer {
+            SonaraLogo()
 
-    ScreenContainer {
-        SonaraLogo()
+            SignUpCard(
+                nome = uiState.nome.value,
+                nomeError = uiState.nome.error,
+                onNomeChange = viewModel::onNomeChange,
 
-        SignUpCard(
-            nome = uiState.nome.value,
-            nomeError = uiState.nome.error,
-            onNomeChange = viewModel::onNomeChange,
+                cpf = uiState.cpf.value,
+                cpfError = uiState.cpf.error,
+                onCpfChange = viewModel::onCpfChange,
 
-            cpf = uiState.cpf.value,
-            cpfError = uiState.cpf.error,
-            onCpfChange = viewModel::onCpfChange,
+                email = uiState.email.value,
+                emailAgain = uiState.emailAgain.value,
+                emailError = uiState.email.error,
+                emailAgainError = uiState.emailAgain.error,
+                onEmailChange = viewModel::onEmailChange,
+                onEmailAgainChange = viewModel::onEmailAgainChange,
 
-            email = uiState.email.value,
-            emailAgain = uiState.emailAgain.value,
-            emailError = uiState.email.error,
-            emailAgainError = uiState.emailAgain.error,
-            onEmailChange = viewModel::onEmailChange,
-            onEmailAgainChange = viewModel::onEmailAgainChange,
+                password = uiState.password.value,
+                passwordAgain = uiState.passwordAgain.value,
+                passwordError = uiState.password.error,
+                passwordAgainError = uiState.passwordAgain.error,
+                onPasswordChange = viewModel::onPasswordChange,
+                onPasswordAgainChange = viewModel::onPasswordAgainChange,
 
-            password = uiState.password.value,
-            passwordAgain = uiState.passwordAgain.value,
-            passwordError = uiState.password.error,
-            passwordAgainError = uiState.passwordAgain.error,
-            onPasswordChange = viewModel::onPasswordChange,
-            onPasswordAgainChange = viewModel::onPasswordAgainChange,
+                userType = uiState.userType.value,
+                onUserTypeChange = viewModel::onUserTypeChange,
 
-            userType = uiState.userType.value,
-            onUserTypeChange = viewModel::onUserTypeChange,
+                profileImageUri = uiState.profileImageUri,
+                profileImageError = uiState.profileImageError,
 
-            profileImageUri = uiState.profileImageUri,
-            profileImageError = uiState.profileImageError,
-
-            onImageClick = { showImageOptions = true },
-            onRegisterClick = viewModel::onRegisterClick
-        )
+                onImageClick = { showImageOptions = true },
+                onRegisterClick = viewModel::onRegisterClick
+            )
+        }
     }
+
 
     if (showImageOptions) {
         ModalBottomSheet(onDismissRequest = { showImageOptions = false }) {
