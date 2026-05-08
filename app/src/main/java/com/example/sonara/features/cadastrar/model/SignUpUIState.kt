@@ -3,9 +3,10 @@ package com.example.sonara.features.cadastrar.model
 import android.net.Uri
 import com.example.sonara.core.form.FieldState
 import com.example.sonara.core.form.SelectionFieldState
+import com.example.sonara.domain.model.Gender
 import com.example.sonara.domain.model.UserType
 
-data class SignUpUIState (
+data class SignUpUIState(
     val nome: FieldState = FieldState(),
     val cpf: FieldState = FieldState(),
     val dataNascimento: FieldState = FieldState(),
@@ -13,7 +14,17 @@ data class SignUpUIState (
     val emailAgain: FieldState = FieldState(),
     val password: FieldState = FieldState(),
     val passwordAgain: FieldState = FieldState(),
-    val userType: SelectionFieldState<UserType> = SelectionFieldState(),
+
+    val userType: SelectionFieldState<Set<UserType>> =
+        SelectionFieldState(
+            value = emptySet()
+        ),
+
+    val gender: SelectionFieldState<Gender?> =
+        SelectionFieldState(
+            value = null
+        ),
+
     val profileImageUri: Uri? = null,
     val profileImageError: String? = null,
     val isImageLoading: Boolean = false,

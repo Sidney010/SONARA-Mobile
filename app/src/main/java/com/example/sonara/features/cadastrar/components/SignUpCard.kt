@@ -1,6 +1,7 @@
 package com.example.sonara.features.cadastrar.components
 
 
+import android.R.attr.password
 import android.net.Uri
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -21,9 +22,13 @@ import com.example.sonara.core.ui.components.AppCardHeader
 import com.example.sonara.core.ui.components.AppPasswordField
 import com.example.sonara.core.ui.components.AppTextField
 import com.example.sonara.core.ui.mask.CpfVisualTransformation
+import com.example.sonara.domain.model.Gender
 import com.example.sonara.domain.model.UserType
+import com.example.sonara.features.cadastrar.components.signupcard.GenderComboBox
+
+
 import com.example.sonara.features.cadastrar.components.signupcard.UserProfileImagePicker
-import com.example.sonara.features.cadastrar.components.signupcard.UserSelectorRadioButton
+import com.example.sonara.features.cadastrar.components.signupcard.UserSelectorCheckBox
 
 @Composable
 fun SignUpCard(
@@ -35,6 +40,10 @@ fun SignUpCard(
     cpf: String,
     cpfError: String?,
     onCpfChange: (String) -> Unit,
+
+    gender: Gender?,
+    genderError: String?,
+    onGenderChange: (Gender) -> Unit,
 
     email: String,
     emailAgain: String,
@@ -50,8 +59,8 @@ fun SignUpCard(
     onPasswordChange: (String) -> Unit,
     onPasswordAgainChange: (String) -> Unit,
 
-    userType: UserType?,
-    onUserTypeChange: (UserType) -> Unit,
+    userType: Set<UserType>,
+    onUserTypeChange: (Set<UserType>) -> Unit,
 
     profileImageUri: Uri?,
     profileImageError: String?,
@@ -105,7 +114,12 @@ fun SignUpCard(
                 isError = cpfError != null,
                 errorMessage = cpfError
             )
-
+            GenderComboBox(
+                selected = gender,
+                onSelectedChange = onGenderChange,
+                isError = genderError != null,
+                errorMessage = genderError
+            )
             AppTextField(
                 value = email,
                 onValueChange = onEmailChange,
@@ -143,10 +157,11 @@ fun SignUpCard(
                 errorMessage = passwordAgainError
             )
 
-            UserSelectorRadioButton(
+            UserSelectorCheckBox(
                 selected = userType,
                 onSelectedChange = onUserTypeChange
             )
+
             AppButton(
                 modifier = Modifier.fillMaxWidth(0.7f),
                 text = "Cadastrar-se",

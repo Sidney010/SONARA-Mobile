@@ -2,18 +2,16 @@ package com.example.sonara.features.cadastrar.validation
 
 import com.example.sonara.core.validation.ValidationResult
 import com.example.sonara.core.validation.Validator
-import com.example.sonara.domain.model.UserType
+import com.example.sonara.domain.model.Gender
 
-object UserTypeValidator : Validator<Set<UserType>> {
+object GenderValidator : Validator<Gender?> {
 
-    override fun validate(
-        value: Set<UserType>
-    ): ValidationResult {
+    override fun validate(value: Gender?): ValidationResult {
 
-        return if (value.isNullOrEmpty()) {
+        return if (value == null) {
 
             ValidationResult.Error(
-                "Selecione ao menos um tipo de usuário"
+                "Selecione um gênero"
             )
 
         } else {

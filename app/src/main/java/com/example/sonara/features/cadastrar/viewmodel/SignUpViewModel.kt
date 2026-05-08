@@ -9,6 +9,7 @@ import com.example.sonara.core.common.AppResult
 import com.example.sonara.core.storage.FormData
 import com.example.sonara.core.validation.*
 import com.example.sonara.data.remote.dto.UsuarioRequest
+import com.example.sonara.domain.model.Gender
 import com.example.sonara.domain.model.UserType
 import com.example.sonara.domain.usecase.ClearFormUseCase
 import com.example.sonara.domain.usecase.GetFormUseCase
@@ -17,6 +18,7 @@ import com.example.sonara.domain.usecase.RegisterUserUseCase
 import com.example.sonara.domain.usecase.SaveFormUseCase
 import com.example.sonara.features.cadastrar.event.SignUpEvent
 import com.example.sonara.features.cadastrar.model.SignUpUIState
+import com.example.sonara.features.cadastrar.validation.GenderValidator
 import com.example.sonara.features.cadastrar.validation.UserTypeValidator
 import com.example.sonara.features.trocarrsenha.event.RedefinedPasswordEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -58,9 +60,14 @@ class SignUpViewModel @Inject constructor(
                     password = _uiState.value.password.copy(value = data.password),
                     profileImageUri = data.image?.let { Uri.parse(it) },
                     userType = _uiState.value.userType.copy(
-                        value = runCatching {
-                            UserType.valueOf(data.userType)
-                        }.getOrNull()
+                        value = data.userType
+                            .split(",")
+                            .mapNotNull {
+                                runCatching {
+                                    UserType.valueOf(it)
+                                }.getOrNull()
+                            }
+                            .toSet()
                     )
                 )
             }
@@ -83,7 +90,10 @@ class SignUpViewModel @Inject constructor(
                     cpf = state.cpf.value,
                     password = state.password.value,
                     image = state.profileImageUri?.toString(),
-                    userType = state.userType.value?.name ?: ""
+
+                    userType = state.userType.value
+                        ?.joinToString(",") { it.name }
+                        ?: ""
                 )
             )
         }
@@ -94,7 +104,7 @@ class SignUpViewModel @Inject constructor(
         if (uri == null) return
 
         viewModelScope.launch {
-            delay(100)
+            delay(200)
             _uiState.value = _uiState.value.copy(isImageLoading = true)
 
             delay(300)
@@ -161,13 +171,30 @@ class SignUpViewModel @Inject constructor(
         saveWithDelay()
     }
 
-    fun onUserTypeChange(type: UserType) {
+    fun onUserTypeChange(types: Set<UserType>) {
+
         _uiState.value = _uiState.value.copy(
-            userType = _uiState.value.userType.copy(value = type, error = null, isTouched = true)
+            userType = _uiState.value.userType.copy(
+                value = types,
+                error = null,
+                isTouched = true
+            )
         )
+
         saveWithDelay()
     }
+    fun onGenderChange(gender: Gender) {
 
+        _uiState.value = _uiState.value.copy(
+            gender = _uiState.value.gender.copy(
+                value = gender,
+                error = null,
+                isTouched = true
+            )
+        )
+
+        saveWithDelay()
+    }
     fun validateAll(): Boolean {
         val current = _uiState.value
 
@@ -184,7 +211,14 @@ class SignUpViewModel @Inject constructor(
             if (current.passwordAgain.value != current.password.value) "Senhas não conferem" else null
 
         val userTypeError =
-            UserTypeValidator.validate(current.userType.value).getErrorOrNull()
+            UserTypeValidator
+                .validate(current.userType.value)
+                .getErrorOrNull()
+
+        val genderTypeError =
+            GenderValidator
+                .validate(current.gender.value)
+                .getErrorOrNull()
 
         _uiState.value = current.copy(
             nome = current.nome.copy(error = nomeError),
@@ -192,7 +226,8 @@ class SignUpViewModel @Inject constructor(
             cpf = current.cpf.copy(error = cpfError),
             password = current.password.copy(error = passwordError),
             profileImageError = imageError,
-            userType = current.userType.copy(error = userTypeError)
+            userType = current.userType.copy(error = userTypeError),
+            gender = current.gender.copy(error = genderTypeError)
         )
 
         return listOf(

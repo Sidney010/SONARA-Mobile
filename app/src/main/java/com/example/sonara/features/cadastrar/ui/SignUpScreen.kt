@@ -107,6 +107,10 @@ fun SignUpScreen(
                 profileImageUri = uiState.profileImageUri,
                 profileImageError = uiState.profileImageError,
 
+                gender = uiState.gender.value,
+                genderError = uiState.gender.error,
+                onGenderChange = viewModel::onGenderChange,
+
                 onImageClick = { showImageOptions = true },
                 onRegisterClick = viewModel::onRegisterClick
             )
