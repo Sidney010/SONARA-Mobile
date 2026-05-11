@@ -1,8 +1,8 @@
-package com.example.sonara.data.remote.dto
+package com.example.sonara.data.remote.dto.response
 
 import com.google.gson.annotations.SerializedName
 
-data class UsuarioResponse(
+data class UsuarioResponseDto(
     @SerializedName("id")
     val id: Int,
 

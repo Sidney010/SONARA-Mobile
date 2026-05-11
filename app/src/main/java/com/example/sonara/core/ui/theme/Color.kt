@@ -25,4 +25,9 @@ object AppColors {
 
     //CardArtista
     val PrimaryRed = Color(0xFFFF0000)
+
+    //Card escuro Planos
+    val colorOrangeDark = Color(0xFFE25E13)
+
+    val colorOrangeMoreDark = Color(0xFFCD4F08)
 }

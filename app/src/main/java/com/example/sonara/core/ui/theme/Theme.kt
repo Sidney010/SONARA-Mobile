@@ -15,7 +15,9 @@ private val DarkColorScheme = darkColorScheme(
     background = AppColors.BLack,
     surface = AppColors.BLack,
     onPrimary = AppColors.White,
-    onBackground = AppColors.White
+    onBackground = AppColors.White,
+    tertiary = AppColors.colorOrangeDark,
+    outline = AppColors.colorOrangeMoreDark
 )
 
 @Composable
