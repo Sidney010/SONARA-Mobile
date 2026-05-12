@@ -1,30 +1,20 @@
-import com.example.sonara.core.network.NetworkConstants
+package com.example.sonara.core.di.repository
+
+import com.example.sonara.data.repository.UsuarioRepositoryImpl
+import com.example.sonara.domain.repository.UsuarioRepository
+import dagger.Binds
 import dagger.Module
-import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
-import okhttp3.OkHttpClient
-import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
 import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
-object RetrofitModule {
+abstract class RepositoryModule {
 
-    @Provides
+    @Binds
     @Singleton
-    fun provideRetrofit(
-        client: OkHttpClient
-    ): Retrofit {
-
-        return Retrofit.Builder()
-            .baseUrl(NetworkConstants.BASE_URL)
-            .client(client)
-            .addConverterFactory(
-                GsonConverterFactory.create()
-            )
-            .build()
-    }
-
+    abstract fun bindUsuarioRepository(
+        impl: UsuarioRepositoryImpl
+    ): UsuarioRepository
 }

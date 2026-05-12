@@ -1,7 +1,9 @@
 package com.example.sonara.data.repository
 
 import com.example.sonara.core.common.AppResult
-import com.example.sonara.data.remote.mapper.toRequestDto
+import com.example.sonara.core.network.safeApiCall
+import com.example.sonara.data.mapper.toDomain
+import com.example.sonara.data.mapper.toRequestDto
 import com.example.sonara.data.remote.datasource.UsuarioRemoteDataSource
 import com.example.sonara.domain.model.Usuario
 import com.example.sonara.domain.repository.UsuarioRepository
@@ -13,23 +15,19 @@ class UsuarioRepositoryImpl @Inject constructor(
 
     override suspend fun register(
         user: Usuario
-    ): AppResult<Unit> {
+    ): AppResult<Usuario> {
 
-        return try {
+        return safeApiCall(
 
-            val response = remoteDataSource
-                .registrarUsuario(user.toRequestDto())
-
-            if (response.isSuccessful) {
-                AppResult.Success(Unit)
-            } else {
-                AppResult.Error(
-                    Exception("Erro: ${response.code()}")
+            apiCall = {
+                remoteDataSource.register(
+                    user.toRequestDto()
                 )
-            }
+            },
 
-        } catch (e: Exception) {
-            AppResult.Error(e)
-        }
+            mapper = { response ->
+                response.toDomain()
+            }
+        )
     }
 }

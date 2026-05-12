@@ -11,9 +11,6 @@ interface SonaraApi {
 
     @POST("usuarios")
     suspend fun register(
-
-        @Body
-        request: CreateUsuarioRequestDto
-
+        @Body request: CreateUsuarioRequestDto
     ): Response<ApiResponse<UsuarioResponseDto>>
 }

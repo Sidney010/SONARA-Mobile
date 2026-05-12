@@ -8,9 +8,9 @@ import androidx.lifecycle.viewModelScope
 import com.example.sonara.core.common.AppResult
 import com.example.sonara.core.storage.FormData
 import com.example.sonara.core.validation.*
-import com.example.sonara.data.remote.dto.UsuarioRequest
 import com.example.sonara.domain.model.Gender
 import com.example.sonara.domain.model.UserType
+import com.example.sonara.domain.model.Usuario
 import com.example.sonara.domain.usecase.ClearFormUseCase
 import com.example.sonara.domain.usecase.GetFormUseCase
 import com.example.sonara.domain.usecase.ProcessImageUseCase
@@ -20,7 +20,6 @@ import com.example.sonara.features.cadastrar.event.SignUpEvent
 import com.example.sonara.features.cadastrar.model.SignUpUIState
 import com.example.sonara.features.cadastrar.validation.GenderValidator
 import com.example.sonara.features.cadastrar.validation.UserTypeValidator
-import com.example.sonara.features.trocarrsenha.event.RedefinedPasswordEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -243,30 +242,62 @@ class SignUpViewModel @Inject constructor(
     }
 
     fun onRegisterClick() {
+
         if (!validateAll()) return
 
         viewModelScope.launch {
-            _uiState.value = _uiState.value.copy(isLoading = true)
 
-            val request = UsuarioRequest(
-                nome = uiState.value.nome.value,
-                email = uiState.value.email.value,
-                senha = uiState.value.password.value,
-                cpf = uiState.value.cpf.value,
-                data_nasc = "2000-01-01", // Implementar DatePicker futuramente
-                foto_perfil = uiState.value.profileImageUri?.toString()
+            _uiState.value = _uiState.value.copy(
+                isLoading = true
             )
 
-            when (val result = registerUserUseCase(request)) {
+            val user = Usuario(
+
+                nome = uiState.value.nome.value,
+
+                email = uiState.value.email.value,
+
+                senha = uiState.value.password.value,
+
+                cpf = uiState.value.cpf.value,
+
+                dataNascimento = "2000-01-01",
+
+                fotoPerfil =
+                    uiState.value.profileImageUri
+                        ?.toString()
+            )
+
+            when (
+                val result =
+                    registerUserUseCase(user)
+            ) {
+
                 is AppResult.Success -> {
+
                     clearFormUseCase()
-                    _event.emit(SignUpEvent.NavigateToLogin)
+
+                    _event.emit(
+                        SignUpEvent.NavigateToLogin
+                    )
                 }
+
                 is AppResult.Error -> {
-                    _event.emit(SignUpEvent.ShowError("Não foi possível efetuar o cadastro. Verifique sua conexão ou tente novamente."))
+
+                    _event.emit(
+
+                        SignUpEvent.ShowError(
+                            result.exception.message
+                                ?: "Erro ao cadastrar usuário"
+                        )
+                    )
                 }
             }
-            _uiState.value = _uiState.value.copy(isLoading = false)
+
+            _uiState.value =
+                _uiState.value.copy(
+                    isLoading = false
+                )
         }
     }
 

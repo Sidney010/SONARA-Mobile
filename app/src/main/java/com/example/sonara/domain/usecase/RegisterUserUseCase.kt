@@ -1,5 +1,6 @@
 package com.example.sonara.domain.usecase
 
+import com.example.sonara.core.common.AppResult
 import com.example.sonara.domain.model.Usuario
 import com.example.sonara.domain.repository.UsuarioRepository
 import javax.inject.Inject
@@ -9,6 +10,9 @@ class RegisterUserUseCase @Inject constructor(
 ) {
 
     suspend operator fun invoke(
-        usuario: Usuario
-    ) = repository.register(usuario)
+        user: Usuario
+    ): AppResult<Usuario> {
+
+        return repository.register(user)
+    }
 }

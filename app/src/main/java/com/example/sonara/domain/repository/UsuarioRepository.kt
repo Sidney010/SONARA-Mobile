@@ -7,5 +7,5 @@ interface UsuarioRepository {
 
     suspend fun register(
         user: Usuario
-    ): AppResult<Unit>
+    ): AppResult<Usuario>
 }
