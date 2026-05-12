@@ -17,7 +17,6 @@ import java.util.*
 object ImageUtils {
 
     fun createTempImageUri(context: Context): Uri {
-        // Usar o diretório de fotos padrão do App
         val directory = context.getExternalFilesDir(Environment.DIRECTORY_PICTURES)
         val file = File.createTempFile(
             "IMG_${System.currentTimeMillis()}_",
@@ -37,18 +36,18 @@ object ImageUtils {
             val inputStream = context.contentResolver.openInputStream(uri)
                 ?: return AppResult.Error(Exception("Não foi possível abrir a imagem"))
 
-            // Criar arquivo final no cache para o preview
-            val outputFile = File(context.cacheDir, "profile_preview_${UUID.randomUUID()}.jpg")
+            // Usar internal files para permanência (evita que o cache apague a foto de perfil)
+            val outputDir = File(context.filesDir, "profiles").apply { mkdirs() }
+            val outputFile = File(outputDir, "profile_${UUID.randomUUID()}.jpg")
 
             val bitmap = inputStream.use { input ->
                 BitmapFactory.decodeStream(input)
             } ?: return AppResult.Error(Exception("Falha ao decodificar imagem"))
 
-            // Corrigir rotação baseada nos metadados (importante para câmeras Samsung/Motorola)
             val rotatedBitmap = fixRotation(context, uri, bitmap)
 
             FileOutputStream(outputFile).use { out ->
-                rotatedBitmap.compress(Bitmap.CompressFormat.JPEG, 80, out)
+                rotatedBitmap.compress(Bitmap.CompressFormat.JPEG, 85, out)
             }
 
             AppResult.Success(outputFile.toUri())
@@ -58,21 +57,25 @@ object ImageUtils {
     }
 
     private fun fixRotation(context: Context, uri: Uri, bitmap: Bitmap): Bitmap {
-        val inputStream = context.contentResolver.openInputStream(uri) ?: return bitmap
-        val exif = ExifInterface(inputStream)
-        val orientation = exif.getAttributeInt(
-            ExifInterface.TAG_ORIENTATION,
-            ExifInterface.ORIENTATION_NORMAL
-        )
+        return try {
+            val inputStream = context.contentResolver.openInputStream(uri) ?: return bitmap
+            val exif = inputStream.use { ExifInterface(it) }
+            val orientation = exif.getAttributeInt(
+                ExifInterface.TAG_ORIENTATION,
+                ExifInterface.ORIENTATION_NORMAL
+            )
 
-        val matrix = Matrix()
-        when (orientation) {
-            ExifInterface.ORIENTATION_ROTATE_90 -> matrix.postRotate(90f)
-            ExifInterface.ORIENTATION_ROTATE_180 -> matrix.postRotate(180f)
-            ExifInterface.ORIENTATION_ROTATE_270 -> matrix.postRotate(270f)
-            else -> return bitmap
+            val matrix = Matrix()
+            when (orientation) {
+                ExifInterface.ORIENTATION_ROTATE_90 -> matrix.postRotate(90f)
+                ExifInterface.ORIENTATION_ROTATE_180 -> matrix.postRotate(180f)
+                ExifInterface.ORIENTATION_ROTATE_270 -> matrix.postRotate(270f)
+                else -> return bitmap
+            }
+
+            Bitmap.createBitmap(bitmap, 0, 0, bitmap.width, bitmap.height, matrix, true)
+        } catch (e: Exception) {
+            bitmap
         }
-
-        return Bitmap.createBitmap(bitmap, 0, 0, bitmap.width, bitmap.height, matrix, true)
     }
 }

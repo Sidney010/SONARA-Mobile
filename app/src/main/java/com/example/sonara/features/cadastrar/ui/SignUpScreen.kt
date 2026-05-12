@@ -7,6 +7,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.clickable
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -30,12 +31,12 @@ fun SignUpScreen(
     var showImageOptions by remember { mutableStateOf(false) }
 
     // Guardar a URI da foto que está sendo tirada no momento
-    var currentPhotoUri by remember { mutableStateOf<Uri?>(null) }
+    var currentPhotoUri by rememberSaveable { mutableStateOf<Uri?>(null) }
 
     val cameraLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.TakePicture()
     ) { success ->
-        if (success) {
+        if (success && currentPhotoUri != null) {
             currentPhotoUri?.let { viewModel.onImagePicked(context, it) }
         }
     }
@@ -52,7 +53,7 @@ fun SignUpScreen(
         if (granted) {
             val uri = ImageUtils.createTempImageUri(context)
             currentPhotoUri = uri
-            cameraLauncher.launch(uri)
+            currentPhotoUri?.let { cameraLauncher.launch(it) }
         }
     }
 

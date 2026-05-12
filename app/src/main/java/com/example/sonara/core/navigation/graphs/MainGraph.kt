@@ -13,6 +13,7 @@ import com.example.sonara.core.navigation.Routes
 import com.example.sonara.core.ui.components.navigation.BottomNavigationBar
 import com.example.sonara.core.ui.components.navigation.BottomNavigationState
 import com.example.sonara.features.home.ui.HomeScreen
+import com.example.sonara.features.plano.ui.PlansScreen
 
 fun NavGraphBuilder.mainGraph(
     rootNavController: NavController
@@ -79,7 +80,7 @@ fun NavGraphBuilder.mainGraph(
                 }
 
                 composable(Routes.Plans.route) {
-                    // PlansScreen()
+                    PlansScreen()
                 }
             }
         }
