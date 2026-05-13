@@ -6,60 +6,75 @@ import androidx.datastore.preferences.preferencesDataStore
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
-val Context.dataStore by preferencesDataStore(name = "signup_form")
+private val Context.dataStore by preferencesDataStore(
+    name = "signup_form"
+)
 
-class FormDataStore(private val context: Context) {
+class FormDataStore(
+    private val context: Context
+) {
 
     companion object {
-        val NAME = stringPreferencesKey("name")
-        val EMAIL = stringPreferencesKey("email")
-        val CPF = stringPreferencesKey("cpf")
-        val PASSWORD = stringPreferencesKey("password")
-        val IMAGE = stringPreferencesKey("image")
-        val USER_TYPE = stringPreferencesKey("user_type")
+
+        private val NAME = stringPreferencesKey("name")
+        private val EMAIL = stringPreferencesKey("email")
+        private val CPF = stringPreferencesKey("cpf")
+        private val PASSWORD = stringPreferencesKey("password")
+        private val IMAGE = stringPreferencesKey("image")
+        private val USER_TYPE = stringPreferencesKey("user_type")
+
+        // ENDEREÇO
+
+        private val CEP = stringPreferencesKey("cep")
+        private val RUA = stringPreferencesKey("rua")
+        private val BAIRRO = stringPreferencesKey("bairro")
+        private val CIDADE = stringPreferencesKey("cidade")
+        private val UF = stringPreferencesKey("uf")
     }
 
     suspend fun saveForm(
-        name: String,
-        email: String,
-        cpf: String,
-        password: String,
-        image: String?,
-        userType: String
+        data: FormData
     ) {
+
         context.dataStore.edit {
-            it[NAME] = name
-            it[EMAIL] = email
-            it[CPF] = cpf
-            it[PASSWORD] = password
-            image?.let { uri -> it[IMAGE] = uri }
-            it[USER_TYPE] = userType
+
+            it[NAME] = data.name
+            it[EMAIL] = data.email
+            it[CPF] = data.cpf
+            it[PASSWORD] = data.password
+            it[IMAGE] = data.image ?: ""
+            it[USER_TYPE] = data.userType
+
+            // ENDEREÇO
+            it[CEP] = data.cep
+            it[RUA] = data.rua
+            it[BAIRRO] = data.bairro
+            it[CIDADE] = data.cidade
+            it[UF] = data.uf
         }
     }
 
-    fun getForm(): Flow<FormData> {
-        return context.dataStore.data.map {
-            FormData(
-                name = it[NAME] ?: "",
-                email = it[EMAIL] ?: "",
-                cpf = it[CPF] ?: "",
-                password = it[PASSWORD] ?: "",
-                image = it[IMAGE],
-                userType = it[USER_TYPE] ?: ""
-            )
-        }
-    }
+    fun getForm() = context.dataStore.data.map {
 
+        FormData(
+
+            name = it[NAME] ?: "",
+            email = it[EMAIL] ?: "",
+            cpf = it[CPF] ?: "",
+            password = it[PASSWORD] ?: "",
+            image = it[IMAGE],
+            userType = it[USER_TYPE] ?: "",
+
+            // ENDEREÇO
+            cep = it[CEP] ?: "",
+            rua = it[RUA] ?: "",
+            bairro = it[BAIRRO] ?: "",
+            cidade = it[CIDADE] ?: "",
+            uf = it[UF] ?: ""
+        )
+    }
     suspend fun clear() {
         context.dataStore.edit { it.clear() }
     }
 }
 
-data class FormData(
-    val name: String,
-    val email: String,
-    val cpf: String,
-    val password: String,
-    val image: String?,
-    val userType: String
-)

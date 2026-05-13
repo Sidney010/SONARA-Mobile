@@ -28,5 +28,6 @@ data class SignUpUIState(
     val profileImageUri: Uri? = null,
     val profileImageError: String? = null,
     val isImageLoading: Boolean = false,
+    val address: AddressUiState = AddressUiState(),
     val isLoading: Boolean = false
 )

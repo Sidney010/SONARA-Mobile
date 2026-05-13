@@ -65,7 +65,21 @@ fun SignUpCard(
     profileImageUri: Uri?,
     profileImageError: String?,
     onImageClick: () -> Unit,
-    onRegisterClick: () -> Unit
+    onRegisterClick: () -> Unit,
+    cep: String,
+    onCepChange: (String) -> Unit,
+
+    rua: String,
+    onRuaChange: (String) -> Unit,
+
+    bairro: String,
+    onBairroChange: (String) -> Unit,
+
+    cidade: String,
+    onCidadeChange: (String) -> Unit,
+
+    uf: String,
+    onUfChange: (String) -> Unit,
 
     ) {
 
@@ -161,6 +175,40 @@ fun SignUpCard(
                 selected = userType,
                 onSelectedChange = onUserTypeChange
             )
+
+            AppTextField(
+                value = cep,
+                onValueChange = onCepChange,
+                placeholder = "CEP",
+                keyboardOptions = KeyboardOptions(
+                    keyboardType = KeyboardType.Number
+                )
+            )
+
+            AppTextField(
+                value = rua,
+                onValueChange = onRuaChange,
+                placeholder = "Rua"
+            )
+
+            AppTextField(
+                value = cidade,
+                onValueChange = onCidadeChange,
+                placeholder = "Cidade"
+            )
+
+            AppTextField(
+                value = bairro,
+                onValueChange = onBairroChange,
+                placeholder = "Bairro"
+            )
+
+            AppTextField(
+                value = uf,
+                onValueChange = onUfChange,
+                placeholder = "UF"
+            )
+
 
             AppButton(
                 modifier = Modifier.fillMaxWidth(0.7f),

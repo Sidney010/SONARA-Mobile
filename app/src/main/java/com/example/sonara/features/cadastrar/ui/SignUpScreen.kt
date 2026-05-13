@@ -112,6 +112,22 @@ fun SignUpScreen(
                 genderError = uiState.gender.error,
                 onGenderChange = viewModel::onGenderChange,
 
+                cep = uiState.address.cep,
+                onCepChange = viewModel::onCepChange,
+
+                rua = uiState.address.rua,
+                onRuaChange = viewModel::onRuaChange,
+
+                cidade = uiState.address.cidade,
+                onCidadeChange = viewModel::onCidadeChange,
+
+                bairro = uiState.address.bairro,
+                onBairroChange = viewModel::onBairroChange,
+
+                uf = uiState.address.uf,
+                onUfChange = viewModel::onUfChange,
+
+
                 onImageClick = { showImageOptions = true },
                 onRegisterClick = viewModel::onRegisterClick
             )

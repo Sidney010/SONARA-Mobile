@@ -11,6 +11,7 @@ import com.example.sonara.core.validation.*
 import com.example.sonara.domain.model.Gender
 import com.example.sonara.domain.model.UserType
 import com.example.sonara.domain.model.Usuario
+import com.example.sonara.domain.usecase.BuscarEnderecoPorCepUseCase
 import com.example.sonara.domain.usecase.ClearFormUseCase
 import com.example.sonara.domain.usecase.GetFormUseCase
 import com.example.sonara.domain.usecase.ProcessImageUseCase
@@ -34,8 +35,11 @@ class SignUpViewModel @Inject constructor(
     private val saveFormUseCase: SaveFormUseCase,
     private val getFormUseCase: GetFormUseCase,
     private val clearFormUseCase: ClearFormUseCase,
-    private val registerUserUseCase: RegisterUserUseCase
+    private val registerUserUseCase: RegisterUserUseCase,
+    private val buscarEnderecoPorCepUseCase: BuscarEnderecoPorCepUseCase
 ) : ViewModel() {
+
+    private var cepJob: Job? = null
     private val _uiState = mutableStateOf(SignUpUIState())
     val uiState: State<SignUpUIState> = _uiState
 
@@ -47,6 +51,7 @@ class SignUpViewModel @Inject constructor(
     init {
         restoreForm()
     }
+
 
     private fun restoreForm() {
         viewModelScope.launch {
@@ -67,32 +72,62 @@ class SignUpViewModel @Inject constructor(
                                 }.getOrNull()
                             }
                             .toSet()
-                    )
+                    ),
+                    address = _uiState.value.address.copy(
+                        cep = data.cep,
+                        rua = data.rua,
+                        bairro = data.bairro,
+                        cidade = data.cidade,
+                        uf = data.uf
                 )
+                )
+
             }
         }
     }
 
     // debounce profissional
     private fun saveWithDelay() {
+
         saveJob?.cancel()
 
         saveJob = viewModelScope.launch {
+
             delay(500)
 
             val state = _uiState.value
 
             saveFormUseCase(
+
                 FormData(
+
                     name = state.nome.value,
+
                     email = state.email.value,
+
                     cpf = state.cpf.value,
+
                     password = state.password.value,
+
                     image = state.profileImageUri?.toString(),
 
-                    userType = state.userType.value
-                        ?.joinToString(",") { it.name }
-                        ?: ""
+                    userType =
+                        state.userType.value
+                            ?.joinToString(",") {
+                                it.name
+                            } ?: "",
+
+                    // ENDEREÇO
+
+                    cep = state.address.cep,
+
+                    rua = state.address.rua,
+
+                    bairro = state.address.bairro,
+
+                    cidade = state.address.cidade,
+
+                    uf = state.address.uf
                 )
             )
         }
@@ -190,6 +225,104 @@ class SignUpViewModel @Inject constructor(
                 error = null,
                 isTouched = true
             )
+        )
+
+        saveWithDelay()
+    }
+    fun onCepChange(value: String) {
+
+        val cep = value
+            .filter { it.isDigit() }
+            .take(8)
+
+        _uiState.value = _uiState.value.copy(
+
+            address =
+                _uiState.value.address.copy(
+                    cep = cep
+                )
+        )
+
+        saveWithDelay()
+
+        if (cep.length == 8) {
+
+            cepJob?.cancel()
+
+            cepJob = viewModelScope.launch {
+
+                delay(400)
+
+                buscarCep(cep)
+            }
+        }
+    }
+
+    fun onCepChange(cep: String) {
+
+        val digits = cep.filter {
+            it.isDigit()
+        }.take(8)
+
+        _uiState.value = _uiState.value.copy(
+
+            address =
+                _uiState.value.address.copy(
+                    cep = digits
+                )
+        )
+
+        saveWithDelay()
+
+        if (digits.length == 8) {
+
+            buscarCep(digits)
+        }
+    }
+    fun onRuaChange(value: String) {
+
+        _uiState.value = _uiState.value.copy(
+
+            address =
+                _uiState.value.address.copy(
+                    rua = value
+                )
+        )
+
+        saveWithDelay()
+    }
+    fun onBairroChange(value: String) {
+
+        _uiState.value = _uiState.value.copy(
+
+            address =
+                _uiState.value.address.copy(
+                    bairro = value
+                )
+        )
+
+        saveWithDelay()
+    }
+    fun onCidadeChange(value: String) {
+
+        _uiState.value = _uiState.value.copy(
+
+            address =
+                _uiState.value.address.copy(
+                    cidade = value
+                )
+        )
+
+        saveWithDelay()
+    }
+    fun onUfChange(value: String) {
+
+        _uiState.value = _uiState.value.copy(
+
+            address =
+                _uiState.value.address.copy(
+                    uf = value
+                )
         )
 
         saveWithDelay()
