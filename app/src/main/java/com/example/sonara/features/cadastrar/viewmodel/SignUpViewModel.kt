@@ -229,34 +229,7 @@ class SignUpViewModel @Inject constructor(
 
         saveWithDelay()
     }
-    fun onCepChange(value: String) {
 
-        val cep = value
-            .filter { it.isDigit() }
-            .take(8)
-
-        _uiState.value = _uiState.value.copy(
-
-            address =
-                _uiState.value.address.copy(
-                    cep = cep
-                )
-        )
-
-        saveWithDelay()
-
-        if (cep.length == 8) {
-
-            cepJob?.cancel()
-
-            cepJob = viewModelScope.launch {
-
-                delay(400)
-
-                buscarCep(cep)
-            }
-        }
-    }
 
     fun onCepChange(cep: String) {
 
@@ -276,7 +249,7 @@ class SignUpViewModel @Inject constructor(
 
         if (digits.length == 8) {
 
-            buscarCep(digits)
+           //buscarCep(digits)
         }
     }
     fun onRuaChange(value: String) {

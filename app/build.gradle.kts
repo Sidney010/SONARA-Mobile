@@ -60,6 +60,7 @@ android {
 dependencies {
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.compose.material3)
+
     // --- REDE (RETROFIT & OKHTTP) ---
     val retrofitVersion = "2.9.0"
     val okHttpVersion = "4.12.0"

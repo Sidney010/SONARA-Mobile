@@ -1,8 +1,5 @@
 package com.example.sonara.core.ui.components.navigation
 
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
-
 sealed class BottomNavItemData(
     val route: String,
     val title: String

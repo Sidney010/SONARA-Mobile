@@ -1,5 +1,6 @@
 package com.example.sonara.core.di.network
 
+import com.example.sonara.core.network.NetworkConstants
 import com.example.sonara.data.remote.api.ViaCepApi
 import dagger.Module
 import dagger.Provides
@@ -20,7 +21,9 @@ object ViaCepModule {
     fun provideViaCepRetrofit(): Retrofit {
 
         return Retrofit.Builder()
-            .baseUrl("https://viacep.com.br/ws/")
+            .baseUrl(
+                NetworkConstants.BASE_URL_VIA_CEP
+            )
             .addConverterFactory(
                 GsonConverterFactory.create()
             )
