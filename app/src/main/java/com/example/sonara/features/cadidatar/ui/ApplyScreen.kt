@@ -30,8 +30,8 @@ fun ApplyScreen(modifier: Modifier = Modifier) {
         padding = PaddingValues(12.dp,40.dp)
     ) {
         val headerState = HeaderUiState(
-            userName = "Sidney Campos Aragão",
-            userRole = "Usuário"
+            userName = "UserName",
+            userRole = "TipodeUsuario"
         )
 
         HomeHeader(

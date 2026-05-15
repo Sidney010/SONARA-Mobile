@@ -60,8 +60,8 @@ fun HomeScreen(
         padding = PaddingValues(12.dp,40.dp)
     ) {
         val headerState = HeaderUiState(
-            userName = "Anônimo",
-            userRole = "Usuário"
+            userName = "UserName",
+            userRole = "TipodeUsuario"
         )
 
         HomeHeader(

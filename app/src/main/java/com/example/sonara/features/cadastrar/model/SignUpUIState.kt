@@ -4,30 +4,49 @@ import android.net.Uri
 import com.example.sonara.core.form.FieldState
 import com.example.sonara.core.form.SelectionFieldState
 import com.example.sonara.domain.model.Gender
+import com.example.sonara.domain.model.GeneroMusical
+import com.example.sonara.domain.model.Nacionalidade
 import com.example.sonara.domain.model.UserType
 
 data class SignUpUIState(
-    val nome: FieldState = FieldState(),
-    val cpf: FieldState = FieldState(),
-    val dataNascimento: FieldState = FieldState(),
-    val email: FieldState = FieldState(),
-    val emailAgain: FieldState = FieldState(),
-    val password: FieldState = FieldState(),
-    val passwordAgain: FieldState = FieldState(),
+    // ── Dados pessoais ────────────────────────────────────────────────────────
+    val nome: FieldState           = FieldState(),
+    val cpf: FieldState            = FieldState(),
+    val dataNascimento: FieldState = FieldState(),   // "yyyy-MM-dd"
+    val telefone: FieldState       = FieldState(),
+    val email: FieldState          = FieldState(),
+    val emailAgain: FieldState     = FieldState(),
+    val password: FieldState       = FieldState(),
+    val passwordAgain: FieldState  = FieldState(),
 
-    val userType: SelectionFieldState<Set<UserType>> =
-        SelectionFieldState(
-            value = emptySet()
-        ),
+    // ── Tipo de usuário (ÚNICO — agora é UserType? e não Set<UserType>) ───────
+    val userType: SelectionFieldState<UserType?> = SelectionFieldState(value = null),
 
-    val gender: SelectionFieldState<Gender?> =
-        SelectionFieldState(
-            value = null
-        ),
+    // ── Gênero da pessoa ──────────────────────────────────────────────────────
+    val gender: SelectionFieldState<Gender?> = SelectionFieldState(value = null),
 
-    val profileImageUri: Uri? = null,
+    // ── Nacionalidade (carregada da API) ──────────────────────────────────────
+    val nacionalidade: SelectionFieldState<Nacionalidade?> = SelectionFieldState(value = null),
+    val nacionalidades: List<Nacionalidade> = emptyList(),
+
+    // ── Gêneros musicais (multi-select, carregados da API) ────────────────────
+    val generosMusicaisSelected: Set<Int> = emptySet(),   // IDs selecionados
+    val generosMusicaisError: String?     = null,
+    val generosMusicaisDisponiveis: List<GeneroMusical> = emptyList(),
+
+    // ── Dados artísticos (opcionais conforme tipo) ────────────────────────────
+    val nomeArtistico: FieldState = FieldState(),
+    val descricao: FieldState     = FieldState(),
+
+    // ── Foto de perfil ────────────────────────────────────────────────────────
+    val profileImageUri: Uri?     = null,
     val profileImageError: String? = null,
-    val isImageLoading: Boolean = false,
-    val address: AddressUiState = AddressUiState(),
-    val isLoading: Boolean = false
+    val isImageLoading: Boolean   = false,
+
+    // ── Endereço ──────────────────────────────────────────────────────────────
+    val address: AddressUiState   = AddressUiState(),
+
+    // ── Controle de UI ────────────────────────────────────────────────────────
+    val isLoading: Boolean        = false,
+    val isLoadingCatalogs: Boolean = false
 )

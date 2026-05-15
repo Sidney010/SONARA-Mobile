@@ -8,7 +8,6 @@ import androidx.compose.foundation.clickable
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.sonara.core.image.ImageUtils
@@ -18,137 +17,113 @@ import com.example.sonara.features.cadastrar.components.SignUpCard
 import com.example.sonara.features.cadastrar.event.SignUpEvent
 import com.example.sonara.features.cadastrar.viewmodel.SignUpViewModel
 
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SignUpScreen(
     viewModel: SignUpViewModel = hiltViewModel(),
     onNavigateToLogin: () -> Unit,
+    onSignUpSuccess: () -> Unit = {}
 ) {
-    val uiState by viewModel.uiState
-    val context = LocalContext.current
-
-    var showImageOptions by remember { mutableStateOf(false) }
-
-    // Guardar a URI da foto que está sendo tirada no momento
+    val uiState     = viewModel.uiState.value
+    val context     = LocalContext.current
+    var showOptions by remember { mutableStateOf(false) }
     var currentPhotoUri by rememberSaveable { mutableStateOf<Uri?>(null) }
 
-    val cameraLauncher = rememberLauncherForActivityResult(
-        ActivityResultContracts.TakePicture()
-    ) { success ->
-        if (success && currentPhotoUri != null) {
-            currentPhotoUri?.let { viewModel.onImagePicked(context, it) }
-        }
+    // ── Launchers ─────────────────────────────────────────────────────────────
+    val cameraLauncher = rememberLauncherForActivityResult(ActivityResultContracts.TakePicture()) { success ->
+        if (success) currentPhotoUri?.let { viewModel.onImagePicked(context, it) }
     }
-
-    val galleryLauncher = rememberLauncherForActivityResult(
-        ActivityResultContracts.GetContent()
-    ) { uri ->
+    val galleryLauncher = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri ->
         uri?.let { viewModel.onImagePicked(context, it) }
     }
-
-    val permissionLauncher = rememberLauncherForActivityResult(
-        ActivityResultContracts.RequestPermission()
-    ) { granted ->
+    val permissionLauncher = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
         if (granted) {
             val uri = ImageUtils.createTempImageUri(context)
             currentPhotoUri = uri
-            currentPhotoUri?.let { cameraLauncher.launch(it) }
+            cameraLauncher.launch(uri)
         }
     }
 
+    // ── Eventos ───────────────────────────────────────────────────────────────
     val snackbarHostState = remember { SnackbarHostState() }
-
     LaunchedEffect(Unit) {
         viewModel.event.collect { event ->
             when (event) {
                 is SignUpEvent.NavigateToLogin -> onNavigateToLogin()
-                is SignUpEvent.ShowError -> {
-                    // Exibe a mensagem recebida do ViewModel
-                    snackbarHostState.showSnackbar(
-                        message = event.message,
-                        duration = SnackbarDuration.Short
-                    )
-                }
+                is SignUpEvent.ShowError       -> snackbarHostState.showSnackbar(event.message, duration = SnackbarDuration.Short)
             }
         }
     }
-    Scaffold(
-        snackbarHost = { SnackbarHost(snackbarHostState) }
-    ) { padding ->
+
+    Scaffold(snackbarHost = { SnackbarHost(snackbarHostState) }) { _ ->
         ScreenContainer {
             SonaraLogo()
-
             SignUpCard(
-                nome = uiState.nome.value,
-                nomeError = uiState.nome.error,
-                onNomeChange = viewModel::onNomeChange,
-
-                cpf = uiState.cpf.value,
-                cpfError = uiState.cpf.error,
-                onCpfChange = viewModel::onCpfChange,
-
-                email = uiState.email.value,
-                emailAgain = uiState.emailAgain.value,
-                emailError = uiState.email.error,
-                emailAgainError = uiState.emailAgain.error,
-                onEmailChange = viewModel::onEmailChange,
-                onEmailAgainChange = viewModel::onEmailAgainChange,
-
-                password = uiState.password.value,
-                passwordAgain = uiState.passwordAgain.value,
-                passwordError = uiState.password.error,
-                passwordAgainError = uiState.passwordAgain.error,
-                onPasswordChange = viewModel::onPasswordChange,
-                onPasswordAgainChange = viewModel::onPasswordAgainChange,
-
-                userType = uiState.userType.value,
-                onUserTypeChange = viewModel::onUserTypeChange,
-
-                profileImageUri = uiState.profileImageUri,
+                // Pessoais
+                nome = uiState.nome.value, nomeError = uiState.nome.error, onNomeChange = viewModel::onNomeChange,
+                cpf  = uiState.cpf.value,  cpfError  = uiState.cpf.error,  onCpfChange  = viewModel::onCpfChange,
+                dataNascimento      = uiState.dataNascimento.value,
+                dataNascimentoError = uiState.dataNascimento.error,
+                onDataNascimentoChange = viewModel::onDataNascimentoChange,
+                telefone = uiState.telefone.value, onTelefoneChange = viewModel::onTelefoneChange,
+                // Tipo de usuário (único)
+                userType  = uiState.userType.value, userTypeError = uiState.userType.error, onUserTypeChange = viewModel::onUserTypeChange,
+                // Gênero
+                gender    = uiState.gender.value, genderError = uiState.gender.error, onGenderChange = viewModel::onGenderChange,
+                // Nacionalidade
+                nacionalidade  = uiState.nacionalidade.value,
+                nacionalidadeError = uiState.nacionalidade.error,
+                nacionalidades = uiState.nacionalidades,
+                onNacionalidadeChange = viewModel::onNacionalidadeChange,
+                // Gêneros musicais
+                generosMusicaisDisponiveis = uiState.generosMusicaisDisponiveis,
+                generosMusicaisSelected    = uiState.generosMusicaisSelected,
+                generosMusicaisError       = uiState.generosMusicaisError,
+                onGeneroMusicalToggle      = viewModel::onGeneroMusicalToggle,
+                // Email/senha
+                email = uiState.email.value, emailAgain = uiState.emailAgain.value,
+                emailError = uiState.email.error, emailAgainError = uiState.emailAgain.error,
+                onEmailChange = viewModel::onEmailChange, onEmailAgainChange = viewModel::onEmailAgainChange,
+                password = uiState.password.value, passwordAgain = uiState.passwordAgain.value,
+                passwordError = uiState.password.error, passwordAgainError = uiState.passwordAgain.error,
+                onPasswordChange = viewModel::onPasswordChange, onPasswordAgainChange = viewModel::onPasswordAgainChange,
+                // Artísticos
+                nomeArtistico = uiState.nomeArtistico.value, onNomeArtisticoChange = viewModel::onNomeArtisticoChange,
+                descricao     = uiState.descricao.value,     onDescricaoChange     = viewModel::onDescricaoChange,
+                // Imagem
+                profileImageUri   = uiState.profileImageUri,
                 profileImageError = uiState.profileImageError,
-
-                gender = uiState.gender.value,
-                genderError = uiState.gender.error,
-                onGenderChange = viewModel::onGenderChange,
-
-                cep = uiState.address.cep,
-                onCepChange = viewModel::onCepChange,
-
-                rua = uiState.address.rua,
-                onRuaChange = viewModel::onRuaChange,
-
-                cidade = uiState.address.cidade,
-                onCidadeChange = viewModel::onCidadeChange,
-
-                bairro = uiState.address.bairro,
-                onBairroChange = viewModel::onBairroChange,
-
-                uf = uiState.address.uf,
-                onUfChange = viewModel::onUfChange,
-
-
-                onImageClick = { showImageOptions = true },
+                onImageClick      = { showOptions = true },
+                // Endereço
+                cep = uiState.address.cep, onCepChange = viewModel::onCepChange,
+                rua = uiState.address.rua, onRuaChange = viewModel::onRuaChange,
+                bairro = uiState.address.bairro, onBairroChange = viewModel::onBairroChange,
+                cidade = uiState.address.cidade, onCidadeChange = viewModel::onCidadeChange,
+                uf     = uiState.address.uf,     onUfChange     = viewModel::onUfChange,
+                numero = uiState.address.numero, onNumeroChange = viewModel::onNumeroChange,
+                complemento = uiState.address.complemento, onComplementoChange = viewModel::onComplementoChange,
+                isLoadingCep = uiState.address.isLoading,
+                // Controle
+                isLoading = uiState.isLoading,
                 onRegisterClick = viewModel::onRegisterClick
             )
         }
     }
 
-
-    if (showImageOptions) {
-        ModalBottomSheet(onDismissRequest = { showImageOptions = false }) {
+    // ── Bottom sheet de seleção de foto ───────────────────────────────────────
+    if (showOptions) {
+        ModalBottomSheet(onDismissRequest = { showOptions = false }) {
             ListItem(
                 headlineContent = { Text("Tirar foto") },
-                modifier = Modifier.clickable {
-                    showImageOptions = false
-                    // Sempre pedir/verificar permissão antes de criar a URI
+                modifier = androidx.compose.ui.Modifier.clickable {
+                    showOptions = false
                     permissionLauncher.launch(Manifest.permission.CAMERA)
                 }
             )
             ListItem(
                 headlineContent = { Text("Escolher da galeria") },
-                modifier = Modifier.clickable {
-                    showImageOptions = false
+                modifier = androidx.compose.ui.Modifier.clickable {
+                    showOptions = false
                     galleryLauncher.launch("image/*")
                 }
             )

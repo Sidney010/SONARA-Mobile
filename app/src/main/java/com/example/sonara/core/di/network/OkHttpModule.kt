@@ -1,5 +1,6 @@
 package com.example.sonara.core.di.network
 
+import com.example.sonara.core.auth.AuthInterceptor
 import com.example.sonara.core.network.NetworkConstants
 import dagger.Module
 import dagger.Provides
@@ -16,44 +17,24 @@ object OkHttpModule {
 
     @Provides
     @Singleton
-    fun provideLoggingInterceptor():
-            HttpLoggingInterceptor {
-
+    fun provideLoggingInterceptor(): HttpLoggingInterceptor {
         return HttpLoggingInterceptor().apply {
-
-            level =
-                HttpLoggingInterceptor.Level.BODY
+            level = HttpLoggingInterceptor.Level.BODY
         }
     }
 
     @Provides
     @Singleton
     fun provideOkHttpClient(
-        loggingInterceptor:
-        HttpLoggingInterceptor
+        loggingInterceptor: HttpLoggingInterceptor,
+        authInterceptor: AuthInterceptor
     ): OkHttpClient {
-
         return OkHttpClient.Builder()
-
-            .connectTimeout(
-                NetworkConstants.TIME_OUT,
-                TimeUnit.SECONDS
-            )
-
-            .readTimeout(
-                NetworkConstants.TIME_OUT,
-                TimeUnit.SECONDS
-            )
-
-            .writeTimeout(
-                NetworkConstants.TIME_OUT,
-                TimeUnit.SECONDS
-            )
-
-            .addInterceptor(
-                loggingInterceptor
-            )
-
+            .connectTimeout(NetworkConstants.TIME_OUT, TimeUnit.SECONDS)
+            .readTimeout(NetworkConstants.TIME_OUT, TimeUnit.SECONDS)
+            .writeTimeout(NetworkConstants.TIME_OUT, TimeUnit.SECONDS)
+            .addInterceptor(authInterceptor)
+            .addInterceptor(loggingInterceptor)
             .build()
     }
 }
