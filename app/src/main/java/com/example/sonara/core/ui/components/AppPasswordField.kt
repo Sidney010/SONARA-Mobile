@@ -14,9 +14,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
-import androidx.lint.kotlin.metadata.Visibility
 
-// CORREÇÃO: ícone do olho estava usando sonara_logo para ambos os estados
 @Composable
 fun AppPasswordField(
     value: String,

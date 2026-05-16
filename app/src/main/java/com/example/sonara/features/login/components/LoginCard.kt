@@ -2,6 +2,7 @@ package com.example.sonara.features.login.components
 
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
@@ -20,6 +21,8 @@ fun LoginCard(
     onEmailChange: (String) -> Unit,
     emailError: String?,
     onPasswordChange: (String) -> Unit,
+    passwordError: String? = null,
+    isLoading: Boolean     = false,
     onLoginClick: () -> Unit,
     onSignUpClick: () -> Unit,
     onForgotClick: () -> Unit,
@@ -42,17 +45,28 @@ fun LoginCard(
             ),
             errorMessage = emailError
         )
+
         AppPasswordField(
             value = password,
             onValueChange = onPasswordChange,
+            isError       = passwordError != null,
+            errorMessage  = passwordError
         )
-        AppButton(
-            text = "Entrar",
-            onClick = onLoginClick
-        )
+
+
+        if (isLoading) {
+            CircularProgressIndicator()
+        } else {
+            AppButton(
+                text = "Entrar",
+                onClick = onLoginClick
+            )
+        }
 
         SignUpRow(onClick = onSignUpClick )
 
         ForgotPasswordRow(onClick = onForgotClick)
+
+
     }
 }

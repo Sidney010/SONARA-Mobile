@@ -11,104 +11,62 @@ import com.example.sonara.features.login.ui.LoginScreen
 import com.example.sonara.features.recuperarsenha.ui.RecoverPasswordScreen
 import com.example.sonara.features.trocarrsenha.ui.RedefinedPasswordScreen
 
-fun NavGraphBuilder.authGraph(
-    navController: NavController
-) {
+fun NavGraphBuilder.authGraph(navController: NavController) {
 
     composable(Routes.Start.route) {
-
         StartWelcomeScreen(
-
-            onNavigateToLogin = {
-                navController.navigate(Routes.Login.route)
-            },
-
+            onNavigateToLogin = { navController.navigate(Routes.Login.route) },
+            // Acesso anônimo: vai para o Main mas SEM token (apenas visualização)
             onNavigateAnonymous = {
-
                 navController.navigate(Routes.Main.route) {
-
-                    popUpTo(Routes.Start.route) {
-                        inclusive = true
-                    }
+                    popUpTo(Routes.Start.route) { inclusive = true }
                 }
             }
         )
     }
 
     composable(
-        route = Routes.Login.route,
-        enterTransition = { NavigationAnimations.enter() },
-        exitTransition = { NavigationAnimations.exit() },
+        route              = Routes.Login.route,
+        enterTransition    = { NavigationAnimations.enter() },
+        exitTransition     = { NavigationAnimations.exit() },
         popEnterTransition = { NavigationAnimations.popEnter() },
-        popExitTransition = { NavigationAnimations.popExit() }
+        popExitTransition  = { NavigationAnimations.popExit() }
     ) {
-
         LoginScreen(
-
-            onNavigateToRecoverPassword = {
-                navController.navigate(
-                    Routes.RecoverPassword.route
-                )
-            },
-
-            onNavigateSignUp = {
-                navController.navigate(
-                    Routes.SignUp.route
-                )
-            },
-
-//            onLoginSuccess = {
-//
-//                navController.navigate(Routes.Main.route) {
-//
-//                    popUpTo(Routes.Login.route) {
-//                        inclusive = true
-//                    }
-//                }
-//            }
-        )
-    }
-
-    composable(Routes.SignUp.route) {
-
-        SignUpScreen(
-
-            onNavigateToLogin = {
-                navController.popBackStack()
-            },
-
-//            onSignUpSuccess = {
-//
-//                navController.navigate(Routes.Main.route)
-//            }
-        )
-    }
-
-    composable(Routes.RecoverPassword.route) {
-
-        RecoverPasswordScreen(
-
-            onNavigateToRedefinedPassword = {
-                navController.navigate(
-                    Routes.RedefinedPassword.route
-                )
+            onNavigateToRecoverPassword = { navController.navigate(Routes.RecoverPassword.route) },
+            onNavigateSignUp = { navController.navigate(Routes.SignUp.route) },
+            // CORREÇÃO: parâmetro onLoginSuccess que estava faltando
+            onLoginSuccess = {
+                navController.navigate(Routes.Main.route) {
+                    popUpTo(Routes.Login.route) { inclusive = true }
+                }
             }
         )
     }
 
+    composable(Routes.SignUp.route) {
+        SignUpScreen(
+            onNavigateToLogin = { navController.popBackStack() },
+            // CORREÇÃO: onSignUpSuccess estava comentado no grafo e ausente na tela
+            onSignUpSuccess = {
+                navController.navigate(Routes.Main.route) {
+                    popUpTo(Routes.Start.route) { inclusive = true }
+                }
+            }
+        )
+    }
+
+    composable(Routes.RecoverPassword.route) {
+        RecoverPasswordScreen(
+            onNavigateToRedefinedPassword = { navController.navigate(Routes.RedefinedPassword.route) }
+        )
+    }
+
     composable(Routes.RedefinedPassword.route) {
-
         RedefinedPasswordScreen(
-
             onNavigateToLogin = {
-
-                navController.navigate(
-                    Routes.Login.route
-                ) {
-
-                    popUpTo(Routes.Login.route) {
-                        inclusive = true
-                    }
+                navController.navigate(Routes.Login.route) {
+                    popUpTo(Routes.Login.route) { inclusive = true }
                 }
             }
         )

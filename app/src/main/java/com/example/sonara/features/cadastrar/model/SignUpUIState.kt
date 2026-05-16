@@ -19,13 +19,13 @@ data class SignUpUIState(
     val password: FieldState       = FieldState(),
     val passwordAgain: FieldState  = FieldState(),
 
-    // ── Tipo de usuário (ÚNICO — agora é UserType? e não Set<UserType>) ───────
+    // ── Tipo de usuário
     val userType: SelectionFieldState<UserType?> = SelectionFieldState(value = null),
 
-    // ── Gênero da pessoa ──────────────────────────────────────────────────────
+    // ── Gênero da pessoa
     val gender: SelectionFieldState<Gender?> = SelectionFieldState(value = null),
 
-    // ── Nacionalidade (carregada da API) ──────────────────────────────────────
+    // ── Nacionalidade (carregada da API)
     val nacionalidade: SelectionFieldState<Nacionalidade?> = SelectionFieldState(value = null),
     val nacionalidades: List<Nacionalidade> = emptyList(),
 
@@ -34,19 +34,19 @@ data class SignUpUIState(
     val generosMusicaisError: String?     = null,
     val generosMusicaisDisponiveis: List<GeneroMusical> = emptyList(),
 
-    // ── Dados artísticos (opcionais conforme tipo) ────────────────────────────
+    // Dados artísticos (opcionais conforme tipo)
     val nomeArtistico: FieldState = FieldState(),
     val descricao: FieldState     = FieldState(),
 
-    // ── Foto de perfil ────────────────────────────────────────────────────────
+    // Foto de perfil
     val profileImageUri: Uri?     = null,
     val profileImageError: String? = null,
     val isImageLoading: Boolean   = false,
 
-    // ── Endereço ──────────────────────────────────────────────────────────────
+    // Endereço
     val address: AddressUiState   = AddressUiState(),
 
-    // ── Controle de UI ────────────────────────────────────────────────────────
+    // Controle de UI
     val isLoading: Boolean        = false,
     val isLoadingCatalogs: Boolean = false
 )

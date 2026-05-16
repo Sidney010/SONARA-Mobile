@@ -9,6 +9,6 @@ class ListarGenerosMusicaisUseCase @Inject constructor(
     private val repository: GeneroMusicalRepository
 ) {
     suspend operator fun invoke(): AppResult<List<GeneroMusical>> {
-        return repository.listar()
+        return repository.listarGeneroMusical()
     }
 }

@@ -176,7 +176,7 @@ fun SignUpCard(
                 placeholder = "Descrição / Bio"
             )
 
-            HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp))
+            //HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp))
 
             // ── Email ─────────────────────────────────────────────────────
             AppTextField(
@@ -203,7 +203,7 @@ fun SignUpCard(
                 isError = passwordAgainError != null, errorMessage = passwordAgainError
             )
 
-            HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp))
+            //HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp))
 
             // ── Endereço ──────────────────────────────────────────────────
             Text("Endereço", style = MaterialTheme.typography.labelLarge,
