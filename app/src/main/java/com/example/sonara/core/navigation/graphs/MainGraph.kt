@@ -14,6 +14,7 @@ import com.example.sonara.core.ui.components.navigation.BottomNavigationBar
 import com.example.sonara.core.ui.components.navigation.BottomNavigationState
 import com.example.sonara.features.cadidatar.ui.ApplyScreen
 import com.example.sonara.features.home.ui.HomeScreen
+import com.example.sonara.features.perfilArtista.ui.ArtistProfileScreen
 import com.example.sonara.features.plano.ui.PlansScreen
 
 fun NavGraphBuilder.mainGraph(
@@ -78,6 +79,7 @@ fun NavGraphBuilder.mainGraph(
 
                 composable(Routes.Search.route) {
                     // SearchScreen()
+                    ArtistProfileScreen()
                 }
 
                 composable(Routes.Events.route) {
