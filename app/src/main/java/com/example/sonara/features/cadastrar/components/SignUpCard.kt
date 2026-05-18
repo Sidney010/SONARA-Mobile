@@ -30,41 +30,41 @@ import com.example.sonara.features.cadastrar.components.signupcard.UserTypeSingl
 
 @Composable
 fun SignUpCard(
-    // ── Dados pessoais ────────────────────────────────────────────────────
+    // Dados pessoais
     nome: String, nomeError: String?, onNomeChange: (String) -> Unit,
     cpf: String, cpfError: String?, onCpfChange: (String) -> Unit,
     dataNascimento: String, dataNascimentoError: String?, onDataNascimentoChange: (String) -> Unit,
     telefone: String, onTelefoneChange: (String) -> Unit,
 
-    // ── Tipo de usuário (único) ───────────────────────────────────────────
+    // Tipo de usuário (único)
     userType: UserType?, userTypeError: String?, onUserTypeChange: (UserType) -> Unit,
 
-    // ── Gênero da pessoa ──────────────────────────────────────────────────
+    // Gênero da pessoa
     gender: Gender?, genderError: String?, onGenderChange: (Gender) -> Unit,
 
-    // ── Nacionalidade ─────────────────────────────────────────────────────
+    // Nacionalidade
     nacionalidade: Nacionalidade?, nacionalidadeError: String?,
     nacionalidades: List<Nacionalidade>, onNacionalidadeChange: (Nacionalidade) -> Unit,
 
-    // ── Gêneros musicais ──────────────────────────────────────────────────
+    // Gêneros musicais
     generosMusicaisDisponiveis: List<GeneroMusical>,
     generosMusicaisSelected: Set<Int>, generosMusicaisError: String?,
     onGeneroMusicalToggle: (Int) -> Unit,
 
-    // ── Email e senha ─────────────────────────────────────────────────────
+    // Email e senha
     email: String, emailAgain: String, emailError: String?, emailAgainError: String?,
     onEmailChange: (String) -> Unit, onEmailAgainChange: (String) -> Unit,
     password: String, passwordAgain: String, passwordError: String?, passwordAgainError: String?,
     onPasswordChange: (String) -> Unit, onPasswordAgainChange: (String) -> Unit,
 
-    // ── Dados artísticos ──────────────────────────────────────────────────
+    // Dados artísticos
     nomeArtistico: String, onNomeArtisticoChange: (String) -> Unit,
     descricao: String, onDescricaoChange: (String) -> Unit,
 
-    // ── Foto ──────────────────────────────────────────────────────────────
+    // Foto
     profileImageUri: Uri?, profileImageError: String?, onImageClick: () -> Unit,
 
-    // ── Endereço ──────────────────────────────────────────────────────────
+    // Endereço
     cep: String, onCepChange: (String) -> Unit,
     rua: String, onRuaChange: (String) -> Unit,
     bairro: String, onBairroChange: (String) -> Unit,
@@ -74,7 +74,7 @@ fun SignUpCard(
     complemento: String, onComplementoChange: (String) -> Unit,
     isLoadingCep: Boolean = false,
 
-    // ── Ação ──────────────────────────────────────────────────────────────
+    // Ação
     isLoading: Boolean = false,
     onRegisterClick: () -> Unit,
 ) {
@@ -90,21 +90,21 @@ fun SignUpCard(
             verticalArrangement   = Arrangement.spacedBy(20.dp),
             horizontalAlignment   = Alignment.CenterHorizontally
         ) {
-            // ── Foto de perfil ────────────────────────────────────────────
+            // Foto de perfil
             UserProfileImagePicker(
                 imageUri = profileImageUri,
                 error    = profileImageError,
                 onClick  = onImageClick
             )
 
-            // ── Nome ──────────────────────────────────────────────────────
+            // Nome
             AppTextField(
                 value = nome, onValueChange = onNomeChange,
                 placeholder = "Nome completo *",
                 isError = nomeError != null, errorMessage = nomeError
             )
 
-            // ── CPF ───────────────────────────────────────────────────────
+            // CPF
             AppTextField(
                 value = cpf,
                 onValueChange = { input ->
@@ -117,7 +117,7 @@ fun SignUpCard(
                 isError = cpfError != null, errorMessage = cpfError
             )
 
-            // ── Data de nascimento (calendar picker) ─────────────────────
+            // Data de nascimento (calendar picker)
             DatePickerField(
                 value = dataNascimento,
                 onDateSelected = onDataNascimentoChange,
@@ -125,14 +125,14 @@ fun SignUpCard(
                 errorMessage = dataNascimentoError
             )
 
-            // ── Telefone ──────────────────────────────────────────────────
+            // Telefone
             AppTextField(
                 value = telefone, onValueChange = onTelefoneChange,
                 placeholder = "Telefone",
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone)
             )
 
-            // ── Tipo de usuário (radio button único) ──────────────────────
+            // Tipo de usuário (radio button único)
             UserTypeSingleSelector(
                 selected = userType,
                 onSelectedChange = onUserTypeChange,
@@ -140,13 +140,13 @@ fun SignUpCard(
                 errorMessage = userTypeError
             )
 
-            // ── Gênero da pessoa ──────────────────────────────────────────
+            // Gênero da pessoa
             GenderComboBox(
                 selected = gender, onSelectedChange = onGenderChange,
                 isError = genderError != null, errorMessage = genderError
             )
 
-            // ── Nacionalidade ─────────────────────────────────────────────
+            // Nacionalidade
             NacionalidadeComboBox(
                 selected = nacionalidade,
                 opcoes   = nacionalidades,
@@ -155,7 +155,7 @@ fun SignUpCard(
                 errorMessage = nacionalidadeError
             )
 
-            // ── Gêneros musicais ──────────────────────────────────────────
+            // Gêneros musicais
             GeneroMusicalMultiSelect(
                 generos  = generosMusicaisDisponiveis,
                 selected = generosMusicaisSelected,
@@ -164,27 +164,26 @@ fun SignUpCard(
                 errorMessage = generosMusicaisError
             )
 
-            // ── Nome artístico ────────────────────────────────────────────
+            // Nome artístico
             AppTextField(
                 value = nomeArtistico, onValueChange = onNomeArtisticoChange,
                 placeholder = "Nome artístico"
             )
 
-            // ── Descrição ─────────────────────────────────────────────────
+            // Descrição
             AppTextField(
                 value = descricao, onValueChange = onDescricaoChange,
                 placeholder = "Descrição / Bio"
             )
 
-            //HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp))
-
-            // ── Email ─────────────────────────────────────────────────────
+            // Email
             AppTextField(
                 value = email, onValueChange = onEmailChange,
                 placeholder = "Email *",
                 isError = emailError != null, errorMessage = emailError,
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email)
             )
+
             AppTextField(
                 value = emailAgain, onValueChange = onEmailAgainChange,
                 placeholder = "Confirmar email *",
@@ -192,7 +191,7 @@ fun SignUpCard(
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email)
             )
 
-            // ── Senha ─────────────────────────────────────────────────────
+            // Senha
             AppPasswordField(
                 value = password, onValueChange = onPasswordChange,
                 isError = passwordError != null, errorMessage = passwordError
@@ -203,9 +202,7 @@ fun SignUpCard(
                 isError = passwordAgainError != null, errorMessage = passwordAgainError
             )
 
-            //HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp))
-
-            // ── Endereço ──────────────────────────────────────────────────
+            // Endereço
             Text("Endereço", style = MaterialTheme.typography.labelLarge,
                 color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f))
 
@@ -232,7 +229,7 @@ fun SignUpCard(
                 AppTextField(value = complemento, onValueChange = onComplementoChange, placeholder = "Complemento", modifier = Modifier.weight(2f))
             }
 
-            // ── Botão de cadastro ─────────────────────────────────────────
+            // Botão de cadastro
             if (isLoading) {
                 CircularProgressIndicator()
             } else {

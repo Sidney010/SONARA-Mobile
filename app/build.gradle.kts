@@ -58,7 +58,7 @@ dependencies {
     implementation(libs.kotlin.stdlib)
     implementation(libs.androidx.exifinterface)
 
-    // Ciclo de vida (Lifecycle) Corrigidos e Alinhados
+    // Ciclo de vida (Lifecycle)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.lifecycle.runtime.compose)
     implementation(libs.androidx.lifecycle.viewmodel.compose)
@@ -69,13 +69,13 @@ dependencies {
     implementation(libs.androidx.compose.ui)
     implementation(libs.androidx.compose.ui.graphics)
     implementation(libs.androidx.compose.ui.tooling.preview)
-
-    // Mudança importante: Usar a referência corrigida do Material 3
-    implementation(libs.androidx.compose.material3)
-
     implementation(libs.androidx.compose.foundation)
     implementation(libs.androidx.compose.foundation.layout)
     implementation(libs.androidx.compose.animation)
+
+    // Material 3 Corrigido (Apenas uma chamada referenciando o TOML perfeitamente)
+    implementation(libs.androidx.compose.material3)
+    implementation(libs.androidx.compose.material.icons.extended)
 
     // Navegação e Room
     implementation(libs.androidx.navigation.compose)
@@ -90,15 +90,13 @@ dependencies {
     kapt(libs.hilt.compiler)
     implementation(libs.androidx.hilt.navigation.compose)
 
-    // GSON e Conversores do Retrofit (ADICIONAR ESTAS LINHAS)
+    // GSON e Conversores do Retrofit
     implementation(libs.gson)
     implementation(libs.retrofit.converter.gson)
-
     implementation(libs.androidx.datastore.preferences)
     implementation(libs.okhttp.logging.interceptor)
-    implementation(libs.androidx.compose.material.icons.extended)
 
-    // Testes e Debug (Fim do teu bloco de dependências)
+    // Testes e Debug
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -106,5 +104,4 @@ dependencies {
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)
     debugImplementation(libs.androidx.compose.ui.tooling)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
-
 }

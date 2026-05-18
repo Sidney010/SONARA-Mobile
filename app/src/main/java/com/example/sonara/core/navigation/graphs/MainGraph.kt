@@ -69,7 +69,11 @@ fun NavGraphBuilder.mainGraph(
             ) {
 
                 composable(Routes.Home.route) {
-                    HomeScreen()
+                    HomeScreen(
+                        searchQuery = "",
+                        onSearchQueryChange = {/*TODO*/},
+                        eventos = emptyList(),
+                    )
                 }
 
                 composable(Routes.Search.route) {
