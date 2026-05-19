@@ -7,12 +7,12 @@ plugins {
 
 android {
     namespace = "com.example.sonara"
-    compileSdk = 34
+    compileSdk = 34 // RETORNADO PARA 34: Compatibilidade total com o AGP 8.5.2
 
     defaultConfig {
         applicationId = "com.example.sonara"
         minSdk = 26
-        targetSdk = 34
+        targetSdk = 34 // RETORNADO PARA 34
         versionCode = 1
         versionName = "1.0"
 
@@ -73,7 +73,7 @@ dependencies {
     implementation(libs.androidx.compose.foundation.layout)
     implementation(libs.androidx.compose.animation)
 
-    // Material 3 Corrigido (Apenas uma chamada referenciando o TOML perfeitamente)
+    // Material 3 e Ícones
     implementation(libs.androidx.compose.material3)
     implementation(libs.androidx.compose.material.icons.extended)
 
@@ -85,12 +85,12 @@ dependencies {
     implementation(libs.coil.compose)
     implementation(libs.coil.base)
 
-    // Hilt (Injeção de dependência)
+    // Hilt (Injeção de dependência) - CORRIGIDO: Removido o foundation intruso daqui
     implementation(libs.hilt.android)
     kapt(libs.hilt.compiler)
     implementation(libs.androidx.hilt.navigation.compose)
 
-    // GSON e Conversores do Retrofit
+    // GSON, Network e DataStore
     implementation(libs.gson)
     implementation(libs.retrofit.converter.gson)
     implementation(libs.androidx.datastore.preferences)
@@ -104,4 +104,16 @@ dependencies {
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)
     debugImplementation(libs.androidx.compose.ui.tooling)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
+}
+
+// Forçador de Segurança para barrar qualquer sub-dependência transitiva intrusa de fora
+configurations.all {
+    resolutionStrategy {
+        force(
+            "androidx.core:core:1.13.1",
+            "androidx.core:core-ktx:1.13.1",
+            "androidx.lifecycle:lifecycle-runtime-compose:2.8.4",
+            "androidx.lifecycle:lifecycle-viewmodel-compose:2.8.4"
+        )
+    }
 }
