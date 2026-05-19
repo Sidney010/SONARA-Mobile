@@ -5,7 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.sonara.core.auth.TokenManager
 import com.example.sonara.core.common.AppResult
 import com.example.sonara.domain.usecase.BuscarUsuarioPorIdUseCase
-import com.example.sonara.features.artistprofile.model.ArtistProfileUiState
+import com.example.sonara.features.perfilartista.model.ArtistProfileUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
