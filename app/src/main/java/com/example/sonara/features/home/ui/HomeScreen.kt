@@ -46,7 +46,8 @@ fun HomeScreen(
     modifier: Modifier = Modifier,
     viewModel: HomeViewModel = hiltViewModel(),
     onNavigateToProfile: () -> Unit = {},
-    onNavigateToHome: () -> Unit = {}
+    onNavigateToHome: () -> Unit = {},
+    onNavigateToLogin: () -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
@@ -63,7 +64,7 @@ fun HomeScreen(
                 avatarUrl = uiState.avatarUrl
             ),
             onLogoClick         = onNavigateToHome,
-            onAvatarClick       = { if (uiState.isLoggedIn) onNavigateToProfile() },
+            onAvatarClick       = { if (uiState.isLoggedIn) onNavigateToProfile() else onNavigateToLogin() },
             onNotificationClick = {}
         )
 

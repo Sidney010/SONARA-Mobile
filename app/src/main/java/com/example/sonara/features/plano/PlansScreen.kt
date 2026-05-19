@@ -58,8 +58,6 @@ fun PlansScreen(modifier: Modifier = Modifier) {
             onNotificationClick = {}
         )
 
-
-
         Column(
             modifier = Modifier.fillMaxWidth().padding(top = 30.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
