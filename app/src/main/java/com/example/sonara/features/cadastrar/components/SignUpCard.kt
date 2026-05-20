@@ -1,11 +1,22 @@
 package com.example.sonara.features.cadastrar.components
 
 import android.net.Uri
-import androidx.compose.foundation.layout.*
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.shrinkVertically
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.*
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -17,6 +28,7 @@ import com.example.sonara.core.ui.components.AppCardHeader
 import com.example.sonara.core.ui.components.AppPasswordField
 import com.example.sonara.core.ui.components.AppTextField
 import com.example.sonara.core.ui.mask.CpfVisualTransformation
+import com.example.sonara.core.ui.mask.TelefoneVisualTransformation
 import com.example.sonara.domain.model.Gender
 import com.example.sonara.domain.model.GeneroMusical
 import com.example.sonara.domain.model.Nacionalidade
@@ -46,7 +58,7 @@ fun SignUpCard(
     nacionalidade: Nacionalidade?, nacionalidadeError: String?,
     nacionalidades: List<Nacionalidade>, onNacionalidadeChange: (Nacionalidade) -> Unit,
 
-    // Gêneros musicais
+    // Gêneros musicais (só exibidos para Artista)
     generosMusicaisDisponiveis: List<GeneroMusical>,
     generosMusicaisSelected: Set<Int>, generosMusicaisError: String?,
     onGeneroMusicalToggle: (Int) -> Unit,
@@ -57,7 +69,7 @@ fun SignUpCard(
     password: String, passwordAgain: String, passwordError: String?, passwordAgainError: String?,
     onPasswordChange: (String) -> Unit, onPasswordAgainChange: (String) -> Unit,
 
-    // Dados artísticos
+    // Dados artísticos (só exibidos para Artista)
     nomeArtistico: String, onNomeArtisticoChange: (String) -> Unit,
     descricao: String, onDescricaoChange: (String) -> Unit,
 
@@ -78,6 +90,8 @@ fun SignUpCard(
     isLoading: Boolean = false,
     onRegisterClick: () -> Unit,
 ) {
+    val isArtista = userType == UserType.ARTISTA
+
     AppCard(modifier = Modifier.fillMaxWidth()) {
         AppCardHeader("Cadastro")
 
@@ -117,7 +131,7 @@ fun SignUpCard(
                 isError = cpfError != null, errorMessage = cpfError
             )
 
-            // Data de nascimento (calendar picker)
+            // Data de nascimento
             DatePickerField(
                 value = dataNascimento,
                 onDateSelected = onDataNascimentoChange,
@@ -125,14 +139,19 @@ fun SignUpCard(
                 errorMessage = dataNascimentoError
             )
 
-            // Telefone
+            // Telefone com máscara (XX) XXXXX-XXXX
             AppTextField(
-                value = telefone, onValueChange = onTelefoneChange,
+                value = telefone,
+                onValueChange = { input ->
+                    val digits = input.filter { it.isDigit() }
+                    if (digits.length <= 11) onTelefoneChange(digits)
+                },
                 placeholder = "Telefone",
+                visualTransformation = TelefoneVisualTransformation(),
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone)
             )
 
-            // Tipo de usuário (radio button único)
+            // Tipo de usuário
             UserTypeSingleSelector(
                 selected = userType,
                 onSelectedChange = onUserTypeChange,
@@ -155,26 +174,40 @@ fun SignUpCard(
                 errorMessage = nacionalidadeError
             )
 
-            // Gêneros musicais
-            GeneroMusicalMultiSelect(
-                generos  = generosMusicaisDisponiveis,
-                selected = generosMusicaisSelected,
-                onToggle = onGeneroMusicalToggle,
-                isError  = generosMusicaisError != null,
-                errorMessage = generosMusicaisError
-            )
+            // ── Campos exclusivos do ARTISTA ──────────────────────────
+            AnimatedVisibility(
+                visible = isArtista,
+                enter   = expandVertically(),
+                exit    = shrinkVertically()
+            ) {
+                Column(
+                    verticalArrangement = Arrangement.spacedBy(20.dp)
+                ) {
+                    // Gêneros musicais
+                    GeneroMusicalMultiSelect(
+                        generos  = generosMusicaisDisponiveis,
+                        selected = generosMusicaisSelected,
+                        onToggle = onGeneroMusicalToggle,
+                        isError  = generosMusicaisError != null,
+                        errorMessage = generosMusicaisError
+                    )
 
-            // Nome artístico
-            AppTextField(
-                value = nomeArtistico, onValueChange = onNomeArtisticoChange,
-                placeholder = "Nome artístico"
-            )
+                    // Nome artístico
+                    AppTextField(
+                        value = nomeArtistico,
+                        onValueChange = onNomeArtisticoChange,
+                        placeholder = "Nome artístico"
+                    )
 
-            // Descrição
-            AppTextField(
-                value = descricao, onValueChange = onDescricaoChange,
-                placeholder = "Descrição / Bio"
-            )
+                    // Descrição / Bio
+                    AppTextField(
+                        value = descricao,
+                        onValueChange = onDescricaoChange,
+                        placeholder = "Descrição / Bio"
+                    )
+                }
+            }
+            // ─────────────────────────────────────────────────────────
 
             // Email
             AppTextField(
@@ -183,7 +216,6 @@ fun SignUpCard(
                 isError = emailError != null, errorMessage = emailError,
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email)
             )
-
             AppTextField(
                 value = emailAgain, onValueChange = onEmailAgainChange,
                 placeholder = "Confirmar email *",
@@ -203,10 +235,12 @@ fun SignUpCard(
             )
 
             // Endereço
-            Text("Endereço", style = MaterialTheme.typography.labelLarge,
-                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f))
+            Text(
+                "Endereço",
+                style = MaterialTheme.typography.labelLarge,
+                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
+            )
 
-            // CEP — ao completar 8 dígitos busca automaticamente
             AppTextField(
                 value = cep, onValueChange = onCepChange,
                 placeholder = "CEP *",
@@ -215,17 +249,21 @@ fun SignUpCard(
                     { CircularProgressIndicator(modifier = Modifier.size(20.dp), strokeWidth = 2.dp) }
                 } else null
             )
-            AppTextField(value = rua, onValueChange = onRuaChange, placeholder = "Rua")
+            AppTextField(value = rua,    onValueChange = onRuaChange,    placeholder = "Rua")
             AppTextField(value = bairro, onValueChange = onBairroChange, placeholder = "Bairro")
 
-            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                AppTextField(value = cidade, onValueChange = onCidadeChange, placeholder = "Cidade", modifier = Modifier.weight(2f))
-                AppTextField(value = uf, onValueChange = onUfChange, placeholder = "UF", modifier = Modifier.weight(1f))
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                AppTextField(value = cidade, onValueChange = onCidadeChange, placeholder = "Cidade",    modifier = Modifier.weight(2f))
+                AppTextField(value = uf,     onValueChange = onUfChange,     placeholder = "UF",        modifier = Modifier.weight(1f))
             }
-
-            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                AppTextField(value = numero, onValueChange = onNumeroChange, placeholder = "Número", modifier = Modifier.weight(1f),
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number))
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                AppTextField(value = numero,      onValueChange = onNumeroChange,      placeholder = "Número",      modifier = Modifier.weight(1f), keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number))
                 AppTextField(value = complemento, onValueChange = onComplementoChange, placeholder = "Complemento", modifier = Modifier.weight(2f))
             }
 
@@ -234,9 +272,9 @@ fun SignUpCard(
                 CircularProgressIndicator()
             } else {
                 AppButton(
-                    modifier  = Modifier.fillMaxWidth(0.7f),
-                    text      = "Cadastrar-se",
-                    onClick   = onRegisterClick
+                    modifier = Modifier.fillMaxWidth(0.7f),
+                    text     = "Cadastrar-se",
+                    onClick  = onRegisterClick
                 )
             }
         }

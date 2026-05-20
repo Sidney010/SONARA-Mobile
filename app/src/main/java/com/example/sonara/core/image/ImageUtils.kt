@@ -12,7 +12,7 @@ import androidx.exifinterface.media.ExifInterface
 import com.example.sonara.core.common.AppResult
 import java.io.File
 import java.io.FileOutputStream
-import java.util.*
+import java.util.UUID
 
 object ImageUtils {
 

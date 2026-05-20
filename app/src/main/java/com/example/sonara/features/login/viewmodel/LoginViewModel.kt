@@ -8,6 +8,7 @@ import com.example.sonara.core.auth.TokenManager
 import com.example.sonara.core.common.AppResult
 import com.example.sonara.core.validation.EmailValidator
 import com.example.sonara.core.validation.getErrorOrNull
+import com.example.sonara.domain.usecase.BuscarUsuarioPorIdUseCase
 import com.example.sonara.domain.usecase.LoginUseCase
 import com.example.sonara.features.login.event.LoginEvent
 import com.example.sonara.features.login.model.LoginUiState
@@ -20,6 +21,7 @@ import javax.inject.Inject
 @HiltViewModel
 class LoginViewModel @Inject constructor(
     private val loginUseCase: LoginUseCase,
+    private val buscarUsuarioPorIdUseCase: BuscarUsuarioPorIdUseCase,
     private val tokenManager: TokenManager
 ) : ViewModel() {
 
@@ -29,7 +31,7 @@ class LoginViewModel @Inject constructor(
     private val _event = MutableSharedFlow<LoginEvent>()
     val event = _event.asSharedFlow()
 
-    // ── Handlers de campo ─────────────────────────────────────────────────────
+    // ── Handlers de campo ─────────────────────────────────────────────
 
     fun onEmailChange(newEmail: String) {
         _uiState.value = _uiState.value.copy(
@@ -41,25 +43,23 @@ class LoginViewModel @Inject constructor(
     }
 
     fun onPasswordChange(newPassword: String) {
-        // CORREÇÃO: era EmailValidator.validate(password) — completamente errado
         val error = if (newPassword.isBlank()) "Senha obrigatória" else null
         _uiState.value = _uiState.value.copy(
             password = _uiState.value.password.copy(value = newPassword, error = error)
         )
     }
 
-    // ── Login ─────────────────────────────────────────────────────────────────
+    // ── Login ─────────────────────────────────────────────────────────
 
     fun onLoginClick() {
-        val state      = _uiState.value
-        val emailError = EmailValidator.validate(state.email.value).getErrorOrNull()
-        val passError  = if (state.password.value.isBlank()) "Senha obrigatória" else null
+        val state       = _uiState.value
+        val emailError  = EmailValidator.validate(state.email.value).getErrorOrNull()
+        val passError   = if (state.password.value.isBlank()) "Senha obrigatória" else null
 
         _uiState.value = state.copy(
             email    = state.email.copy(error = emailError),
             password = state.password.copy(error = passError)
         )
-
         if (emailError != null || passError != null) return
 
         viewModelScope.launch {
@@ -67,18 +67,45 @@ class LoginViewModel @Inject constructor(
 
             when (val result = loginUseCase(state.email.value, state.password.value)) {
                 is AppResult.Success -> {
-                    // Salva JWT + dados do usuário no DataStore
+                    val loginData = result.data
+
+                    // Salva sessão com tipo padrão primeiro
                     tokenManager.saveSession(
-                        token    = result.data.token,
-                        userId   = result.data.usuario.id ?: 0,
-                        userName = result.data.usuario.nome
+                        token    = loginData.token,
+                        userId   = loginData.usuario.id ?: 0,
+                        userName = loginData.usuario.nome,
+                        userType = "Usuário"
                     )
+
+                    // Busca perfil completo para obter tipo_usuario real
+                    val userId = loginData.usuario.id ?: 0
+                    if (userId > 0) {
+                        when (val perfil = buscarUsuarioPorIdUseCase(userId)) {
+                            is AppResult.Success -> {
+                                val tipo = perfil.data.tipoUsuario?.let {
+                                    when (it.lowercase()) {
+                                        "artista"     -> "Artista"
+                                        "organizador" -> "Organizador"
+                                        else          -> "Usuário"
+                                    }
+                                } ?: "Usuário"
+                                tokenManager.saveSession(
+                                    token    = loginData.token,
+                                    userId   = userId,
+                                    userName = loginData.usuario.nome,
+                                    userType = tipo
+                                )
+                            }
+                            else -> { /* mantém padrão */ }
+                        }
+                    }
+
                     _event.emit(LoginEvent.NavigateToHome)
                 }
                 is AppResult.Error -> {
-                    _event.emit(
-                        LoginEvent.ShowError(result.exception.message ?: "Erro ao fazer login")
-                    )
+                    _event.emit(LoginEvent.ShowError(
+                        result.exception.message ?: "Erro ao fazer login"
+                    ))
                 }
             }
             _uiState.value = _uiState.value.copy(isLoading = false)

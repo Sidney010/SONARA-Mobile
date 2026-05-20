@@ -12,22 +12,42 @@ import com.example.sonara.domain.model.Usuario
 import com.example.sonara.domain.repository.GeneroMusicalRepository
 import com.example.sonara.domain.repository.NacionalidadeRepository
 import com.example.sonara.domain.repository.UsuarioRepository
+import com.google.gson.Gson
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.MultipartBody
+import okhttp3.RequestBody.Companion.asRequestBody
+import okhttp3.RequestBody.Companion.toRequestBody
+import java.io.File
 import javax.inject.Inject
 
 class UsuarioRepositoryImpl @Inject constructor(
     private val remoteDataSource: UsuarioRemoteDataSource
 ) : UsuarioRepository, NacionalidadeRepository, GeneroMusicalRepository {
 
-    // ── Cadastro ──────────────────────────────────────────────────────────────
-    override suspend fun register(user: Usuario): AppResult<Usuario> {
+    // ── Cadastro ──────────────────────────────────────────────────────
+    override suspend fun register(user: Usuario, photoFilePath: String?): AppResult<Usuario> {
+
+        // 1. Serializa o DTO como JSON → RequestBody
+        val dto      = user.toRequestDto()
+        val json     = Gson().toJson(dto)
+        val dadosPart = json.toRequestBody("text/plain".toMediaTypeOrNull())
+
+        // 2. Constrói a parte da foto (opcional)
+        val fotoPart: MultipartBody.Part? = photoFilePath?.let { path ->
+            val file = File(path)
+            if (file.exists()) {
+                val requestBody = file.asRequestBody("image/jpeg".toMediaTypeOrNull())
+                MultipartBody.Part.createFormData("foto", file.name, requestBody)
+            } else null
+        }
+
         return safeApiCall(
-            apiCall = { remoteDataSource.register(user.toRequestDto()) },
+            apiCall = { remoteDataSource.register(fotoPart, dadosPart) },
             mapper  = { it.toDomain() }
         )
     }
 
-    // ── Login ─────────────────────────────────────────────────────────────────
-    // A API de login retorna o body diretamente (sem wrapper ApiResponse)
+    // ── Login ─────────────────────────────────────────────────────────
     override suspend fun login(email: String, senha: String): AppResult<LoginResult> {
         return try {
             val response = remoteDataSource.login(email, senha)
@@ -39,34 +59,25 @@ class UsuarioRepositoryImpl @Inject constructor(
                     AppResult.Error(Exception("Credenciais inválidas"))
                 }
             } else {
-                val code = response.code()
-                AppResult.Error(
-                    Exception(
-                        when (code) {
-                            401 -> "Email ou senha incorretos"
-                            404 -> "Usuário não encontrado"
-                            else -> "Erro ${code}"
-                        }
-                    )
-                )
+                AppResult.Error(Exception(when (response.code()) {
+                    401  -> "Email ou senha incorretos"
+                    404  -> "Usuário não encontrado"
+                    else -> "Erro ${response.code()}"
+                }))
             }
-        } catch (e: Exception) {
-            AppResult.Error(e)
-        }
+        } catch (e: Exception) { AppResult.Error(e) }
     }
 
-    // ── Catálogos
-    override suspend fun listarNacionalidades(): AppResult<List<Nacionalidade>> {
-        return safeApiCall(
+    // ── Catálogos ─────────────────────────────────────────────────────
+    override suspend fun listarNacionalidades(): AppResult<List<Nacionalidade>> =
+        safeApiCall(
             apiCall = { remoteDataSource.getNacionalidades() },
             mapper  = { dto -> dto.nacionalidades.map { it.toDomain() } }
         )
-    }
 
-    override suspend fun listarGeneroMusical(): AppResult<List<GeneroMusical>> {
-        return safeApiCall(
+    override suspend fun listarGeneroMusical(): AppResult<List<GeneroMusical>> =
+        safeApiCall(
             apiCall = { remoteDataSource.getGenerosMusicais() },
             mapper  = { dto -> dto.generoMusical.map { it.toDomain() } }
         )
-    }
 }

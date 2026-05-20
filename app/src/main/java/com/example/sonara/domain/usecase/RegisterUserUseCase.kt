@@ -8,11 +8,8 @@ import javax.inject.Inject
 class RegisterUserUseCase @Inject constructor(
     private val repository: UsuarioRepository
 ) {
-
     suspend operator fun invoke(
-        user: Usuario
-    ): AppResult<Usuario> {
-
-        return repository.register(user)
-    }
+        user: Usuario,
+        photoFilePath: String? = null
+    ): AppResult<Usuario> = repository.register(user, photoFilePath)
 }

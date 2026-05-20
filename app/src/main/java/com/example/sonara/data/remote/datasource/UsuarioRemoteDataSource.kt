@@ -2,36 +2,35 @@ package com.example.sonara.data.remote.datasource
 
 import com.example.sonara.core.network.ApiResponse
 import com.example.sonara.data.remote.api.SonaraApi
-import com.example.sonara.data.remote.dto.request.CreateUsuarioRequestDto
 import com.example.sonara.data.remote.dto.request.LoginRequestDto
 import com.example.sonara.data.remote.dto.response.GeneroMusicalListDto
 import com.example.sonara.data.remote.dto.response.LoginResponseDto
 import com.example.sonara.data.remote.dto.response.NacionalidadeListDto
 import com.example.sonara.data.remote.dto.response.UsuarioResponseDto
+import okhttp3.MultipartBody
+import okhttp3.RequestBody
 import retrofit2.Response
 import javax.inject.Inject
 
 class UsuarioRemoteDataSource @Inject constructor(
     private val api: SonaraApi
 ) {
+    /** Cadastro como multipart: foto (opcional) + JSON de dados */
     suspend fun register(
-        request: CreateUsuarioRequestDto
-    ): Response<ApiResponse<UsuarioResponseDto>> {
-        return api.register(request)
-    }
+        foto: MultipartBody.Part?,
+        dados: RequestBody
+    ): Response<ApiResponse<UsuarioResponseDto>> =
+        api.register(foto, dados)
 
     suspend fun login(
         email: String,
         senha: String
-    ): Response<LoginResponseDto> {
-        return api.login(LoginRequestDto(email = email, senha = senha))
-    }
+    ): Response<LoginResponseDto> =
+        api.login(LoginRequestDto(email = email, senha = senha))
 
-    suspend fun getNacionalidades(): Response<ApiResponse<NacionalidadeListDto>> {
-        return api.getNacionalidades()
-    }
+    suspend fun getNacionalidades(): Response<ApiResponse<NacionalidadeListDto>> =
+        api.getNacionalidades()
 
-    suspend fun getGenerosMusicais(): Response<ApiResponse<GeneroMusicalListDto>> {
-        return api.getGenerosMusicais()
-    }
+    suspend fun getGenerosMusicais(): Response<ApiResponse<GeneroMusicalListDto>> =
+        api.getGenerosMusicais()
 }

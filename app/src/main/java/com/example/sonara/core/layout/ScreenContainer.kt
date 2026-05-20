@@ -1,7 +1,5 @@
 package com.example.sonara.core.layout
 
-import android.R.attr.verticalSpacing
-import android.util.Log.i
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box

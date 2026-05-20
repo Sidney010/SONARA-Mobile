@@ -1,8 +1,6 @@
-package com.example.sonara.core.di.auth
+package com.example.sonara.core.auth
 
 import android.content.Context
-import com.example.sonara.core.auth.AuthInterceptor
-import com.example.sonara.core.auth.TokenManager
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

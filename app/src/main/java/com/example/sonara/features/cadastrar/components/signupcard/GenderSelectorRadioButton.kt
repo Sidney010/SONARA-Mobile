@@ -17,7 +17,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import com.example.sonara.core.ui.components.AppTextField
 import com.example.sonara.domain.model.Gender
 import com.example.sonara.domain.model.toDisplayName
 
