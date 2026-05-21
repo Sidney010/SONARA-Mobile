@@ -11,9 +11,12 @@ import androidx.navigation.compose.rememberNavController
 import com.example.sonara.core.navigation.Routes
 import com.example.sonara.core.ui.components.navigation.BottomNavigationBar
 import com.example.sonara.core.ui.components.navigation.BottomNavigationState
+import com.example.sonara.features.HomeCasaShow.HomeCreatedEventScreen
 import com.example.sonara.features.home.ui.HomeScreen
 import com.example.sonara.features.perfilartista.ui.ArtistProfileScreen
+import com.example.sonara.features.pesquisar.ui.SearchScreen
 import com.example.sonara.features.plano.ui.PlansScreen
+
 
 fun NavGraphBuilder.mainGraph(
     rootNavController: NavController
@@ -64,11 +67,12 @@ fun NavGraphBuilder.mainGraph(
                 }
 
                 composable(Routes.Search.route) {
-                    // SearchScreen()
+                     SearchScreen()
                 }
 
                 composable(Routes.Events.route) {
-                    // EventsScreen()
+//                     EventsScreen()
+                    HomeCreatedEventScreen()
                 }
 
                 composable(Routes.Plans.route) {
