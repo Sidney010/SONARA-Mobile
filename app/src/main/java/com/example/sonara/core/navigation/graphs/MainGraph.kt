@@ -12,10 +12,15 @@ import com.example.sonara.core.navigation.Routes
 import com.example.sonara.core.ui.components.navigation.BottomNavigationBar
 import com.example.sonara.core.ui.components.navigation.BottomNavigationState
 import com.example.sonara.features.HomeCasaShow.HomeCreatedEventScreen
+import com.example.sonara.features.criarEventoCasaDeShow.ui.CreateEventHouseShow
 import com.example.sonara.features.home.ui.HomeScreen
+//import com.example.sonara.features.meusEventos.ui.MyEventsScreen
+import com.example.sonara.features.meusEventosCasaDeShow.ui.MyEventsHouseShowScreen
 import com.example.sonara.features.perfilartista.ui.ArtistProfileScreen
 import com.example.sonara.features.pesquisar.ui.SearchScreen
 import com.example.sonara.features.plano.ui.PlansScreen
+import com.example.sonara.features.sobreEvento.ui.AboutEventsScreen
+import com.example.sonara.features.sobreEventoCasaDeShow.ui.AboutEventHouseShowScreenScreen
 
 
 fun NavGraphBuilder.mainGraph(
@@ -72,7 +77,13 @@ fun NavGraphBuilder.mainGraph(
 
                 composable(Routes.Events.route) {
 //                     EventsScreen()
-                    HomeCreatedEventScreen()
+//                    HomeCreatedEventScreen()
+//                    MyEventsHouseShowScreen()
+//                    CreateEventHouseShow()
+//                    AboutEventsScreen()
+//                    AboutEventHouseShowScreenScreen()
+
+
                 }
 
                 composable(Routes.Plans.route) {

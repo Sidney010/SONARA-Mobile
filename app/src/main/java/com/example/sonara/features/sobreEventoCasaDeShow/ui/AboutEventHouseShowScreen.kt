@@ -1,5 +1,4 @@
-package com.example.sonara.features.sobreEvento.ui
-
+package com.example.sonara.features.sobreEventoCasaDeShow.ui
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -13,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -42,7 +42,7 @@ import com.example.sonara.core.ui.theme.DarkGradients
 
 
 @Composable
-fun AboutEventsScreen(modifier: Modifier = Modifier) {
+fun AboutEventHouseShowScreenScreen(modifier: Modifier = Modifier) {
 
     val gradients = DarkGradients
 
@@ -132,7 +132,7 @@ fun AboutEventsScreen(modifier: Modifier = Modifier) {
                                     shape = RoundedCornerShape(8.dp)
                                 )
                                 .then(
-                                    if (index == 1)
+                                    if (index == 2)
                                         Modifier.border(2.dp, Color.White, RoundedCornerShape(8.dp))
                                     else Modifier
                                 ),
@@ -159,7 +159,6 @@ fun AboutEventsScreen(modifier: Modifier = Modifier) {
                         .padding(12.dp)
                 ) {
                     Column {
-
 
                         Column(
                             modifier = Modifier.padding(vertical = 8.dp),
@@ -243,6 +242,82 @@ fun AboutEventsScreen(modifier: Modifier = Modifier) {
                                 )
                             }
                         }
+                    }
+                }
+            }
+        }
+
+
+
+        Card(
+            modifier = Modifier
+                .fillMaxWidth()
+                .wrapContentHeight()
+                .background(
+                    brush = gradients.secondaryCard,
+                    shape = RoundedCornerShape(16.dp)
+                ),
+            shape = RoundedCornerShape(16.dp),
+            colors = CardDefaults.cardColors(containerColor = Color.Transparent)
+        ) {
+            Column(
+                modifier = Modifier.padding(16.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+
+                Column (
+                    modifier = Modifier.wrapContentHeight(),
+                ) {
+
+                    Text(
+                        text = "Sobre o Artista:",
+                        fontSize = 15.sp,
+                        fontWeight = FontWeight.Medium,
+                        color = Color.White
+                    )
+
+                    Row( modifier = Modifier.padding(10.dp).wrapContentHeight(),
+                        horizontalArrangement = Arrangement.spacedBy(30.dp)
+                        ) {
+
+                        Box(
+                            modifier = Modifier
+                                .width(150.dp)
+                                .background(
+                                    Color.LightGray.copy(alpha = 0.1f),
+                                    shape = RoundedCornerShape(12.dp)
+                                )
+                                .padding(12.dp)
+                        ) {
+                            Text(
+                                text = " \"Nome: Loren Ipsum\",\n" +
+                                        "\"Estilo Musical: 78\",\n" +
+                                        "\"Instrumento Musical: Loren Ipsum\",\n" +
+                                        "\"Bio: Loren Ipsum\"",
+                                fontSize = 13.sp,
+                                color = Color.White.copy(alpha = 0.9f)
+
+                            )
+                        }
+
+                            Box(
+                                modifier = Modifier
+                                    .width(150.dp)
+                                    .height(150.dp)
+                                    .background(
+                                        Color.LightGray.copy(alpha = 0.2f),
+                                        shape = RoundedCornerShape(12.dp)
+                                    ),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.Person,
+                                    contentDescription = null,
+                                    tint = Color.LightGray,
+                                    modifier = Modifier.size(48.dp)
+                                )
+                            }
+
                     }
                 }
             }
