@@ -10,5 +10,6 @@ data class UsuarioLoginDto(
     @SerializedName("data_nasc") val data_nasc: String?,
     @SerializedName("telefone") val telefone: String?,
     @SerializedName("nacionalidade_id") val nacionalidade_id: Int?,
-    @SerializedName("genero_id") val genero_id: Int?
+    @SerializedName("genero_id") val genero_id: Int?,
+    @SerializedName("foto_url") val foto_perfil: String?
 )
