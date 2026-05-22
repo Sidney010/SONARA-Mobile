@@ -177,12 +177,15 @@ fun ProfileContent(perfil: UsuarioPerfil, isEditing: Boolean) {
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
+
                     Icon(Icons.Outlined.Info, null, tint = AppColors.PrimaryOrange)
+
                     Text(
                         text  = "A edição completa do perfil via PUT estará disponível em breve.",
                         color = Color.White.copy(alpha = 0.7f),
                         fontSize = 13.sp
                     )
+
                 }
             }
         }
