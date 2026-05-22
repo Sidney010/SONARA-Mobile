@@ -1,4 +1,4 @@
-package com.example.sonara.features.organizador.sobreEventoCasaDeShow.ui
+package com.example.sonara.features.organizador.sobreeventoorganizador.ui
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -23,7 +23,6 @@ import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -42,7 +41,7 @@ import com.example.sonara.core.ui.theme.DarkGradients
 
 
 @Composable
-fun AboutEventHouseShowScreenScreen(modifier: Modifier = Modifier) {
+fun AboutEventOrganizerScreen(modifier: Modifier = Modifier) {
 
     val gradients = DarkGradients
 

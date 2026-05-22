@@ -1,4 +1,4 @@
-package com.example.sonara.features.organizador.criarEventoCasaDeShow.ui
+package com.example.sonara.features.organizador.criareventoorganizador.ui
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -41,7 +41,7 @@ import com.example.sonara.core.ui.components.header.HomeHeader
 import com.example.sonara.core.ui.theme.DarkGradients
 
 @Composable
-fun CreateEventHouseShow(modifier: Modifier = Modifier) {
+fun CreateEventOrganizerScreen(modifier: Modifier = Modifier) {
 
     val gradients = DarkGradients
 
