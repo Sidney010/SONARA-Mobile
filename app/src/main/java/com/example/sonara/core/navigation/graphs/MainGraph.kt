@@ -16,6 +16,7 @@ import com.example.sonara.features.home.ui.HomeScreen
 import com.example.sonara.features.artista.perfilartista.ui.ArtistProfileScreen
 import com.example.sonara.features.artista.sobreEvento.ui.AboutEventsScreen
 import com.example.sonara.features.organizador.HomeCasaShow.ui.HomeCreatedEventScreen
+import com.example.sonara.features.organizador.nearbyartists.ui.SeeArtistsHouseShowScreen
 import com.example.sonara.features.organizador.selectartist.ui.SelectArtistScreen
 import com.example.sonara.features.organizador.sobreEventoCasaDeShow.ui.AboutEventHouseShowScreenScreen
 import com.example.sonara.features.organizador.telaperfilorganizador.ui.OrganizerrofileScreen
@@ -83,7 +84,8 @@ fun NavGraphBuilder.mainGraph(
 //                    AboutEventsScreen()
 //                    AboutEventHouseShowScreenScreen()
 //                    OrganizerrofileScreen()
-                    SelectArtistScreen()
+//                    SelectArtistScreen()
+                    SeeArtistsHouseShowScreen()
 
 
                 }

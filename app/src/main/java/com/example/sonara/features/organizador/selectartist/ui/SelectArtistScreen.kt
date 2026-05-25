@@ -246,7 +246,7 @@ fun SelectArtistScreen(modifier: Modifier = Modifier) {
                                 .background(Color(0xFFE84B0A), shape = RoundedCornerShape(22.dp)),
                             contentAlignment = Alignment.Center
                         ) {
-                            Text(text = "Contra\nProposta", fontSize = 14.sp, color = Color.White, fontWeight = FontWeight.SemiBold, textAlign = TextAlign.Center)
+                            Text(text = "Alternativa", fontSize = 14.sp, color = Color.White, fontWeight = FontWeight.SemiBold, textAlign = TextAlign.Center)
                         }
                     }
 
