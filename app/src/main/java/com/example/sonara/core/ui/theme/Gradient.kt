@@ -6,7 +6,8 @@ import androidx.compose.ui.graphics.Color
 data class AppGradientColors(
     val primaryBackground: Brush,
     val primaryCard: Brush,
-    val secondaryCard: Brush
+    val secondaryCard: Brush,
+    val thirdCard: Brush
 )
 
 internal val DarkGradients = AppGradientColors(
@@ -26,6 +27,12 @@ internal val DarkGradients = AppGradientColors(
         colorStops = arrayOf(
             0.6f to Color(0x3CFF0000),
             1.0f to Color(0xFFFC4C13)
+        )
+    ),
+    thirdCard = Brush.verticalGradient(
+        colorStops = arrayOf(
+            0.6f to Color(0x40FF0000),
+            0.6f to Color(0x46A62525),
         )
     )
 )
@@ -47,6 +54,12 @@ internal val LightGradients = AppGradientColors(
         colorStops = arrayOf(
             0.6f to Color(0x1AFC4C13),
             1.0f to Color(0xFFFFC1A6)
+        )
+    ),
+    thirdCard = Brush.verticalGradient(
+        colorStops = arrayOf(
+            0.6f to Color(0x3CFF0000),
+            0.6f to Color(0x3C831414),
         )
     )
 )
