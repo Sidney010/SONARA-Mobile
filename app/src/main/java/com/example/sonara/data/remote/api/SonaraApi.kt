@@ -1,26 +1,41 @@
 package com.example.sonara.data.remote.api
 
 import com.example.sonara.core.network.ApiResponse
+import com.example.sonara.data.remote.dto.request.CandidaturaCreateRequestDto
+import com.example.sonara.data.remote.dto.request.CandidaturaUpdateRequestDto
+import com.example.sonara.data.remote.dto.request.EventoCreateRequestDto
 import com.example.sonara.data.remote.dto.request.LoginRequestDto
+import com.example.sonara.data.remote.dto.request.RedeSocialRequestDto
+import com.example.sonara.data.remote.dto.response.CandidaturaDto
+import com.example.sonara.data.remote.dto.response.CandidaturaListDto
+import com.example.sonara.data.remote.dto.response.EventoDto
 import com.example.sonara.data.remote.dto.response.EventoListDto
+import com.example.sonara.data.remote.dto.response.EventoSimpleDto
+import com.example.sonara.data.remote.dto.response.FotoResponseDto
 import com.example.sonara.data.remote.dto.response.GeneroMusicalListDto
 import com.example.sonara.data.remote.dto.response.LoginResponseDto
 import com.example.sonara.data.remote.dto.response.NacionalidadeListDto
+import com.example.sonara.data.remote.dto.response.RedeSocialDto
+import com.example.sonara.data.remote.dto.response.RedeSocialListDto
+import com.example.sonara.data.remote.dto.response.TipoRedeSocialListDto
 import com.example.sonara.data.remote.dto.response.UsuarioPerfilDto
 import com.example.sonara.data.remote.dto.response.UsuarioResponseDto
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import retrofit2.Response
 import retrofit2.http.Body
+import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.Multipart
 import retrofit2.http.POST
+import retrofit2.http.PUT
 import retrofit2.http.Part
 import retrofit2.http.Path
 
 interface SonaraApi {
 
-    // ── Cadastro — FormData: foto (file) + dados (JSON text)
+    // ── Usuário ────────────────────────────────────────────────────────────────
+
     @Multipart
     @POST("usuario/")
     suspend fun register(
@@ -28,23 +43,99 @@ interface SonaraApi {
         @Part("dados") dados: RequestBody
     ): Response<ApiResponse<UsuarioResponseDto>>
 
-    // ── Login (body direto, sem wrapper ApiResponse)
     @POST("usuario/login")
-    suspend fun login(
-        @Body request: LoginRequestDto
-    ): Response<LoginResponseDto>
+    suspend fun login(@Body request: LoginRequestDto): Response<LoginResponseDto>
 
-    // ── Perfil do usuário
     @GET("usuario/{id}")
-    suspend fun getUsuarioById(
-        @Path("id") id: Int
-    ): Response<ApiResponse<UsuarioPerfilDto>>
+    suspend fun getUsuarioById(@Path("id") id: Int): Response<ApiResponse<UsuarioPerfilDto>>
 
-    // ── Eventos
+    // ── Eventos ────────────────────────────────────────────────────────────────
+
     @GET("evento")
     suspend fun getEventos(): Response<ApiResponse<EventoListDto>>
 
-    // ── Catálogos
+    @GET("evento/{id}")
+    suspend fun getEventoById(@Path("id") id: Int): Response<ApiResponse<EventoDto>>
+
+    @GET("evento/organizador/{organizadorId}")
+    suspend fun getEventosPorOrganizador(
+        @Path("organizadorId") organizadorId: Int
+    ): Response<ApiResponse<EventoListDto>>
+
+    @POST("evento")
+    suspend fun criarEvento(
+        @Body request: EventoCreateRequestDto
+    ): Response<ApiResponse<EventoSimpleDto>>
+
+    @PUT("evento/{id}")
+    suspend fun editarEvento(
+        @Path("id") id: Int,
+        @Body request: EventoCreateRequestDto
+    ): Response<ApiResponse<EventoSimpleDto>>
+
+    @DELETE("evento/{id}")
+    suspend fun deletarEvento(@Path("id") id: Int): Response<ApiResponse<Unit>>
+
+    // ── Fotos do Evento ────────────────────────────────────────────────────────
+
+    @Multipart
+    @POST("foto")
+    suspend fun uploadFotoEvento(
+        @Part foto: MultipartBody.Part,
+        @Part("evento_id") eventoId: RequestBody
+    ): Response<ApiResponse<FotoResponseDto>>
+
+    @DELETE("foto/{id}")
+    suspend fun deletarFoto(@Path("id") id: Int): Response<ApiResponse<Unit>>
+
+    // ── Redes Sociais ─────────────────────────────────────────────────────────
+
+    @GET("redesSociais")
+    suspend fun getRedesSociais(): Response<ApiResponse<RedeSocialListDto>>
+
+    @GET("redesSociais/{id}")
+    suspend fun getRedesSociaisPorUsuario(
+        @Path("id") usuarioId: Int
+    ): Response<ApiResponse<RedeSocialListDto>>
+
+    @POST("redesSociais")
+    suspend fun createRedeSocial(
+        @Body request: RedeSocialRequestDto
+    ): Response<ApiResponse<RedeSocialDto>>
+
+    @DELETE("redesSociais/{id}")
+    suspend fun deleteRedeSocial(@Path("id") id: Int): Response<ApiResponse<Unit>>
+
+    // ── Tipo Redes Sociais ────────────────────────────────────────────────────
+
+    @GET("TiporedesSociais")
+    suspend fun getTiposRedesSociais(): Response<ApiResponse<TipoRedeSocialListDto>>
+
+    // ── Candidatura ───────────────────────────────────────────────────────────
+
+    @GET("candidatura/evento/{eventoId}")
+    suspend fun getCandidaturasPorEvento(
+        @Path("eventoId") eventoId: Int
+    ): Response<ApiResponse<CandidaturaListDto>>
+
+    @GET("candidatura/artista/{artistaId}")
+    suspend fun getCandidaturasPorArtista(
+        @Path("artistaId") artistaId: Int
+    ): Response<ApiResponse<CandidaturaListDto>>
+
+    @POST("candidatura")
+    suspend fun criarCandidatura(
+        @Body request: CandidaturaCreateRequestDto
+    ): Response<ApiResponse<CandidaturaDto>>
+
+    @PUT("candidatura/{id}")
+    suspend fun atualizarCandidatura(
+        @Path("id") id: Int,
+        @Body request: CandidaturaUpdateRequestDto
+    ): Response<ApiResponse<CandidaturaDto>>
+
+    // ── Catálogos ─────────────────────────────────────────────────────────────
+
     @GET("nacionalidade")
     suspend fun getNacionalidades(): Response<ApiResponse<NacionalidadeListDto>>
 

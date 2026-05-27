@@ -29,7 +29,3 @@ data class CreateUsuarioRequestDto(
     @SerializedName("foto_perfil") val foto_perfil: String? = null
 )
 
-data class LoginRequestDto(
-    @SerializedName("email") val email: String,
-    @SerializedName("senha") val senha: String
-)

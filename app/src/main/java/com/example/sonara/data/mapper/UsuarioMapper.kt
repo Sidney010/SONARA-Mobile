@@ -60,7 +60,7 @@ fun LoginResponseDto.toDomain() = LoginResult(
         cpf            = usuario.cpf ?: "",
         dataNascimento = usuario.data_nasc ?: "",
         telefone       = usuario.telefone,
-        nacionalidadeId= usuario.nacionalidade_id,
-        generoId       = usuario.genero_id
+        nacionalidadeId = 0,
+        generoId       = 0
     )
 )
