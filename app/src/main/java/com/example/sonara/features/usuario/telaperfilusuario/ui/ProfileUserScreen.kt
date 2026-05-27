@@ -1,4 +1,4 @@
-package com.example.sonara.features.organizador.telaperfilorganizador.ui
+package com.example.sonara.features.usuario.telaperfilusuario.ui
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -37,7 +37,7 @@ import com.example.sonara.core.ui.components.header.HomeHeader
 import com.example.sonara.core.ui.theme.DarkGradients
 
 @Composable
-fun OrganizerProfileScreen(modifier: Modifier = Modifier) {
+fun ProfileUserScreen(modifier: Modifier = Modifier) {
 
     val gradients = DarkGradients
 
@@ -115,7 +115,7 @@ fun OrganizerProfileScreen(modifier: Modifier = Modifier) {
                     color = Color.White
                 )
 
-                listOf("Nome Estabelecimento", "CNPJ", "Email", "Telefone").forEach { label ->
+                listOf("Nome","Email").forEach { label ->
                     Box(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -152,45 +152,7 @@ fun OrganizerProfileScreen(modifier: Modifier = Modifier) {
             shape = RoundedCornerShape(16.dp),
             colors = CardDefaults.cardColors(containerColor = Color.Transparent)
         ) {
-            Column(
-                modifier = Modifier.padding(16.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                Text(
-                    text = "Endereço",
-                    fontSize = 15.sp,
-                    fontWeight = FontWeight.Medium,
-                    color = Color.White
-                )
-                listOf("Cep", "Rua", "Número", "Cidade", "Bairro", "Uf", "Complemento").forEach { label ->
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .background(
-                                Color.LightGray.copy(alpha = 0.2f),
-                                shape = RoundedCornerShape(8.dp)
-                            )
-                            .padding(horizontal = 12.dp, vertical = 10.dp)
-                    ) {
-                        Text(text = label, fontSize = 13.sp, color = Color.LightGray)
-                    }
-                }
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.End
-                ) {
-                    Box(
-                        modifier = Modifier
-                            .background(Color.LightGray.copy(alpha = 0.3f), shape = RoundedCornerShape(8.dp))
-                            .padding(horizontal = 20.dp, vertical = 10.dp)
-                    ) {
-                        Text(text = "Editar Endereço",
-                            fontSize = 13.sp,
-                            color = Color.White
-                        )
-                    }
-                }
-            }
+
         }
 
         Card(
@@ -206,7 +168,7 @@ fun OrganizerProfileScreen(modifier: Modifier = Modifier) {
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 Text(
-                    text = "Meus Eventos",
+                    text = "Meus Eventos Favoritos",
                     fontSize = 15.sp,
                     fontWeight = FontWeight.Medium,
                     color = Color.White

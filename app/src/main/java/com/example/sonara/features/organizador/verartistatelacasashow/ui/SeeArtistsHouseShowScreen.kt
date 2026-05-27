@@ -1,4 +1,3 @@
-package com.example.sonara.features.organizador.nearbyartists.ui
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -41,13 +40,13 @@ import com.example.sonara.core.ui.components.header.HomeHeader
 import com.example.sonara.core.ui.theme.DarkGradients
 
 @Composable
-fun SeeArtistsHouseShowScreen(modifier: Modifier = Modifier) {
+fun   SeeArtistsHouseShowScreen(modifier: Modifier = Modifier) {
 
     val gradients = DarkGradients
 
     ScreenContainer(
-        modifier = Modifier.verticalScroll(rememberScrollState()),
-        verticalArrangement = Arrangement.SpaceBetween,
+        modifier = Modifier.verticalScroll(rememberScrollState()).wrapContentHeight(),
+        verticalArrangement = Arrangement.Top,
         verticalSpacing = 6.dp,
         padding = PaddingValues(12.dp, 40.dp)
     ) {
@@ -107,8 +106,11 @@ fun SeeArtistsHouseShowScreen(modifier: Modifier = Modifier) {
                         }
                     }
                 }
+
             }
+
         }
+        Spacer(modifier = Modifier.height(80.dp))
     }
 }
 

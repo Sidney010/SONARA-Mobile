@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -59,10 +60,9 @@ fun MyEventsOrganizerScreen(modifier: Modifier = Modifier) {
 
         ) {
             Card(
-                modifier = Modifier
-                    .fillMaxWidth()
+                 modifier = Modifier
+                        .fillMaxWidth()
                     .wrapContentHeight()
-                    .padding(bottom = 100.dp)
                     .background(
                         brush = gradients.secondaryCard,
                         shape = RoundedCornerShape(16.dp)
@@ -89,17 +89,33 @@ fun MyEventsOrganizerScreen(modifier: Modifier = Modifier) {
                 }
             }
         }
+        Spacer(modifier = Modifier.height(80.dp))
     }
 }
 
 @Composable
 fun eventoCardItem(modifier: Modifier = Modifier) {
 
+
+    val gradients = DarkGradients
+
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .wrapContentHeight()
+            .background(
+                brush = gradients.secondaryCard,
+                shape = RoundedCornerShape(16.dp)
+            ),
+        shape = RoundedCornerShape(16.dp),
+        colors = CardDefaults.cardColors(containerColor = Color.Transparent)
+
+    ) {
+
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .wrapContentHeight()
-            .background(Color(0x88FF8A50), shape = RoundedCornerShape(8.dp))
             .padding(20.dp),
         horizontalArrangement = Arrangement.spacedBy(50.dp)
     ) {
@@ -136,4 +152,5 @@ fun eventoCardItem(modifier: Modifier = Modifier) {
             )
         }
     }
+        }
 }

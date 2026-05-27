@@ -1,7 +1,12 @@
 package com.example.sonara.core.navigation.graphs
 
+import SeeArtistsHouseShowScreen
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.height
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.NavHost
@@ -15,11 +20,19 @@ import com.example.sonara.features.home.ui.HomeScreen
 //import com.example.sonara.features.meusEventos.ui.MyEventsScreen
 import com.example.sonara.features.artista.perfilartista.ui.ArtistProfileScreen
 import com.example.sonara.features.artista.sobreEvento.ui.AboutEventsScreen
-import com.example.sonara.features.organizador.nearbyartists.ui.SeeArtistsHouseShowScreen
+import com.example.sonara.features.organizador.criareventoorganizador.ui.CreateEventOrganizerScreen
+import com.example.sonara.features.organizador.homeorganizador.ui.HomeOrganizerScreen
+import com.example.sonara.features.organizador.meuseventosorganizador.ui.MyEventsOrganizerScreen
+import com.example.sonara.features.organizador.pesquisarartistacasadeshow.ui.SearchArtistHouseshowScreen
 import com.example.sonara.features.organizador.selectartist.ui.SelectArtistScreen
-import com.example.sonara.features.organizador.telaperfilorganizador.ui.OrganizerrofileScreen
+import com.example.sonara.features.organizador.sobreeventoorganizador.ui.AboutEventOrganizerScreen
+import com.example.sonara.features.organizador.telaperfilorganizador.ui.OrganizerProfileScreen
 import com.example.sonara.features.pesquisar.ui.SearchScreen
 import com.example.sonara.features.plano.ui.PlansScreen
+import com.example.sonara.features.usuario.sobreoeventoselecionado.ui.AboutSelectionEventScreen
+import com.example.sonara.features.usuario.telahomeusuario.HomeUserScreen
+import com.example.sonara.features.usuario.telaperfilusuario.ui.ProfileUserScreen
+import com.example.sonara.features.usuario.telausuariopesquisar.ui.SearchEventsUserScreen
 
 
 fun NavGraphBuilder.mainGraph(
@@ -76,14 +89,19 @@ fun NavGraphBuilder.mainGraph(
 
                 composable(Routes.Events.route) {
 //                     EventsScreen()
-//                    HomeCreatedEventScreen()
-//                    MyEventsHouseShowScreen()
-//                    CreateEventHouseShow()
+//                    HomeOrganizerScreen()
+//                    MyEventsOrganizerScreen()
+//                      CreateEventOrganizerScreen()
 //                    AboutEventsScreen()
-//                    AboutEventHouseShowScreenScreen()
-//                    OrganizerrofileScreen()
+//                    AboutEventOrganizerScreen()
+//                    OrganizerProfileScreen()
 //                    SelectArtistScreen()
-                    SeeArtistsHouseShowScreen()
+//                    SeeArtistsHouseShowScreen()
+//                    HomeUserScreen() {}
+//                    SearchEventsUserScreen()
+//                    AboutSelectionEventScreen()
+//                      ProfileUserScreen()
+//                    SearchArtistHouseshowScreen()
 
 
                 }
@@ -102,6 +120,7 @@ fun NavGraphBuilder.mainGraph(
                             rootNavController.navigate(Routes.Login.route)
                         }
                     )
+                    Spacer(modifier = Modifier.height(80.dp))
                 }
             }
         }
