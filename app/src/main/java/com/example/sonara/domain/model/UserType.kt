@@ -1,9 +1,9 @@
 package com.example.sonara.domain.model
 
 enum class UserType(val apiValue: String) {
-    ARTISTA("Artista"),
-    ORGANIZADOR("Organizador"),
-    USUARIO_COMUM("Usuario")
+    ARTISTA("artista"),
+    ORGANIZADOR("organizador"),
+    USUARIO_COMUM("user")
 }
 
 fun UserType.toDisplayName(): String {

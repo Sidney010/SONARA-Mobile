@@ -3,7 +3,7 @@ package com.example.sonara.data.remote.dto.request
 import com.google.gson.annotations.SerializedName
 
 data class EventoCreateRequestDto(
-    @SerializedName("evento_nome")    val evento_nome: String,
+    @SerializedName("nome")           val evento_nome: String,
     @SerializedName("descricao")      val descricao: String?,
     @SerializedName("local")          val local: String?,
     @SerializedName("data")           val data: String?,

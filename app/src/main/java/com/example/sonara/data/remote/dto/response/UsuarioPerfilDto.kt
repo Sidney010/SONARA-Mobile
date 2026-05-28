@@ -15,7 +15,5 @@ data class UsuarioPerfilDto(
     @SerializedName("tipo_usuario")       val tipo_usuario: String?,
     @SerializedName("nome_artistico")     val nome_artistico: String?,
     @SerializedName("descricao")          val descricao: String?,
-    @SerializedName("criado")             val criado: String?,
-    @SerializedName("ultima_atualizacao") val ultima_atualizacao: String?,
     @SerializedName("fotos")              val fotos: List<FotoDto>? = null
 )
