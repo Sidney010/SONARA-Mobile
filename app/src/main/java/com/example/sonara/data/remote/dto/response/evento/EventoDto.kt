@@ -1,5 +1,6 @@
-package com.example.sonara.data.remote.dto.response
+package com.example.sonara.data.remote.dto.response.evento
 
+import com.example.sonara.data.remote.dto.response.foto.FotoDto
 import com.google.gson.annotations.SerializedName
 
 data class EventoDto(

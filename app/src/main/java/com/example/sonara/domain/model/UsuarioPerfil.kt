@@ -1,17 +1,16 @@
 package com.example.sonara.domain.model
 
 data class UsuarioPerfil(
-    val id: Int,
+    val idUsuario: Int,
     val nome: String,
     val email: String,
     val cpf: String?,
     val dataNasc: String?,
     val telefone: String?,
-    val nacionalidadeId: Int?,
-    val generoId: Int?,
-    val tipoUsuario: String?,
-    val nomeArtistico: String?,
-    val descricao: String?,
-    val criado: String?,
-    val fotosUrls: List<String>
+    val foto: String?,
+    val tipoUsuario: String,
+    val genero: Genero?,
+    val nacionalidade: Nacionalidade?,
+    val endereco: Endereco?,
+    val redesSociais: List<RedeSocial>
 )

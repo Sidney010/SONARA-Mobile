@@ -1,4 +1,4 @@
-package com.example.sonara.data.remote.dto.response
+package com.example.sonara.data.remote.dto.response.foto
 
 import com.google.gson.annotations.SerializedName
 

@@ -11,7 +11,7 @@ data class FormData(
     val telefone: String     = "",
 
     // Tipo de usuário (único valor)
-    val userType: String     = "",          // "artista" | "organizador" | "usuario"
+    val userType: String     = "",          // "artista" | "organizador" | "user"
 
     // Dados artísticos (opcionais)
     val nomeArtistico: String = "",

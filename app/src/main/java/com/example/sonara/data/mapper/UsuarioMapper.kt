@@ -1,8 +1,8 @@
 package com.example.sonara.data.mapper
 
 import com.example.sonara.data.remote.dto.request.CreateUsuarioRequestDto
-import com.example.sonara.data.remote.dto.response.LoginResponseDto
-import com.example.sonara.data.remote.dto.response.UsuarioResponseDto
+import com.example.sonara.data.remote.dto.response.login.LoginResponseDto
+import com.example.sonara.data.remote.dto.response.usuario.UsuarioResponseDto
 import com.example.sonara.domain.model.LoginResult
 import com.example.sonara.domain.model.Usuario
 import java.time.LocalDate
@@ -17,7 +17,7 @@ fun Usuario.toRequestDto() = CreateUsuarioRequestDto(
     cpf               = cpf.filter { it.isDigit() },             // remove máscara
     data_nasc         = dataNascimento,                          // "yyyy-MM-dd"
     nacionalidade_id  = nacionalidadeId ?: 9,                    // default: Brasileiro
-    genero_id         = generoId ?: 1,
+    genero_id         = generoId ?: 0,
     criado            = LocalDate.now().format(DateTimeFormatter.ISO_DATE),
     ultima_atualizacao= LocalDate.now().format(DateTimeFormatter.ISO_DATE),
     telefone          = telefone ?: "",
@@ -33,8 +33,7 @@ fun Usuario.toRequestDto() = CreateUsuarioRequestDto(
     bairro            = bairro ?: "",
     longitude         = longitude,
     latitude          = latitude,
-    generos_musicais  = generosMusicais,
-    foto_perfil       = fotoPerfil
+    generos_musicais  = generosMusicais
 )
 
 // ── Response DTO → Domain ────────────────────────────────────────────────────

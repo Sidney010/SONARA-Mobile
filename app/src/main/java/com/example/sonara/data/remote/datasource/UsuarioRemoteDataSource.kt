@@ -3,10 +3,10 @@ package com.example.sonara.data.remote.datasource
 import com.example.sonara.core.network.ApiResponse
 import com.example.sonara.data.remote.api.SonaraApi
 import com.example.sonara.data.remote.dto.request.LoginRequestDto
-import com.example.sonara.data.remote.dto.response.GeneroMusicalListDto
-import com.example.sonara.data.remote.dto.response.LoginResponseDto
-import com.example.sonara.data.remote.dto.response.NacionalidadeListDto
-import com.example.sonara.data.remote.dto.response.UsuarioResponseDto
+import com.example.sonara.data.remote.dto.response.generomusicais.GeneroMusicalListDto
+import com.example.sonara.data.remote.dto.response.login.LoginResponseDto
+import com.example.sonara.data.remote.dto.response.nacionalidade.NacionalidadeListDto
+import com.example.sonara.data.remote.dto.response.usuario.UsuarioResponseDto
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import retrofit2.Response

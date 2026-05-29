@@ -1,13 +1,14 @@
 package com.example.sonara.data.remote.dto.response.usuario
 
+import com.example.sonara.data.remote.dto.response.usuario.perfil.UsuarioPerfilEventosDto
 import com.google.gson.annotations.SerializedName
 
 data class UsuarioArtistaDto (
-    @SerializedName("id_artista")       val id_artista: Int?,
-    @SerializedName("nome_artistico")   val nome_artistico: String?,
+    @SerializedName("id_artista")       val idAtista: Int?,
+    @SerializedName("nome_artistico")   val nomeArtistico: String?,
     @SerializedName("descricao")        val descricao: String?,
-    @SerializedName("generos_musicais") val generos_musicais: List<UsuarioArtistaGenerosMusicaisDto> = emptyList(),
-    @SerializedName("media_avaliacao")  val media_avaliacao: Double?,
-    @SerializedName("total_avaliacoes") val total_avaliacoes: Int?,
-    @SerializedName("eventos")          val eventos:String?//chama o evento
+    @SerializedName("generos_musicais") val generosMusicais: List<UsuarioArtistaGenerosMusicaisDto?>,
+    @SerializedName("media_avaliacao")  val mediaAvaliacao: Double?,
+    @SerializedName("total_avaliacoes") val totalAvaliacoes: Int?,
+    @SerializedName("eventos")          val eventos: List<UsuarioPerfilEventosDto?>
 )

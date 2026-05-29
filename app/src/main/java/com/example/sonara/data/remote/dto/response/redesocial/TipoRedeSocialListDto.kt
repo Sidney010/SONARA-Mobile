@@ -1,4 +1,4 @@
-package com.example.sonara.data.remote.dto.response
+package com.example.sonara.data.remote.dto.response.redesocial
 
 import com.google.gson.annotations.SerializedName
 

@@ -6,20 +6,19 @@ import com.example.sonara.data.remote.dto.request.CandidaturaUpdateRequestDto
 import com.example.sonara.data.remote.dto.request.EventoCreateRequestDto
 import com.example.sonara.data.remote.dto.request.LoginRequestDto
 import com.example.sonara.data.remote.dto.request.RedeSocialRequestDto
-import com.example.sonara.data.remote.dto.response.CandidaturaDto
-import com.example.sonara.data.remote.dto.response.CandidaturaListDto
-import com.example.sonara.data.remote.dto.response.EventoDto
-import com.example.sonara.data.remote.dto.response.EventoListDto
-import com.example.sonara.data.remote.dto.response.EventoSimpleDto
-import com.example.sonara.data.remote.dto.response.FotoResponseDto
-import com.example.sonara.data.remote.dto.response.GeneroMusicalListDto
-import com.example.sonara.data.remote.dto.response.LoginResponseDto
-import com.example.sonara.data.remote.dto.response.NacionalidadeListDto
-import com.example.sonara.data.remote.dto.response.RedeSocialDto
-import com.example.sonara.data.remote.dto.response.RedeSocialListDto
-import com.example.sonara.data.remote.dto.response.TipoRedeSocialListDto
-import com.example.sonara.data.remote.dto.response.UsuarioPerfilDto
-import com.example.sonara.data.remote.dto.response.UsuarioResponseDto
+import com.example.sonara.data.remote.dto.response.candidatura.CandidaturaDto
+import com.example.sonara.data.remote.dto.response.candidatura.CandidaturaListDto
+import com.example.sonara.data.remote.dto.response.evento.EventoDto
+import com.example.sonara.data.remote.dto.response.evento.EventoListDto
+import com.example.sonara.data.remote.dto.response.evento.EventoSimpleDto
+import com.example.sonara.data.remote.dto.response.foto.FotoResponseDto
+import com.example.sonara.data.remote.dto.response.generomusicais.GeneroMusicalListDto
+import com.example.sonara.data.remote.dto.response.login.LoginResponseDto
+import com.example.sonara.data.remote.dto.response.nacionalidade.NacionalidadeListDto
+import com.example.sonara.data.remote.dto.response.redesocial.RedeSocialDto
+import com.example.sonara.data.remote.dto.response.redesocial.RedeSocialListDto
+import com.example.sonara.data.remote.dto.response.redesocial.TipoRedeSocialListDto
+import com.example.sonara.data.remote.dto.response.usuario.UsuarioResponseDto
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import retrofit2.Response
@@ -34,8 +33,6 @@ import retrofit2.http.Path
 
 interface SonaraApi {
 
-    // ── Usuário ────────────────────────────────────────────────────────────────
-
     @Multipart
     @POST("usuario/")
     suspend fun register(
@@ -47,9 +44,7 @@ interface SonaraApi {
     suspend fun login(@Body request: LoginRequestDto): Response<LoginResponseDto>
 
     @GET("usuario/{id}")
-    suspend fun getUsuarioById(@Path("id") id: Int): Response<ApiResponse<UsuarioPerfilDto>>
-
-    // ── Eventos ────────────────────────────────────────────────────────────────
+    suspend fun getUsuarioById(@Path("id") id: Int): Response<ApiResponse<UsuarioResponseDto>>
 
     @GET("evento")
     suspend fun getEventos(): Response<ApiResponse<EventoListDto>>

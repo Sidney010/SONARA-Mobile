@@ -25,7 +25,6 @@ data class CreateUsuarioRequestDto(
     @SerializedName("bairro") val bairro: String,
     @SerializedName("longitude") val longitude: String? = null,
     @SerializedName("latitude") val latitude: String? = null,
-    @SerializedName("generos_musicais") val generos_musicais: List<Int>,
-    @SerializedName("foto_perfil") val foto_perfil: String? = null
+    @SerializedName("generos_musicais") val generos_musicais: List<Int> = emptyList(),
 )
 

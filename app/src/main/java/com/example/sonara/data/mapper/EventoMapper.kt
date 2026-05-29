@@ -1,6 +1,6 @@
 package com.example.sonara.data.mapper
 
-import com.example.sonara.data.remote.dto.response.EventoDto
+import com.example.sonara.data.remote.dto.response.evento.EventoDto
 import com.example.sonara.data.remote.dto.response.UsuarioPerfilDto
 import com.example.sonara.domain.model.Evento
 import com.example.sonara.domain.model.UsuarioPerfil

@@ -17,10 +17,13 @@ class TokenManager @Inject constructor(
     private val context: Context
 ) {
     companion object {
-        private val TOKEN_KEY     = stringPreferencesKey("bearer_token")
-        private val USER_ID_KEY   = stringPreferencesKey("user_id")
+        private val TOKEN_KEY = stringPreferencesKey("auth_token")
+        private val USER_ID_KEY = stringPreferencesKey("user_id")
         private val USER_NAME_KEY = stringPreferencesKey("user_name")
-        private val USER_TYPE_KEY = stringPreferencesKey("user_type")   // NOVO: tipo de usuário
+        private val USER_TYPE_KEY = stringPreferencesKey("user_type")
+        private val USER_PHOTO_KEY = stringPreferencesKey("user_photo")
+        private val ARTIST_ID_KEY = stringPreferencesKey("artist_id")
+        private val ORGANIZER_ID_KEY = stringPreferencesKey("organizer_id")
     }
 
     val token: Flow<String?> = context.authDataStore.data.map {
@@ -49,13 +52,19 @@ class TokenManager @Inject constructor(
         token: String,
         userId: Int,
         userName: String,
-        userType: String = "Usuário"
+        userType: String,
+        photoUrl: String?,
+        artistId: Int?,
+        organizerId: Int?
     ) {
-        context.authDataStore.edit {
-            it[TOKEN_KEY]     = token
-            it[USER_ID_KEY]   = userId.toString()
-            it[USER_NAME_KEY] = userName
-            it[USER_TYPE_KEY] = userType
+        context.authDataStore.edit { prefs ->
+            prefs[TOKEN_KEY] = token
+            prefs[USER_ID_KEY] = userId.toString()
+            prefs[USER_NAME_KEY] = userName
+            prefs[USER_TYPE_KEY] = userType
+            prefs[USER_PHOTO_KEY] = photoUrl ?: ""
+            prefs[ARTIST_ID_KEY] = artistId?.toString() ?: ""
+            prefs[ORGANIZER_ID_KEY] = organizerId?.toString() ?: ""
         }
     }
 
