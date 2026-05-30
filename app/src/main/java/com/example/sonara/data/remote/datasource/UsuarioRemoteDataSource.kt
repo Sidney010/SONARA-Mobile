@@ -7,7 +7,9 @@ import com.example.sonara.data.remote.dto.response.generomusicais.GeneroMusicalL
 import com.example.sonara.data.remote.dto.response.login.LoginResponseDto
 import com.example.sonara.data.remote.dto.response.nacionalidade.NacionalidadeListDto
 import com.example.sonara.data.remote.dto.response.usuario.UsuarioResponseDto
-import com.example.sonara.data.remote.dto.response.usuario.perfil.UsuarioPerfilDto
+
+import com.example.sonara.data.remote.dto.response.usuario.perfil.UsuarioPerfilResponseDto
+import com.example.sonara.data.remote.dto.response.usuario.perfil.UsuarioPerfilWrapperDto
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import retrofit2.Response
@@ -35,6 +37,6 @@ class UsuarioRemoteDataSource @Inject constructor(
     suspend fun getGenerosMusicais(): Response<ApiResponse<GeneroMusicalListDto>> =
         api.getGenerosMusicais()
 
-    suspend fun getUsuarioById(id: Int): Response<ApiResponse<UsuarioPerfilDto>> =
+    suspend fun getUsuarioById(id: Int): Response<ApiResponse<UsuarioPerfilWrapperDto>> =
         api.getUsuarioById(id)
 }

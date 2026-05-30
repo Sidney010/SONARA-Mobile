@@ -8,15 +8,15 @@ import com.google.gson.annotations.SerializedName
 
 data class UsuarioPerfilDto(
     @SerializedName("id_usuario") val idUsuario: Int,
-    @SerializedName("nome") val nome: String,
-    @SerializedName("email") val email: String,
+    @SerializedName("nome") val nome: String?,
+    @SerializedName("email") val email: String?,
     @SerializedName("cpf") val cpf: String?,
     @SerializedName("data_nasc") val dataNasc: String?,
     @SerializedName("telefone") val telefone: String?,
     @SerializedName("foto") val foto: String?,
     @SerializedName("criado") val criado: String?,
     @SerializedName("ultima_atualizacao") val ultimaAtualizacao: String?,
-    @SerializedName("tipo_usuario") val tipoUsuario: String,
+    @SerializedName("tipo_usuario") val tipoUsuario: String?,
     @SerializedName("genero") val genero: UsuarioGeneroDto?,
     @SerializedName("nacionalidade") val nacionalidade: UsuarioNacionalidadeDto?,
     @SerializedName("endereco") val endereco: UsuarioEnderecoDto?,

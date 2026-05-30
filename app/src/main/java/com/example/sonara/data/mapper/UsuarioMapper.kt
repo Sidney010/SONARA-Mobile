@@ -59,17 +59,21 @@ fun UsuarioResponseDto.toDomain() = Usuario(
 )
 fun UsuarioPerfilDto.toDomain() = UsuarioPerfil(
     idUsuario         = idUsuario,
-    nome              = nome,
-    email             = email,
+    nome              = nome ?: "",
+    email             = email ?: "",
     cpf               = cpf,
     dataNasc          = dataNasc,
     telefone          = telefone,
     foto              = foto,
     criado            = criado,
     ultimaAtualizacao = ultimaAtualizacao,
-    tipoUsuario       = tipoUsuario,
-    genero            = genero?.let { Genero(it.idGenero ?: 0, it.nome ?: "") },
-    nacionalidade     = nacionalidade?.let { Nacionalidade(it.idNacionalidade ?: 0, it.nome ?: "") },
+    tipoUsuario       = tipoUsuario ?: "Usuario",
+    genero            = genero?.let {
+        Genero(it.idGenero ?: 0, it.nome ?: "")
+    },
+    nacionalidade     = nacionalidade?.let {
+        Nacionalidade(it.idNacionalidade ?: 0, it.nome ?: "")
+    },
     endereco          = endereco?.let {
         Endereco(
             cep       = it.cep ?: "",
@@ -81,24 +85,29 @@ fun UsuarioPerfilDto.toDomain() = UsuarioPerfil(
             longitude = it.longitude ?: ""
         )
     },
-    redesSociais = redesSociais?.map { rs ->
-        RedeSocial(
-            id        = rs.idRedesSociais,
-            link      = rs.link,
-            tipoId    = rs.tipoId,
-            tipoNome  = rs.tipo,
-            usuarioId = rs.usuarioId
-        )
+    redesSociais = redesSociais?.mapNotNull { rs ->
+        // link é não-nulo no RedeSocial domain — proteger
+        rs.link.let {
+            RedeSocial(
+                id       = rs.idRedesSociais,
+                link     = rs.link,
+                tipoId   = rs.tipoId,
+                tipoNome = rs.tipo,
+                usuarioId = rs.usuarioId
+            )
+        }
     } ?: emptyList(),
-    artista    = artista?.toDomain(),
-    organizador = organizador   // já é o tipo de domínio (veja abaixo)
+    artista     = artista?.toDomain(),
+    organizador = organizador
 )
 
 private fun UsuarioPerfilArtistaDto.toDomain() = UsuarioArtistaPerfil(
     idAtista        = idAtista,
     nomeArtistico   = nomeArtistico,
     descricao       = descricao,
-    generosMusicais = generosMusicais.mapNotNull { it?.let { g -> GeneroMusical(g.id_genero_musical, g.nome) } },
+    generosMusicais = generosMusicais.mapNotNull { g ->
+        g?.let { GeneroMusical(it.id_genero_musical, it.nome) }
+    },
     mediaAvaliacao  = mediaAvaliacao,
     totalAvaliacoes = totalAvaliacoes,
     eventos         = eventos.mapNotNull { it?.toDomain() }
@@ -116,10 +125,10 @@ private fun UsuarioPerfilEventosDto.toDomain() = UsuarioEventoPerfil(
             cacheProposta = it.cacheProposta
         )
     },
-    status          = status,
+    status          = status?.nome,
     fotos           = fotos?.mapNotNull { f ->
         f?.url?.let { url -> UsuarioFotosPerfil(f.idFoto, url) }
-    } ?: emptyList(),
+    },
     endereco        = endereco?.let {
         UsuarioPerfilEventosEndereco(
             cep              = it.cep,

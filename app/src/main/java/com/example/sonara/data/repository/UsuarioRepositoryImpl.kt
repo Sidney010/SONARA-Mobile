@@ -83,7 +83,10 @@ class UsuarioRepositoryImpl @Inject constructor(
     override suspend fun buscarUsuarioPorId(id: Int): AppResult<UsuarioPerfil> {
         return safeApiCall(
             apiCall = { remoteDataSource.getUsuarioById(id) },
-            mapper  = { it.toDomain() }
+            mapper  = { wrapper ->
+                android.util.Log.d("PERFIL_DEBUG", "usuario dto: ${wrapper.usuario}")
+                wrapper.usuario.toDomain()   // <- acessar .usuario antes do toDomain()
+            }
         )
     }
 }

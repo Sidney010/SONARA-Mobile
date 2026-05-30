@@ -4,5 +4,5 @@ import com.google.gson.annotations.SerializedName
 
 data class UsuarioPerfilOrganizadorDto(
     @SerializedName("id_organizador") val idOrganizador: Int,
-    @SerializedName("eventos")        val eventos: List<UsuarioPerfilEventosDto>
+    @SerializedName("eventos")        val eventos: List<UsuarioPerfilEventosDto>? = null
 )

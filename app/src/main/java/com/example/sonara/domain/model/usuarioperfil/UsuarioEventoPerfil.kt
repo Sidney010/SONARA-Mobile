@@ -6,7 +6,7 @@ data class UsuarioEventoPerfil(
     val eventoNome: String?,
     val cache: UsuarioCachePerfil?,
     val status: String?,
-    val fotos: List<UsuarioFotosPerfil> = emptyList(),
+    val fotos: List<UsuarioFotosPerfil?>? = emptyList(),
     val endereco: UsuarioPerfilEventosEndereco?,
     val horaFim: String?,
     val descricao: String?,

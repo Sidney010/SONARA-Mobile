@@ -145,7 +145,7 @@ fun ProfileContent(
                                     it.cacheOfertado, it.cacheProposta
                                 )
                             },
-                            status          = eventoDto.status,
+                            status          = eventoDto.status?.nome,
                             fotos           = eventoDto.fotos
                                 ?.mapNotNull { f -> f?.let { UsuarioFotosPerfil(it.idFoto, it.url) } }
                                 ?: emptyList(),
@@ -294,7 +294,7 @@ private fun EventoItem(evento: UsuarioEventoPerfil) {
         }
 
         // Foto do evento (primeira disponível)
-        val primeiraFoto = evento.fotos.firstOrNull()?.url
+        val primeiraFoto = evento.fotos?.firstOrNull()?.url
         if (primeiraFoto != null) {
             AsyncImage(
                 model = primeiraFoto,
