@@ -10,6 +10,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.unit.dp
+import coil.compose.AsyncImage
+import com.example.sonara.R
 
 @Composable
 fun UserAvatar(
@@ -17,6 +22,7 @@ fun UserAvatar(
     modifier: Modifier = Modifier,
     onClick: () -> Unit
 ) {
+    val photoUrl: String? = avatarUrl
 
     Box(
         modifier = modifier
@@ -43,7 +49,15 @@ fun UserAvatar(
 
             } else {
 
-                // Aqui entra AsyncImage futuramente
+                AsyncImage(                         // Coil
+                    model = photoUrl,
+                    contentDescription = "Avatar",
+                    contentScale = ContentScale.Crop,
+                    placeholder = painterResource(R.drawable.ic_launcher_foreground),
+                    error       = painterResource(R.drawable.ic_launcher_foreground),
+                    modifier = modifier
+                        .size(40.dp)
+                )
             }
         }
     }

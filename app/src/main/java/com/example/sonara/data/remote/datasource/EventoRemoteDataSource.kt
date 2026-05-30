@@ -12,6 +12,5 @@ class EventoRemoteDataSource @Inject constructor(
 ) {
     suspend fun getEventos(): Response<ApiResponse<EventoListDto>> = api.getEventos()
 
-    suspend fun getUsuarioById(id: Int): Response<ApiResponse<UsuarioPerfilDto>> =
-        api.getUsuarioById(id)
+
 }

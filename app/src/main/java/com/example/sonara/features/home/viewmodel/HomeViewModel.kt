@@ -40,15 +40,18 @@ class HomeViewModel @Inject constructor(
             combine(
                 tokenManager.userName,
                 tokenManager.userType,
-                tokenManager.token
-            ) { name, type, token ->
-                Triple(name, type, token)
-            }.collect { (name, type, token) ->
+                tokenManager.token,
+                tokenManager.userPhoto
+            ) { name, type, token, photo ->
+                // Triple → data class ou Pair aninhado
+                listOf(name, type, token, photo)
+            }.collect { (name, type, token, photo) ->
                 _uiState.update {
                     it.copy(
-                        userName  = name ?: "Anônimo",
-                        userRole  = type ?: "Usuário",
-                        isLoggedIn = !token.isNullOrBlank()
+                        userName    = name  ?: "Anônimo",
+                        userRole    = type  ?: "Usuário",
+                        userPhoto   = photo,
+                        isLoggedIn  = !token.isNullOrBlank()
                     )
                 }
             }

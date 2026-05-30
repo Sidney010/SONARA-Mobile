@@ -5,7 +5,7 @@ data class HomeUiState(
     // ── Sessão ────────────────────────────────────────────────────────────────
     val userName: String      = "Anônimo",
     val userRole: String      = "Usuário",
-    val avatarUrl: String?    = null,
+    val userPhoto:  String? = null,
     val isLoggedIn: Boolean   = false,
 
     // ── Eventos ───────────────────────────────────────────────────────────────

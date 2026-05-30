@@ -1,9 +1,9 @@
 package com.example.sonara.data.mapper
 
 import com.example.sonara.data.remote.dto.response.evento.EventoDto
-import com.example.sonara.data.remote.dto.response.UsuarioPerfilDto
+
 import com.example.sonara.domain.model.Evento
-import com.example.sonara.domain.model.UsuarioPerfil
+import com.example.sonara.domain.model.usuarioperfil.UsuarioPerfil
 
 fun EventoDto.toDomain() = Evento(
     id              = id_evento,
@@ -34,18 +34,3 @@ fun EventoDto.toDomain() = Evento(
     fotosUrls       = fotos.mapNotNull { it.caminho?.takeIf { c -> c.isNotBlank() } }
 )
 
-fun UsuarioPerfilDto.toDomain() = UsuarioPerfil(
-    id             = id_usuario,
-    nome           = nome,
-    email          = email,
-    cpf            = cpf,
-    dataNasc       = data_nasc,
-    telefone       = telefone,
-    nacionalidadeId= nacionalidade_id,
-    generoId       = genero_id,
-    tipoUsuario    = tipo_usuario,
-    nomeArtistico  = nome_artistico,
-    descricao      = descricao,
-    criado         = criado,
-    fotosUrls      = fotos?.mapNotNull { it.caminho?.takeIf { c -> c.isNotBlank() } } ?: emptyList()
-)

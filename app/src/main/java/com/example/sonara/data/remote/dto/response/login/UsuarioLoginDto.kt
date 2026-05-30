@@ -7,7 +7,7 @@ data class UsuarioLoginDto(
     @SerializedName("nome")             val nome: String,
     @SerializedName("email")            val email: String,
     @SerializedName("foto")             val foto: String?,
-    @SerializedName("tipo_usuario")     val tipoUsuario: String, // ex: "Artista" ou "Organizador"
+    @SerializedName("tipo_usuario")     val tipoUsuario: String, // "Artista" ou "Organizador" ou "Usuario"
     @SerializedName("id_artista")       val idArtista: Int?,
     @SerializedName("id_organizador")   val idOrganizador: Int?
 )

@@ -10,7 +10,7 @@ data class Usuario(
     val nacionalidadeId: Int? = null,
     val generoId: Int? = null,          // gênero (masculino/feminino etc.)
     val telefone: String? = null,
-    val tipoUsuario: String = "usuario", // "artista", "organizador", "usuario"
+    val tipoUsuario: String = "usuario", // "artista", "organizador", "user"
     val nomeArtistico: String? = null,
     val descricao: String? = null,
     // endereço

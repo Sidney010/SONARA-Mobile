@@ -9,6 +9,7 @@ import com.example.sonara.domain.model.GeneroMusical
 import com.example.sonara.domain.model.LoginResult
 import com.example.sonara.domain.model.Nacionalidade
 import com.example.sonara.domain.model.Usuario
+import com.example.sonara.domain.model.usuarioperfil.UsuarioPerfil
 import com.example.sonara.domain.repository.GeneroMusicalRepository
 import com.example.sonara.domain.repository.NacionalidadeRepository
 import com.example.sonara.domain.repository.UsuarioRepository
@@ -24,15 +25,14 @@ class UsuarioRepositoryImpl @Inject constructor(
     private val remoteDataSource: UsuarioRemoteDataSource
 ) : UsuarioRepository, NacionalidadeRepository, GeneroMusicalRepository {
 
-    // ── Cadastro ──────────────────────────────────────────────────────
+
     override suspend fun register(user: Usuario, photoFilePath: String?): AppResult<Usuario> {
 
-        // 1. Serializa o DTO como JSON → RequestBody
+
         val dto      = user.toRequestDto()
         val json     = Gson().toJson(dto)
         val dadosPart = json.toRequestBody("text/plain".toMediaTypeOrNull())
 
-        // 2. Constrói a parte da foto (opcional)
         val fotoPart: MultipartBody.Part? = photoFilePath?.let { path ->
             val file = File(path)
             if (file.exists()) {
@@ -47,7 +47,6 @@ class UsuarioRepositoryImpl @Inject constructor(
         )
     }
 
-    // ── Login ─────────────────────────────────────────────────────────
     override suspend fun login(email: String, senha: String): AppResult<LoginResult> {
         return try {
             val response = remoteDataSource.login(email, senha)
@@ -68,7 +67,7 @@ class UsuarioRepositoryImpl @Inject constructor(
         } catch (e: Exception) { AppResult.Error(e) }
     }
 
-    // ── Catálogos ─────────────────────────────────────────────────────
+
     override suspend fun listarNacionalidades(): AppResult<List<Nacionalidade>> =
         safeApiCall(
             apiCall = { remoteDataSource.getNacionalidades() },
@@ -80,4 +79,11 @@ class UsuarioRepositoryImpl @Inject constructor(
             apiCall = { remoteDataSource.getGenerosMusicais() },
             mapper  = { dto -> dto.generoMusical.map { it.toDomain() } }
         )
+
+    override suspend fun buscarUsuarioPorId(id: Int): AppResult<UsuarioPerfil> {
+        return safeApiCall(
+            apiCall = { remoteDataSource.getUsuarioById(id) },
+            mapper  = { it.toDomain() }
+        )
+    }
 }

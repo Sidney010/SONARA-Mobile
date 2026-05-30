@@ -1,6 +1,6 @@
 package com.example.sonara.features.artista.perfilartista.model
 
-import com.example.sonara.domain.model.UsuarioPerfil
+import com.example.sonara.domain.model.usuarioperfil.UsuarioPerfil
 
 data class ArtistProfileUiState(
     val perfil: UsuarioPerfil?    = null,

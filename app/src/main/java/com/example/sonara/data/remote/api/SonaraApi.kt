@@ -19,6 +19,7 @@ import com.example.sonara.data.remote.dto.response.redesocial.RedeSocialDto
 import com.example.sonara.data.remote.dto.response.redesocial.RedeSocialListDto
 import com.example.sonara.data.remote.dto.response.redesocial.TipoRedeSocialListDto
 import com.example.sonara.data.remote.dto.response.usuario.UsuarioResponseDto
+import com.example.sonara.data.remote.dto.response.usuario.perfil.UsuarioPerfilDto
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import retrofit2.Response
@@ -44,7 +45,7 @@ interface SonaraApi {
     suspend fun login(@Body request: LoginRequestDto): Response<LoginResponseDto>
 
     @GET("usuario/{id}")
-    suspend fun getUsuarioById(@Path("id") id: Int): Response<ApiResponse<UsuarioResponseDto>>
+    suspend fun getUsuarioById(@Path("id") id: Int): Response<ApiResponse<UsuarioPerfilDto>>
 
     @GET("evento")
     suspend fun getEventos(): Response<ApiResponse<EventoListDto>>

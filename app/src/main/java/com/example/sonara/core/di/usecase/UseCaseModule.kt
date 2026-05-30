@@ -36,5 +36,5 @@ object UseCaseModule {
     @Provides fun provideListarNacionalidadesUseCase(r: NacionalidadeRepository) = ListarNacionalidadesUseCase(r)
     @Provides fun provideListarGenerosMusicaisUseCase(r: GeneroMusicalRepository) = ListarGenerosMusicaisUseCase(r)
     @Provides fun provideListarEventosUseCase(r: EventoRepository)             = ListarEventosUseCase(r)
-    @Provides fun provideBuscarUsuarioPorIdUseCase(r: EventoRepository)        = BuscarUsuarioPorIdUseCase(r)
+    @Provides fun provideBuscarUsuarioPorIdUseCase(r: UsuarioRepository)        = BuscarUsuarioPorIdUseCase(r)
 }

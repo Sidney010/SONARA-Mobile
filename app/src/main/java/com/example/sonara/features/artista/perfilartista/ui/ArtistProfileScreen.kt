@@ -116,10 +116,10 @@ fun ArtistProfileScreen(
                     color    = AppColors.PrimaryOrange
                 )
 
-                uiState.perfil != null -> ProfileContent(
-                    perfil    = uiState.perfil!!,
-                    isEditing = uiState.isEditing
-                )
+//                uiState.perfil != null -> ProfileContent(
+//                    perfil    = uiState.perfil!!,
+//                    isEditing = uiState.isEditing
+//                )
 
                 uiState.errorMessage != null -> Column(
                     modifier            = Modifier.align(Alignment.Center),
@@ -133,6 +133,15 @@ fun ArtistProfileScreen(
                             containerColor = AppColors.PrimaryOrange
                         )
                     ) { Text("Tentar novamente") }
+                }
+
+                else -> {
+                    uiState.perfil?.let { perfil ->
+                        ProfileContent(
+                            perfil    = perfil,
+                            isEditing = uiState.isEditing,
+                        )
+                    }
                 }
             }
         }

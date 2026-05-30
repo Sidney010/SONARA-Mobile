@@ -1,195 +1,310 @@
 package com.example.sonara.features.artista.perfilartista.components
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Badge
-import androidx.compose.material.icons.outlined.Cake
-import androidx.compose.material.icons.outlined.CalendarToday
-import androidx.compose.material.icons.outlined.Email
-import androidx.compose.material.icons.outlined.Info
-import androidx.compose.material.icons.outlined.Person
-import androidx.compose.material.icons.outlined.Phone
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Icon
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
+import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Star
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
-import coil.request.ImageRequest
 import com.example.sonara.core.ui.theme.AppColors
-import com.example.sonara.domain.model.UsuarioPerfil
-import java.time.ZonedDateTime
-import java.time.format.DateTimeFormatter
-import java.util.Locale
+import com.example.sonara.domain.model.usuarioperfil.UsuarioCachePerfil
+import com.example.sonara.domain.model.usuarioperfil.UsuarioPerfil
+import com.example.sonara.domain.model.usuarioperfil.UsuarioEventoPerfil
+import com.example.sonara.domain.model.usuarioperfil.UsuarioFotosPerfil
+import com.example.sonara.domain.model.usuarioperfil.UsuarioPerfilEventosEndereco
 
 @Composable
-fun ProfileContent(perfil: UsuarioPerfil, isEditing: Boolean) {
+fun ProfileContent(
+    perfil: UsuarioPerfil,
+    isEditing: Boolean,
+    modifier: Modifier = Modifier
+) {
     Column(
-        modifier = Modifier
-            .fillMaxSize()
+        modifier = modifier
             .verticalScroll(rememberScrollState())
-            .padding(20.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(16.dp)
+            .padding(horizontal = 16.dp, vertical = 12.dp),
+        verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-        // ── Avatar ────────────────────────────────────────────────────────────
-        Box(
-            modifier = Modifier
-                .size(120.dp)
-                .clip(CircleShape)
-                .background(Color(0xFF2D2D3A)),
-            contentAlignment = Alignment.Center
-        ) {
-            val fotoUrl = perfil.fotosUrls.firstOrNull()
-            if (fotoUrl != null) {
+        // ── Foto + nome + tipo ────────────────────────────────────────
+        ProfileHeader(perfil = perfil)
+
+        // ── Dados do artista (nome artístico, descrição, avaliação) ──
+        if (perfil.tipoUsuario == "Artista") {
+            perfil.artista?.let { artista ->
+                ProfileCard(title = "Perfil Artístico") {
+                    InfoRow(label = "Nome artístico", value = artista.nomeArtistico ?: "-")
+                    InfoRow(label = "Descrição",      value = artista.descricao ?: "-")
+
+                    // Avaliação
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Icon(
+                            imageVector = Icons.Default.Star,
+                            contentDescription = null,
+                            tint = AppColors.PrimaryOrange,
+                            modifier = Modifier.size(16.dp)
+                        )
+                        Spacer(Modifier.width(4.dp))
+                        val media = artista.mediaAvaliacao
+                        Text(
+                            text = if (media != null) "%.1f".format(media) +
+                                    " (${artista.totalAvaliacoes} avaliações)"
+                            else "Sem avaliações",
+                            fontSize = 13.sp,
+                            color = Color.LightGray
+                        )
+                    }
+
+                    // Gêneros musicais
+                    if (artista.generosMusicais.isNotEmpty()) {
+                        Text("Gêneros musicais",
+                            fontSize = 12.sp, color = Color.Gray,
+                            modifier = Modifier.padding(top = 4.dp))
+                        LazyRow(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                            items(artista.generosMusicais) { genero ->
+                                SuggestionChip(
+                                    onClick = {},
+                                    label = { Text(genero.nome, fontSize = 11.sp) },
+                                    colors = SuggestionChipDefaults.suggestionChipColors(
+                                        containerColor = AppColors.PrimaryOrange.copy(alpha = 0.15f),
+                                        labelColor = AppColors.PrimaryOrange
+                                    )
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        // ── Dados do organizador ──────────────────────────────────────
+        if (perfil.tipoUsuario == "Organizador") {
+            ProfileCard(title = "Meus Dados") {
+                InfoRow(label = "Nome",     value = perfil.nome)
+                InfoRow(label = "Email",    value = perfil.email)
+                InfoRow(label = "Telefone", value = perfil.telefone ?: "-")
+            }
+        }
+
+        // ── Dados básicos (Usuario) ───────────────────────────────────
+        if (perfil.tipoUsuario == "Usuario") {
+            ProfileCard(title = "Meus Dados") {
+                InfoRow(label = "Nome",  value = perfil.nome)
+                InfoRow(label = "Email", value = perfil.email)
+            }
+        }
+
+        // ── Endereço ─────────────────────────────────────────────────
+        perfil.endereco?.let { end ->
+            ProfileCard(title = "Endereço") {
+                InfoRow(label = "CEP",         value = end.cep)
+                InfoRow(label = "Rua",         value = end.rua)
+                InfoRow(label = "Cidade / UF", value = "${end.cidade} / ${end.uf}")
+                InfoRow(label = "Bairro",      value = end.bairro)
+            }
+        }
+
+        // ── Redes sociais ─────────────────────────────────────────────
+        if (perfil.redesSociais.isNotEmpty()) {
+            ProfileCard(title = "Redes Sociais") {
+                perfil.redesSociais.forEach { rs ->
+                    InfoRow(label = rs.tipoNome ?: "Link", value = rs.link)
+                }
+            }
+        }
+
+        // ── Eventos ──────────────────────────────────────────────────
+        val eventos: List<UsuarioEventoPerfil> = when (perfil.tipoUsuario) {
+            "Artista" -> perfil.artista?.eventos?.filterNotNull() ?: emptyList()
+
+            "Organizador" -> perfil.organizador?.eventos
+                ?.mapNotNull { eventoDto ->            // <- mapNotNull protege nulos
+                    try {
+                        UsuarioEventoPerfil(
+                            idEvento        = eventoDto.idEvento,
+                            eventoData      = eventoDto.eventoData,
+                            eventoNome      = eventoDto.eventoNome,
+                            cache           = eventoDto.cache?.let {
+                                UsuarioCachePerfil(
+                                    it.cacheFinal, it.cacheEsperado,
+                                    it.cacheOfertado, it.cacheProposta
+                                )
+                            },
+                            status          = eventoDto.status,
+                            fotos           = eventoDto.fotos
+                                ?.mapNotNull { f -> f?.let { UsuarioFotosPerfil(it.idFoto, it.url) } }
+                                ?: emptyList(),
+                            endereco        = eventoDto.endereco?.let {
+                                UsuarioPerfilEventosEndereco(
+                                    cep = it.cep, bairro = it.bairro, cidade = it.cidade,
+                                    estado = it.estado, numero = it.numero,
+                                    latitude = it.latitude, longitude = it.longitude,
+                                    logradouro = it.logradouro, complemento = it.complemento,
+                                    idEnderecoEvento = it.idEnderecoEvento
+                                )
+                            },
+                            horaFim = eventoDto.horaFim, descricao = eventoDto.descricao,
+                            horaInicio = eventoDto.horaInicio, sobreArtista = null,
+                            motivoInscricao = null, idEventoArtista = eventoDto.idEventoArtista
+                        )
+                    } catch (e: Exception) { null }    // <- nunca deixa crashar a tela
+                } ?: emptyList()
+
+            else -> emptyList()
+        }
+
+        if (eventos.isNotEmpty()) {
+            ProfileCard(title = "Meus Eventos") {
+                eventos.forEach { evento ->
+                    EventoItem(evento = evento)
+                    if (evento != eventos.last()) {
+                        HorizontalDivider(color = Color.White.copy(alpha = 0.1f))
+                    }
+                }
+            }
+        }
+    }
+}
+
+// ── Subcomponentes ────────────────────────────────────────────────────────────
+
+@Composable
+private fun ProfileHeader(perfil: UsuarioPerfil) {
+    Column(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        Box {
+            if (perfil.foto != null) {
                 AsyncImage(
-                    model = ImageRequest.Builder(LocalContext.current)
-                        .data(fotoUrl).crossfade(true).build(),
+                    model = perfil.foto,
                     contentDescription = "Foto de perfil",
-                    modifier     = Modifier.fillMaxSize(),
-                    contentScale = ContentScale.Crop
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier
+                        .size(100.dp)
+                        .clip(CircleShape)
                 )
             } else {
-                Icon(
-                    Icons.Outlined.Person,
-                    contentDescription = null,
-                    tint     = Color.White,
-                    modifier = Modifier.size(60.dp)
-                )
+                Box(
+                    modifier = Modifier
+                        .size(100.dp)
+                        .clip(CircleShape)
+                        .background(Color.DarkGray),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(Icons.Default.Person, contentDescription = null,
+                        tint = Color.Gray, modifier = Modifier.size(40.dp))
+                }
             }
         }
 
-        // ── Nome e tipo ───────────────────────────────────────────────────────
-        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+        Text(perfil.nome, fontSize = 20.sp, fontWeight = FontWeight.Bold, color = Color.White)
+
+        // Nome artístico abaixo do nome, se artista
+        perfil.artista?.nomeArtistico?.let {
+            Text("\"$it\"", fontSize = 14.sp, color = Color.LightGray)
+        }
+
+        Surface(
+            shape = RoundedCornerShape(20.dp),
+            color = AppColors.PrimaryOrange.copy(alpha = 0.2f)
+        ) {
             Text(
-                text       = perfil.nome,
-                color      = Color.White,
-                fontSize   = 22.sp,
-                fontWeight = FontWeight.Bold
+                text = perfil.tipoUsuario,
+                fontSize = 12.sp,
+                color = AppColors.PrimaryOrange,
+                modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp)
             )
-            if (!perfil.nomeArtistico.isNullOrBlank()) {
-                Text(
-                    text   = "\"${perfil.nomeArtistico}\"",
-                    color  = AppColors.PrimaryOrange,
-                    fontSize = 14.sp
-                )
+        }
+    }
+}
+
+@Composable
+private fun ProfileCard(
+    title: String,
+    content: @Composable ColumnScope.() -> Unit
+) {
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(16.dp),
+        colors = CardDefaults.cardColors(containerColor = Color(0xFF1A1A1A))
+    ) {
+        Column(
+            modifier = Modifier.padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(10.dp)
+        ) {
+            Text(title, fontSize = 15.sp,
+                fontWeight = FontWeight.SemiBold, color = Color.White)
+            HorizontalDivider(color = Color.White.copy(alpha = 0.1f))
+            content()
+        }
+    }
+}
+
+@Composable
+private fun InfoRow(label: String, value: String) {
+    Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
+        Text(label, fontSize = 11.sp, color = Color.Gray)
+        Text(value, fontSize = 14.sp, color = Color.White)
+    }
+}
+
+@Composable
+private fun EventoItem(evento: UsuarioEventoPerfil) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 8.dp),
+        verticalArrangement = Arrangement.spacedBy(4.dp)
+    ) {
+        Text(evento.eventoNome ?: "Evento", fontSize = 14.sp,
+            fontWeight = FontWeight.Medium, color = Color.White)
+
+        val local = listOfNotNull(
+            evento.endereco?.cidade,
+            evento.endereco?.estado
+        ).joinToString(" / ")
+
+        if (local.isNotBlank())
+            Text(local, fontSize = 12.sp, color = Color.Gray)
+
+        Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+            evento.eventoData?.let {
+                Text(it.take(10), fontSize = 12.sp, color = Color.LightGray)
             }
-            if (!perfil.tipoUsuario.isNullOrBlank()) {
-                Surface(
-                    color = AppColors.PrimaryOrange.copy(alpha = 0.2f),
-                    shape = RoundedCornerShape(20.dp)
-                ) {
-                    Text(
-                        text     = perfil.tipoUsuario.replaceFirstChar { it.uppercase() },
-                        color    = AppColors.PrimaryOrange,
-                        fontSize = 12.sp,
-                        modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp)
-                    )
-                }
+            evento.horaInicio?.let {
+                Text(it.take(5), fontSize = 12.sp, color = Color.LightGray)
             }
         }
 
-        // ── Bio / Descrição ───────────────────────────────────────────────────
-        if (!perfil.descricao.isNullOrBlank()) {
-            Card(
-                modifier = Modifier.fillMaxWidth(),
-                colors   = CardDefaults.cardColors(containerColor = Color(0xFF1A1A2E)),
-                shape    = RoundedCornerShape(12.dp)
-            ) {
-                Text(
-                    text     = perfil.descricao,
-                    color    = Color.White.copy(alpha = 0.85f),
-                    fontSize = 14.sp,
-                    modifier = Modifier.padding(16.dp)
-                )
-            }
+        // Foto do evento (primeira disponível)
+        val primeiraFoto = evento.fotos.firstOrNull()?.url
+        if (primeiraFoto != null) {
+            AsyncImage(
+                model = primeiraFoto,
+                contentDescription = "Foto do evento",
+                contentScale = ContentScale.Crop,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(120.dp)
+                    .clip(RoundedCornerShape(8.dp))
+            )
         }
-
-        // ── Informações pessoais ──────────────────────────────────────────────
-        ProfileSection(title = "Informações") {
-            ProfileInfoRow(Icons.Outlined.Email, "Email", perfil.email)
-
-            if (!perfil.telefone.isNullOrBlank())
-                ProfileInfoRow(Icons.Outlined.Phone, "Telefone", perfil.telefone)
-
-            if (!perfil.cpf.isNullOrBlank())
-                ProfileInfoRow(Icons.Outlined.Badge, "CPF",
-                    perfil.cpf.let {
-                        // Máscara visual: 123.456.789-00
-                        val d = it.filter { c -> c.isDigit() }
-                        if (d.length == 11)
-                            "${d.take(3)}.${d.drop(3).take(3)}.${d.drop(6).take(3)}-${d.drop(9)}"
-                        else it
-                    }
-                )
-
-            if (!perfil.dataNasc.isNullOrBlank()) {
-                val dataFormatada = runCatching {
-                    ZonedDateTime.parse(perfil.dataNasc)
-                        .format(DateTimeFormatter.ofPattern("dd/MM/yyyy", Locale("pt", "BR")))
-                }.getOrElse { perfil.dataNasc.take(10) }
-                ProfileInfoRow(Icons.Outlined.Cake, "Nascimento", dataFormatada)
-            }
-
-            if (!perfil.criado.isNullOrBlank()) {
-                val membroDesde = runCatching {
-                    ZonedDateTime.parse(perfil.criado)
-                        .format(DateTimeFormatter.ofPattern("MMMM 'de' yyyy", Locale("pt", "BR")))
-                }.getOrElse { "" }
-                if (membroDesde.isNotBlank())
-                    ProfileInfoRow(Icons.Outlined.CalendarToday, "Membro desde", membroDesde)
-            }
-        }
-
-        // ── Aviso de edição futura ────────────────────────────────────────────
-        if (isEditing) {
-            Card(
-                modifier = Modifier.fillMaxWidth(),
-                colors   = CardDefaults.cardColors(containerColor = Color(0xFF2D2D3A)),
-                shape    = RoundedCornerShape(12.dp)
-            ) {
-                Row(
-                    modifier = Modifier.padding(16.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
-
-                    Icon(Icons.Outlined.Info, null, tint = AppColors.PrimaryOrange)
-
-                    Text(
-                        text  = "A edição completa do perfil via PUT estará disponível em breve.",
-                        color = Color.White.copy(alpha = 0.7f),
-                        fontSize = 13.sp
-                    )
-
-                }
-            }
-        }
-
-        Spacer(modifier = Modifier.height(40.dp))
     }
 }

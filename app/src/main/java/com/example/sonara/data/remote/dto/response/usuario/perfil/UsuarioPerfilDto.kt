@@ -1,7 +1,6 @@
 package com.example.sonara.data.remote.dto.response.usuario.perfil
 
 import com.example.sonara.data.remote.dto.response.redesocial.RedeSocialDto
-import com.example.sonara.data.remote.dto.response.usuario.UsuarioArtistaDto
 import com.example.sonara.data.remote.dto.response.usuario.UsuarioEnderecoDto
 import com.example.sonara.data.remote.dto.response.usuario.UsuarioGeneroDto
 import com.example.sonara.data.remote.dto.response.usuario.UsuarioNacionalidadeDto
@@ -22,5 +21,7 @@ data class UsuarioPerfilDto(
     @SerializedName("nacionalidade") val nacionalidade: UsuarioNacionalidadeDto?,
     @SerializedName("endereco") val endereco: UsuarioEnderecoDto?,
     @SerializedName("redes_sociais") val redesSociais: List<RedeSocialDto>?,
-    @SerializedName("artista") val artista: List<UsuarioArtistaDto?>
+    @SerializedName("artista") val artista: UsuarioPerfilArtistaDto?,
+    @SerializedName("organizador") val organizador: UsuarioPerfilOrganizadorDto?
+
 )

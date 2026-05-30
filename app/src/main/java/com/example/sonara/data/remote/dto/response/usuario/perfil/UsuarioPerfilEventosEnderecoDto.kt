@@ -12,5 +12,5 @@ data class UsuarioPerfilEventosEnderecoDto (
     @SerializedName("longitude")        val longitude: String?,
     @SerializedName("logradouro")       val logradouro: String?,
     @SerializedName("complemento")      val complemento: String?,
-    @SerializedName("id_endereco_evento") val idEnderecoEvento: Int?
+    @SerializedName("id_endereco_evento") val idEnderecoEvento: Int? = null
 )

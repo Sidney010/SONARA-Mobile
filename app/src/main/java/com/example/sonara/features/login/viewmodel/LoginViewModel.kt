@@ -68,37 +68,18 @@ class LoginViewModel @Inject constructor(
             when (val result = loginUseCase(state.email.value, state.password.value)) {
                 is AppResult.Success -> {
                     val loginData = result.data
+                    val u = loginData.usuario
 
-                    // Salva sessão com tipo padrão primeiro
+                    // Salva sessão já com os dados reais do login
                     tokenManager.saveSession(
-                        token    = loginData.token,
-                        userId   = loginData.usuario.id ?: 0,
-                        userName = loginData.usuario.nome,
-                        userType = "Usuário"
+                        token        = loginData.token,
+                        userId       = u.idUsuario,
+                        userName     = u.nome,
+                        userType     = u.tipoUsuario,   // já vem correto da API
+                        photoUrl     = u.foto,
+                        artistId     = u.idArtista,
+                        organizerId  = u.idOrganizador
                     )
-
-                    // Busca perfil completo para obter tipo_usuario real
-                    val userId = loginData.usuario.id ?: 0
-                    if (userId > 0) {
-                        when (val perfil = buscarUsuarioPorIdUseCase(userId)) {
-                            is AppResult.Success -> {
-                                val tipo = perfil.data.tipoUsuario?.let {
-                                    when (it.lowercase()) {
-                                        "artista"     -> "Artista"
-                                        "organizador" -> "Organizador"
-                                        else          -> "Usuário"
-                                    }
-                                } ?: "Usuário"
-                                tokenManager.saveSession(
-                                    token    = loginData.token,
-                                    userId   = userId,
-                                    userName = loginData.usuario.nome,
-                                    userType = tipo
-                                )
-                            }
-                            else -> { /* mantém padrão */ }
-                        }
-                    }
 
                     _event.emit(LoginEvent.NavigateToHome)
                 }

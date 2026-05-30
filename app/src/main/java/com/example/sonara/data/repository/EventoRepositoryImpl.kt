@@ -5,7 +5,7 @@ import com.example.sonara.core.network.safeApiCall
 import com.example.sonara.data.mapper.toDomain
 import com.example.sonara.data.remote.datasource.EventoRemoteDataSource
 import com.example.sonara.domain.model.Evento
-import com.example.sonara.domain.model.UsuarioPerfil
+import com.example.sonara.domain.model.usuarioperfil.UsuarioPerfil
 import com.example.sonara.domain.repository.EventoRepository
 import javax.inject.Inject
 
@@ -20,10 +20,5 @@ class EventoRepositoryImpl @Inject constructor(
         )
     }
 
-    override suspend fun buscarUsuarioPorId(id: Int): AppResult<UsuarioPerfil> {
-        return safeApiCall(
-            apiCall = { remoteDataSource.getUsuarioById(id) },
-            mapper  = { it.toDomain() }
-        )
-    }
+
 }

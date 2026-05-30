@@ -72,7 +72,7 @@ fun HomeUserScreen(
             state = HeaderUiState(
                 userName  = uiState.userName,
                 userRole  = uiState.userRole,
-                avatarUrl = uiState.avatarUrl
+                avatarUrl = uiState.userPhoto
             ),
             onLogoClick         = onNavigateToHome,
             onAvatarClick       = { if (uiState.isLoggedIn) onNavigateToProfile() else onNavigateToLogin() },

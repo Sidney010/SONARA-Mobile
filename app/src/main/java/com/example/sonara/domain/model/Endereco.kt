@@ -10,5 +10,9 @@ data class Endereco(
 
     val cidade: String = "",
 
-    val uf: String = ""
+    val uf: String = "",
+
+    val latitude: String = "",
+
+    val longitude: String = ""
 )
