@@ -26,7 +26,7 @@ import com.example.sonara.core.ui.theme.AppColors
 import com.example.sonara.domain.model.usuarioperfil.UsuarioCachePerfil
 import com.example.sonara.domain.model.usuarioperfil.UsuarioPerfil
 import com.example.sonara.domain.model.usuarioperfil.UsuarioEventoPerfil
-import com.example.sonara.domain.model.usuarioperfil.UsuarioFotosPerfil
+import com.example.sonara.domain.model.Fotos
 import com.example.sonara.domain.model.usuarioperfil.UsuarioPerfilEventosEndereco
 
 @Composable
@@ -147,7 +147,7 @@ fun ProfileContent(
                             },
                             status          = eventoDto.status?.nome,
                             fotos           = eventoDto.fotos
-                                ?.mapNotNull { f -> f?.let { UsuarioFotosPerfil(it.idFoto, it.url) } }
+                                ?.mapNotNull { f -> f?.let { Fotos(it.idFoto, it.url) } }
                                 ?: emptyList(),
                             endereco        = eventoDto.endereco?.let {
                                 UsuarioPerfilEventosEndereco(

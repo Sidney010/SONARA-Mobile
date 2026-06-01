@@ -41,7 +41,10 @@ import com.example.sonara.core.ui.components.header.HomeHeader
 import com.example.sonara.core.ui.theme.DarkGradients
 
 @Composable
-fun CreateEventOrganizerScreen(modifier: Modifier = Modifier) {
+fun CreateEventOrganizerScreen(
+    modifier: Modifier = Modifier,
+    onBackClick: () -> Unit = {}
+) {
 
     val gradients = DarkGradients
 

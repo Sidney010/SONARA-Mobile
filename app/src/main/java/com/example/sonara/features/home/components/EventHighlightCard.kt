@@ -1,5 +1,7 @@
 package com.example.sonara.features.home.components
 
+import android.R.attr.fontWeight
+import android.R.attr.text
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -124,7 +126,8 @@ fun EventHighlightCard(
                     }
                 }
 
-                if (!evento.artista.isNullOrBlank()) {
+                val artistaNome = evento.artista?.nome
+                if (!artistaNome.isNullOrBlank()) {
                     Spacer(modifier = Modifier.height(2.dp))
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Icon(Icons.Default.MusicNote, null,
@@ -132,7 +135,7 @@ fun EventHighlightCard(
                             modifier = Modifier.size(12.dp))
                         Spacer(modifier = Modifier.width(4.dp))
                         Text(
-                            text  = evento.artista,
+                            text  = artistaNome,
                             color = AppColors.PrimaryOrange,
                             fontSize = 12.sp,
                             fontWeight = FontWeight.Medium

@@ -121,7 +121,7 @@ class HomeViewModel @Inject constructor(
             e.nome.lowercase().contains(query)      ||
                     e.local?.lowercase()?.contains(query) == true ||
                     e.cidade?.lowercase()?.contains(query) == true ||
-                    e.artista?.lowercase()?.contains(query) == true ||
+                    e.artista?.nome?.lowercase()?.contains(query) == true ||
                     e.descricao?.lowercase()?.contains(query) == true
         }
 

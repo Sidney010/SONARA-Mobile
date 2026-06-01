@@ -20,5 +20,10 @@ class EventoRepositoryImpl @Inject constructor(
         )
     }
 
-
+    override suspend fun buscarEventoPorId(id: Int): AppResult<Evento> {
+        return safeApiCall(
+            apiCall = { remoteDataSource.getEventoById(id) },
+            mapper  = { dto -> dto.toDomain() }
+        )
+    }
 }

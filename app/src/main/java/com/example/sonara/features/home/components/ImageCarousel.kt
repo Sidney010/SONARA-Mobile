@@ -51,12 +51,14 @@ fun formatarHora(hora: String?): String {
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun ImageCarousel(
-    fotos: List<String>,
+    fotos: List<String>?,
     modifier: Modifier = Modifier,
     height: Dp = 220.dp,
     placeholderColor: Color = Color.DarkGray
 ) {
-    if (fotos.isEmpty()) {
+    val safeFotos = fotos ?: emptyList()
+
+    if (safeFotos.isEmpty()) {
         // Placeholder quando não há fotos
         Box(
             modifier = modifier
@@ -67,7 +69,7 @@ fun ImageCarousel(
         return
     }
 
-    val pagerState = rememberPagerState(pageCount = { fotos.size })
+    val pagerState = rememberPagerState(pageCount = { safeFotos.size })
 
     Box(modifier = modifier.fillMaxWidth().height(height)) {
         HorizontalPager(
@@ -76,7 +78,7 @@ fun ImageCarousel(
         ) { page ->
             AsyncImage(
                 model = ImageRequest.Builder(LocalContext.current)
-                    .data(fotos[page])
+                    .data(safeFotos[page])
                     .crossfade(true)
                     .build(),
                 contentDescription = "Imagem do evento",
@@ -86,14 +88,14 @@ fun ImageCarousel(
         }
 
         // Indicador de páginas (bolinhas) — só mostra se há mais de 1 foto
-        if (fotos.size > 1) {
+        if (safeFotos.size > 1) {
             Row(
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
                     .padding(bottom = 8.dp),
                 horizontalArrangement = Arrangement.spacedBy(4.dp)
             ) {
-                repeat(fotos.size) { index ->
+                repeat(safeFotos.size) { index ->
                     Box(
                         modifier = Modifier
                             .size(if (index == pagerState.currentPage) 8.dp else 6.dp)

@@ -21,20 +21,20 @@ fun HeaderUserSection(
             HeaderDimens.ItemSpacing
         )
     ) {
+        if (state.isLoggedIn) {
+            HeaderActions(
+                onNotificationClick = onNotificationClick
+            )
 
-        HeaderActions(
-            onNotificationClick = onNotificationClick
-        )
-
-        UserInfo(
-            userName = state.userName,
-            userRole = state.userRole
-        )
+            UserInfo(
+                userName = state.userName,
+                userRole = state.userRole
+            )
+        }
 
         UserAvatar(
             avatarUrl = state.avatarUrl,
             onClick = onAvatarClick
         )
-
     }
 }

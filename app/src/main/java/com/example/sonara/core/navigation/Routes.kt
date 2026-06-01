@@ -18,4 +18,9 @@ sealed class Routes(val route: String) {
     // ── Perfil ────────────────────────────────────────────────────────────────
     // Rota no grafo do main (não no BottomNav)
     data object Profile : Routes("profile")
+
+    // ── Organizador ───────────────────────────────────────────────────────────
+    data object CreateEvent : Routes("create_event")
+    data object HireArtist  : Routes("hire_artist")
+    data object MyEvents    : Routes("my_events")
 }

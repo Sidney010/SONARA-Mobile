@@ -6,5 +6,5 @@ import com.example.sonara.domain.model.usuarioperfil.UsuarioPerfil
 
 interface EventoRepository {
     suspend fun listarEventos(): AppResult<List<Evento>>
-
+    suspend fun buscarEventoPorId(id: Int): AppResult<Evento>
 }

@@ -47,7 +47,10 @@ import com.example.sonara.core.ui.components.header.HomeHeader
 import com.example.sonara.core.ui.theme.DarkGradients
 
 @Composable
-fun SelectArtistScreen(modifier: Modifier = Modifier) {
+fun SelectArtistScreen(
+    modifier: Modifier = Modifier,
+    onBackClick: () -> Unit = {}
+) {
 
     val gradients = DarkGradients
 

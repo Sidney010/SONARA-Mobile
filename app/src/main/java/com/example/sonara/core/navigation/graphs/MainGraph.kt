@@ -3,8 +3,12 @@ package com.example.sonara.core.navigation.graphs
 import SeeArtistsHouseShowScreen
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import com.example.sonara.features.home.viewmodel.HomeViewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
@@ -43,6 +47,7 @@ fun NavGraphBuilder.mainGraph(
         val bottomNavController = rememberNavController()
         val navBackStackEntry   by bottomNavController.currentBackStackEntryAsState()
         val currentRoute        = navBackStackEntry?.destination?.route
+        val viewModel: HomeViewModel = hiltViewModel()
 
         Scaffold(
             bottomBar = {
@@ -59,27 +64,74 @@ fun NavGraphBuilder.mainGraph(
                     }
                 )
             }
-        ) { _ ->
+        ) { paddingValues ->
             NavHost(
                 navController    = bottomNavController,
                 startDestination = Routes.Home.route
             ) {
                 composable(Routes.Home.route) {
-                    HomeScreen(
-                        onNavigateToHome = {
-                            bottomNavController.navigate(Routes.Home.route) {
-                                launchSingleTop = true
-                                popUpTo(bottomNavController.graph.startDestinationId) {
-                                    inclusive = false
+                    val uiState by viewModel.uiState.collectAsState()
+
+                    if (uiState.userRole == "ORGANIZADOR") {
+                        HomeOrganizerScreen(
+                            onNavigateToCreateEvent = { bottomNavController.navigate(Routes.CreateEvent.route) },
+                            onNavigateToHireArtist = { bottomNavController.navigate(Routes.HireArtist.route) },
+                            onNavigateToMyEvents = { bottomNavController.navigate(Routes.MyEvents.route) },
+                            onNavigateToProfile = { rootNavController.navigate(Routes.Profile.route) }
+                        )
+                    } else {
+                        HomeScreen(
+                            onNavigateToEventDetails = { eventId ->
+                                val route = if (uiState.userRole == "ARTISTA") {
+                                    "about_event_artist/$eventId"
+                                } else {
+                                    "about_event_user/$eventId"
                                 }
+                                bottomNavController.navigate(route)
+                            },
+                            onNavigateToHome = {
+                                bottomNavController.navigate(Routes.Home.route) {
+                                    launchSingleTop = true
+                                    popUpTo(bottomNavController.graph.startDestinationId) {
+                                        inclusive = false
+                                    }
+                                }
+                            },
+                            onNavigateToProfile = {
+                                rootNavController.navigate(Routes.Profile.route)
+                            },
+                            onNavigateToLogin = {
+                                rootNavController.navigate(Routes.Login.route)
                             }
-                        },
-                        onNavigateToProfile = {
-                            rootNavController.navigate(Routes.Profile.route)
-                        },
-                        onNavigateToLogin = {
-                            rootNavController.navigate(Routes.Login.route)
-                        }
+                        )
+                    }
+                }
+
+                // ── Detalhes do Evento por Perfil ──────────────────────────────
+
+                composable("about_event_artist/{eventId}") { backStackEntry ->
+                    val eventId = backStackEntry.arguments?.getString("eventId")?.toInt() ?: 0
+                    AboutEventsScreen(
+                        eventId = eventId,
+                        onBackClick = { bottomNavController.popBackStack() }
+                    )
+                }
+
+                composable("about_event_user/{eventId}") { backStackEntry ->
+                    val eventId = backStackEntry.arguments?.getString("eventId")?.toInt() ?: 0
+                    AboutSelectionEventScreen(
+                        eventId = eventId,
+                        // Assumindo que esta tela recebe o eventId
+                        // Se a assinatura for diferente, ajuste conforme necessário
+                        onBackClick = { bottomNavController.popBackStack() }
+                    )
+                }
+
+                composable("about_event_organizer/{eventId}") { backStackEntry ->
+                    val eventId = backStackEntry.arguments?.getString("eventId")?.toInt() ?: 0
+                    AboutEventOrganizerScreen(
+                        eventId = eventId,
+                        onBackClick = { bottomNavController.popBackStack() }
                     )
                 }
 
@@ -88,22 +140,34 @@ fun NavGraphBuilder.mainGraph(
                 }
 
                 composable(Routes.Events.route) {
-//                     EventsScreen()
-//                    HomeOrganizerScreen()
-//                    MyEventsOrganizerScreen()
-//                      CreateEventOrganizerScreen()
-//                    AboutEventsScreen()
-//                    AboutEventOrganizerScreen()
-//                    OrganizerProfileScreen()
-//                    SelectArtistScreen()
-//                    SeeArtistsHouseShowScreen()
-//                    HomeUserScreen() {}
-//                    SearchEventsUserScreen()
-//                    AboutSelectionEventScreen()
-//                      ProfileUserScreen()
-//                    SearchArtistHouseshowScreen()
+                    val viewModel: HomeViewModel = hiltViewModel()
+                    val uiState by viewModel.uiState.collectAsState()
 
+                    if (uiState.userRole == "ORGANIZADOR") {
+                        MyEventsOrganizerScreen(
+                            onBackClick = { bottomNavController.popBackStack() }
+                        )
+                    } else {
+                        // MyEventsScreen() // Se existir para outros papeis
+                    }
+                }
 
+                composable(Routes.CreateEvent.route) {
+                    CreateEventOrganizerScreen(
+                        onBackClick = { bottomNavController.popBackStack() }
+                    )
+                }
+
+                composable(Routes.HireArtist.route) {
+                    SelectArtistScreen(
+                        onBackClick = { bottomNavController.popBackStack() }
+                    )
+                }
+
+                composable(Routes.MyEvents.route) {
+                    MyEventsOrganizerScreen(
+                        onBackClick = { bottomNavController.popBackStack() }
+                    )
                 }
 
                 composable(Routes.Plans.route) {

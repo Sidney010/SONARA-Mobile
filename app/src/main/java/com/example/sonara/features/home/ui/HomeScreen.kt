@@ -57,7 +57,8 @@ fun HomeScreen(
     viewModel: HomeViewModel = hiltViewModel(),
     onNavigateToProfile: () -> Unit = {},
     onNavigateToHome: () -> Unit = {},
-    onNavigateToLogin: () -> Unit
+    onNavigateToLogin: () -> Unit,
+    onNavigateToEventDetails: (Int) -> Unit = {}
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
@@ -69,12 +70,13 @@ fun HomeScreen(
         // ── Header reativo ─────────────────────────────────────────────────────
         HomeHeader(
             state = HeaderUiState(
-                userName  = uiState.userName,
-                userRole  = uiState.userRole,
-                avatarUrl = uiState.userPhoto
+                userName = uiState.userName,
+                userRole = uiState.userRole,
+                avatarUrl = uiState.userPhoto,
+                isLoggedIn = uiState.isLoggedIn
             ),
-            onLogoClick         = onNavigateToHome,
-            onAvatarClick       = { if (uiState.isLoggedIn) onNavigateToProfile() else onNavigateToLogin() },
+            onLogoClick = onNavigateToHome,
+            onAvatarClick = { if (uiState.isLoggedIn) onNavigateToProfile() else onNavigateToLogin() },
             onNotificationClick = {}
         )
 
@@ -193,7 +195,8 @@ fun HomeScreen(
                     item {
                         EventHighlightCard(
                             evento      = uiState.eventosFiltrados.first(),
-                            isLoggedIn  = uiState.isLoggedIn
+                            isLoggedIn  = uiState.isLoggedIn,
+                            onVerMaisClick = { onNavigateToEventDetails(uiState.eventosFiltrados.first().id) }
                         )
                     }
 
@@ -230,7 +233,8 @@ fun HomeScreen(
                                     SmallEventCard(
                                         evento     = evento,
                                         width      = smallCardWidth,
-                                        isLoggedIn = uiState.isLoggedIn
+                                        isLoggedIn = uiState.isLoggedIn,
+                                        onClick    = { onNavigateToEventDetails(evento.id) }
                                     )
                                 }
                             }

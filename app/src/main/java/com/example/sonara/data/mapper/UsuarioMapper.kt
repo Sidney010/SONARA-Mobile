@@ -2,7 +2,6 @@ package com.example.sonara.data.mapper
 
 import com.example.sonara.data.remote.dto.response.usuario.perfil.UsuarioPerfilArtistaDto
 import com.example.sonara.data.remote.dto.response.usuario.perfil.UsuarioPerfilDto
-import com.example.sonara.data.remote.dto.response.usuario.perfil.UsuarioPerfilOrganizadorDto
 import com.example.sonara.domain.model.Endereco
 import com.example.sonara.domain.model.Genero
 import com.example.sonara.domain.model.GeneroMusical
@@ -13,6 +12,7 @@ import com.example.sonara.data.remote.dto.request.CreateUsuarioRequestDto
 import com.example.sonara.data.remote.dto.response.login.LoginResponseDto
 import com.example.sonara.data.remote.dto.response.usuario.UsuarioResponseDto
 import com.example.sonara.data.remote.dto.response.usuario.perfil.UsuarioPerfilEventosDto
+import com.example.sonara.domain.model.Fotos
 import com.example.sonara.domain.model.LoginResult
 import com.example.sonara.domain.model.Usuario
 import com.example.sonara.domain.model.UsuarioLogin
@@ -127,7 +127,7 @@ private fun UsuarioPerfilEventosDto.toDomain() = UsuarioEventoPerfil(
     },
     status          = status?.nome,
     fotos           = fotos?.mapNotNull { f ->
-        f?.url?.let { url -> UsuarioFotosPerfil(f.idFoto, url) }
+        f?.url?.let { url -> Fotos(f.idFoto, url) }
     },
     endereco        = endereco?.let {
         UsuarioPerfilEventosEndereco(
