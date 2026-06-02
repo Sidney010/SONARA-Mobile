@@ -72,7 +72,7 @@ fun NavGraphBuilder.mainGraph(
                 composable(Routes.Home.route) {
                     val uiState by viewModel.uiState.collectAsState()
 
-                    if (uiState.userRole == "ORGANIZADOR") {
+                    if (uiState.userRole == "Organizador" || uiState.userRole == "ORGANIZADOR") {
                         HomeOrganizerScreen(
                             onNavigateToCreateEvent = { bottomNavController.navigate(Routes.CreateEvent.route) },
                             onNavigateToHireArtist = { bottomNavController.navigate(Routes.HireArtist.route) },
@@ -82,7 +82,7 @@ fun NavGraphBuilder.mainGraph(
                     } else {
                         HomeScreen(
                             onNavigateToEventDetails = { eventId ->
-                                val route = if (uiState.userRole == "ARTISTA") {
+                                val route = if (uiState.userRole == "Artista" || uiState.userRole == "ARTISTA" ) {
                                     "about_event_artist/$eventId"
                                 } else {
                                     "about_event_user/$eventId"
