@@ -11,6 +11,7 @@ data class Evento(
     val fotosUrls: List<String>,
     val mediaAvaliacao: Double?,
     val totalAvaliacoes: Int,
+
     // Endereço
     val logradouro: String?,
     val numero: String?,
@@ -19,6 +20,9 @@ data class Evento(
     val estado: String?,
     val cep: String?,
     val complemento: String?,
+    val latitude: String?,
+    val longitude: String?,
+
     // Organizador
     val organizadorNome: String?,
     val organizadorEmail: String?,

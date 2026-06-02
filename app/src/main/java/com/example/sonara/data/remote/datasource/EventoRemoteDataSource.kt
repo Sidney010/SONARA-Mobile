@@ -4,6 +4,7 @@ import com.example.sonara.core.network.ApiResponse
 import com.example.sonara.data.remote.api.SonaraApi
 import com.example.sonara.data.remote.dto.request.EventoCreateRequestDto
 import com.example.sonara.data.remote.dto.response.evento.EventoDto
+import com.example.sonara.data.remote.dto.response.evento.EventoResponseDto
 import com.example.sonara.data.remote.dto.response.evento.EventoListDto
 import com.example.sonara.data.remote.dto.response.evento.EventoSimpleDto
 import okhttp3.MultipartBody
@@ -16,7 +17,7 @@ class EventoRemoteDataSource @Inject constructor(
 ) {
     suspend fun getEventos(): Response<ApiResponse<EventoListDto>> = api.getEventos()
 
-    suspend fun getEventoById(id: Int): Response<ApiResponse<EventoDto>> = api.getEventoById(id)
+    suspend fun getEventoById(id: Int): Response<ApiResponse<EventoResponseDto>> = api.getEventoById(id)
 
     suspend fun getEventosPorOrganizador(organizadorId: Int): Response<ApiResponse<EventoListDto>> =
         api.getEventosPorOrganizador(organizadorId)

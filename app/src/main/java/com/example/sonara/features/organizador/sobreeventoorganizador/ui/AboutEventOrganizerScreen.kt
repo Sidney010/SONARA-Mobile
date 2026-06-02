@@ -7,6 +7,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.*
@@ -24,7 +25,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
 import com.example.sonara.core.layout.ScreenContainer
 import com.example.sonara.core.ui.components.header.HeaderUiState
-import com.example.sonara.core.ui.components.header.HomeHeader
+import com.example.sonara.core.ui.components.header.HeaderUserSection
 import com.example.sonara.core.ui.theme.DarkGradients
 import com.example.sonara.features.home.components.ImageCarousel
 import com.example.sonara.features.home.components.formatarData
@@ -36,6 +37,8 @@ fun AboutEventOrganizerScreen(
     eventId: Int,
     modifier: Modifier = Modifier,
     viewModel: AboutEventOrganizerViewModel = hiltViewModel(),
+    onNavigateToProfile: () -> Unit = {},
+    onNavigateToLogin: () -> Unit = {},
     onBackClick: () -> Unit = {}
 ) {
     val uiState by viewModel.uiState.collectAsState()
@@ -50,16 +53,30 @@ fun AboutEventOrganizerScreen(
         verticalArrangement = Arrangement.spacedBy(16.dp),
         padding = PaddingValues(start = 12.dp, end = 12.dp, top = 40.dp, bottom = 40.dp)
     ) {
-        HomeHeader(
-            state = HeaderUiState(
-                userName = uiState.userName,
-                userRole = uiState.userRole,
-                avatarUrl = uiState.userPhoto
-            ),
-            onLogoClick = onBackClick,
-            onAvatarClick = {},
-            onNotificationClick = {}
-        )
+        // ── Custom Detail Header with Back Arrow ─────────────────────────────
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            IconButton(onClick = onBackClick) {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                    contentDescription = "Voltar",
+                    tint = Color.White
+                )
+            }
+
+            HeaderUserSection(
+                state = HeaderUiState(
+                    userName = uiState.userName,
+                    userRole = uiState.userRole,
+                    avatarUrl = uiState.userPhoto
+                ),
+                onAvatarClick = {if (uiState.isLoggedIn) onNavigateToProfile() else onNavigateToLogin()},
+                onNotificationClick = {}
+            )
+        }
 
         when {
             uiState.isLoading -> {
@@ -171,6 +188,7 @@ fun AboutEventOrganizerScreen(
                 }
             }
         }
+        Spacer(modifier = Modifier.height(50.dp))
     }
 }
 

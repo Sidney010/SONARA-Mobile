@@ -25,6 +25,8 @@ data class EnderecoDto(
     @SerializedName("numero") val numero: String?,
     @SerializedName("logradouro") val logradouro: String?,
     @SerializedName("complemento") val complemento: String?,
+    @SerializedName("latitude") val latitude: String?,
+    @SerializedName("longitude") val longitude: String?,
     @SerializedName("id_endereco_evento") val idEndereco: Int?
 )
 

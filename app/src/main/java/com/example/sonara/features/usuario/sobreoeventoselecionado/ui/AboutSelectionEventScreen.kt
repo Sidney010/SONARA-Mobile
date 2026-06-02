@@ -6,6 +6,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.*
@@ -21,8 +22,9 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.sonara.core.layout.ScreenContainer
 import com.example.sonara.core.ui.components.header.HeaderUiState
-import com.example.sonara.core.ui.components.header.HomeHeader
+import com.example.sonara.core.ui.components.header.HeaderUserSection
 import com.example.sonara.core.ui.theme.DarkGradients
+import com.example.sonara.features.artista.sobreEvento.ui.components.EventMapView
 import com.example.sonara.features.home.components.ImageCarousel
 import com.example.sonara.features.home.components.formatarData
 import com.example.sonara.features.home.components.formatarHora
@@ -33,7 +35,9 @@ fun AboutSelectionEventScreen(
     eventId: Int,
     modifier: Modifier = Modifier,
     viewModel: AboutSelectionEventViewModel = hiltViewModel(),
-    onBackClick: () -> Unit = {}
+    onBackClick: () -> Unit = {},
+    onNavigateToProfile: () -> Unit = {},
+    onNavigateToLogin: () -> Unit = {},
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val gradients = DarkGradients
@@ -47,16 +51,31 @@ fun AboutSelectionEventScreen(
         verticalArrangement = Arrangement.spacedBy(16.dp),
         padding = PaddingValues(start = 12.dp, end = 12.dp, top = 40.dp, bottom = 40.dp)
     ) {
-        HomeHeader(
-            state = HeaderUiState(
-                userName = uiState.userName,
-                userRole = uiState.userRole,
-                avatarUrl = uiState.userPhoto
-            ),
-            onLogoClick = onBackClick,
-            onAvatarClick = {},
-            onNotificationClick = {}
-        )
+        // Custom Detail Header with Back Arrow
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            IconButton(onClick = onBackClick) {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                    contentDescription = "Voltar",
+                    tint = Color.White
+                )
+            }
+
+            HeaderUserSection(
+                state = HeaderUiState(
+                    userName = uiState.userName,
+                    userRole = uiState.userRole,
+                    avatarUrl = uiState.userPhoto,
+                    isLoggedIn = uiState.isLoggedIn
+                ),
+                onAvatarClick = {if (uiState.isLoggedIn) onNavigateToProfile() else onNavigateToLogin()},
+                onNotificationClick = {}
+            )
+        }
 
         when {
             uiState.isLoading -> {
@@ -127,19 +146,46 @@ fun AboutSelectionEventScreen(
                         Text("Localização", fontSize = 18.sp, fontWeight = FontWeight.Bold, color = Color.White)
                         Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
                             Text("Rua: ${evento.logradouro ?: "N/A"}", color = Color.White.copy(alpha = 0.8f))
+                            Text("Número: ${evento.numero ?: "S/N"}", color = Color.White.copy(alpha = 0.8f))
+                            Text("Bairro: ${evento.bairro ?: "N/A"}", color = Color.White.copy(alpha = 0.8f))
                             Text("Cidade: ${evento.cidade ?: "N/A"} - ${evento.estado ?: ""}", color = Color.White.copy(alpha = 0.8f))
                         }
 
-                        Box(
-                            modifier = Modifier.fillMaxWidth().height(150.dp).background(Color(0xFFC8DBB0), RoundedCornerShape(12.dp)),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Icon(Icons.Default.LocationOn, "Mapa", tint = Color.Gray, modifier = Modifier.size(40.dp))
+                        val latitude = evento.latitude?.toDouble()
+                        val longitude = evento.longitude?.toDouble()
+
+                        if (latitude != null && longitude != null) {
+                            EventMapView(
+                                latitude = latitude,
+                                longitude = longitude,
+                                title = evento.nome,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(180.dp)
+                                    .clip(RoundedCornerShape(12.dp))
+                            )
+                        } else {
+                            // Fallback caso o evento não tenha coordenadas cadastradas
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(150.dp)
+                                    .background(Color(0xFF2A2A2A), RoundedCornerShape(12.dp)),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Text(
+                                    text = "Localização não disponível",
+                                    color = Color.Gray
+                                )
+                            }
                         }
                     }
                 }
             }
+
+
         }
+        Spacer(modifier = Modifier.height(50.dp))
     }
 }
 

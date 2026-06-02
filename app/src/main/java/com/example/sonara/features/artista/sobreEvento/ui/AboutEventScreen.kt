@@ -1,37 +1,32 @@
 package com.example.sonara.features.artista.sobreEvento.ui
 // Helper imports e correções
-import androidx.compose.material3.HorizontalDivider
-
-import androidx.compose.ui.draw.clip
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -48,8 +43,9 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.sonara.core.layout.ScreenContainer
 import com.example.sonara.core.ui.components.header.HeaderUiState
-import com.example.sonara.core.ui.components.header.HomeHeader
+import com.example.sonara.core.ui.components.header.HeaderUserSection
 import com.example.sonara.core.ui.theme.DarkGradients
+import com.example.sonara.features.artista.sobreEvento.ui.components.EventMapView
 import com.example.sonara.features.artista.sobreEvento.viewmodel.AboutEventViewModel
 import com.example.sonara.features.home.components.ImageCarousel
 import com.example.sonara.features.home.components.formatarData
@@ -60,6 +56,8 @@ fun AboutEventsScreen(
     eventId: Int,
     modifier: Modifier = Modifier,
     viewModel: AboutEventViewModel = hiltViewModel(),
+    onNavigateToProfile: () -> Unit = {},
+    onNavigateToLogin: () -> Unit = {},
     onBackClick: () -> Unit = {}
 ) {
     val uiState by viewModel.uiState.collectAsState()
@@ -74,17 +72,31 @@ fun AboutEventsScreen(
         verticalArrangement = Arrangement.spacedBy(16.dp),
         padding = PaddingValues(start = 12.dp, end = 12.dp, top = 40.dp, bottom = 40.dp)
     ) {
-        // ── Header ───────────────────────────────────────────────────────────
-        HomeHeader(
-            state = HeaderUiState(
-                userName = uiState.userName,
-                userRole = uiState.userRole,
-                avatarUrl = uiState.userPhoto
-            ),
-            onLogoClick = onBackClick,
-            onAvatarClick = {},
-            onNotificationClick = {}
-        )
+        // ── Custom Detail Header with Back Arrow ─────────────────────────────
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            IconButton(onClick = onBackClick) {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                    contentDescription = "Voltar",
+                    tint = Color.White
+                )
+            }
+
+            HeaderUserSection(
+                state = HeaderUiState(
+                    userName = uiState.userName,
+                    userRole = uiState.userRole,
+                    avatarUrl = uiState.userPhoto,
+                    isLoggedIn = uiState.isLoggedIn
+                ),
+                onAvatarClick = {if (uiState.isLoggedIn) onNavigateToProfile() else onNavigateToLogin()},
+                onNotificationClick = {}
+            )
+        }
 
         when {
             uiState.isLoading -> {
@@ -188,14 +200,35 @@ fun AboutEventsScreen(
                         }
 
                         // Placeholder do Mapa
-                        Box(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(150.dp)
-                                .background(Color(0xFFC8DBB0), RoundedCornerShape(12.dp)),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Icon(Icons.Default.LocationOn, "Mapa", tint = Color.Gray, modifier = Modifier.size(40.dp))
+                        // ANTES — Placeholder estático
+                        // DEPOIS — Mapa real com localização do evento
+                        val latitude = evento.latitude?.toDouble()
+                        val longitude = evento.longitude?.toDouble()
+
+                        if (latitude != null && longitude != null) {
+                            EventMapView(
+                                latitude = latitude,
+                                longitude = longitude,
+                                title = evento.nome,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(180.dp)
+                                    .clip(RoundedCornerShape(12.dp))
+                            )
+                        } else {
+                            // Fallback caso o evento não tenha coordenadas cadastradas
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(150.dp)
+                                    .background(Color(0xFF2A2A2A), RoundedCornerShape(12.dp)),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Text(
+                                    text = "Localização não disponível",
+                                    color = Color.Gray
+                                )
+                            }
                         }
 
                         // Botão de Inscrição
@@ -209,6 +242,7 @@ fun AboutEventsScreen(
                         }
                     }
                 }
+                Spacer(modifier = Modifier.height(50.dp))
             }
         }
     }

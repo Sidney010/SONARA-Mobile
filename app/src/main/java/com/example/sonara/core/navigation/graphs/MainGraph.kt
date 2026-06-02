@@ -111,7 +111,9 @@ fun NavGraphBuilder.mainGraph(
 
                 composable("about_event_artist/{eventId}") { backStackEntry ->
                     val eventId = backStackEntry.arguments?.getString("eventId")?.toInt() ?: 0
-                    AboutEventsScreen(
+                     AboutEventsScreen(
+                        onNavigateToProfile = { rootNavController.navigate(Routes.Profile.route) },
+                        onNavigateToLogin = { rootNavController.navigate(Routes.Login.route) },
                         eventId = eventId,
                         onBackClick = { bottomNavController.popBackStack() }
                     )
@@ -120,6 +122,8 @@ fun NavGraphBuilder.mainGraph(
                 composable("about_event_user/{eventId}") { backStackEntry ->
                     val eventId = backStackEntry.arguments?.getString("eventId")?.toInt() ?: 0
                     AboutSelectionEventScreen(
+                        onNavigateToProfile = {rootNavController.navigate(Routes.Profile.route) },
+                        onNavigateToLogin = {rootNavController.navigate(Routes.Login.route) },
                         eventId = eventId,
                         // Assumindo que esta tela recebe o eventId
                         // Se a assinatura for diferente, ajuste conforme necessário
@@ -130,6 +134,8 @@ fun NavGraphBuilder.mainGraph(
                 composable("about_event_organizer/{eventId}") { backStackEntry ->
                     val eventId = backStackEntry.arguments?.getString("eventId")?.toInt() ?: 0
                     AboutEventOrganizerScreen(
+                        onNavigateToProfile = {rootNavController.navigate(Routes.Profile.route) },
+                        onNavigateToLogin = {rootNavController.navigate(Routes.Login.route) },
                         eventId = eventId,
                         onBackClick = { bottomNavController.popBackStack() }
                     )

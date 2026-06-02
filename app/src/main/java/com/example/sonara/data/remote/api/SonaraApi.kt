@@ -9,6 +9,7 @@ import com.example.sonara.data.remote.dto.request.RedeSocialRequestDto
 import com.example.sonara.data.remote.dto.response.candidatura.CandidaturaDto
 import com.example.sonara.data.remote.dto.response.candidatura.CandidaturaListDto
 import com.example.sonara.data.remote.dto.response.evento.EventoDto
+import com.example.sonara.data.remote.dto.response.evento.EventoResponseDto
 import com.example.sonara.data.remote.dto.response.evento.EventoListDto
 import com.example.sonara.data.remote.dto.response.evento.EventoSimpleDto
 import com.example.sonara.data.remote.dto.response.foto.FotoResponseDto
@@ -54,7 +55,7 @@ interface SonaraApi {
     suspend fun getEventos(): Response<ApiResponse<EventoListDto>>
 
     @GET("evento/{id}")
-    suspend fun getEventoById(@Path("id") id: Int): Response<ApiResponse<EventoDto>>
+    suspend fun getEventoById(@Path("id") id: Int): Response<ApiResponse<EventoResponseDto>>
 
     @GET("evento/organizador/{organizadorId}")
     suspend fun getEventosPorOrganizador(

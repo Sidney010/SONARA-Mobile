@@ -72,6 +72,7 @@ dependencies {
     implementation(libs.androidx.compose.foundation)
     implementation(libs.androidx.compose.foundation.layout)
     implementation(libs.androidx.compose.animation)
+    implementation("org.osmdroid:osmdroid-android:6.1.18")
 
     // Material 3 e Ícones
     implementation(libs.androidx.compose.material3)
