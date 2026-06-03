@@ -56,7 +56,7 @@ fun ProfileContent(
                         Icon(
                             imageVector = Icons.Default.Star,
                             contentDescription = null,
-                            tint = AppColors.PrimaryOrange,
+                            tint = AppColors.SecondColor,
                             modifier = Modifier.size(16.dp)
                         )
                         Spacer(Modifier.width(4.dp))
@@ -73,7 +73,7 @@ fun ProfileContent(
                     // Gêneros musicais
                     if (artista.generosMusicais.isNotEmpty()) {
                         Text("Gêneros musicais",
-                            fontSize = 12.sp, color = Color.Gray,
+                            fontSize = 12.sp, color = AppColors.colorFontLogin,
                             modifier = Modifier.padding(top = 4.dp))
                         LazyRow(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                             items(artista.generosMusicais) { genero ->
@@ -81,8 +81,8 @@ fun ProfileContent(
                                     onClick = {},
                                     label = { Text(genero.nome, fontSize = 11.sp) },
                                     colors = SuggestionChipDefaults.suggestionChipColors(
-                                        containerColor = AppColors.PrimaryOrange.copy(alpha = 0.15f),
-                                        labelColor = AppColors.PrimaryOrange
+                                        containerColor = AppColors.PrimaryColor.copy(alpha = 0.15f),
+                                        labelColor = AppColors.PrimaryColor
                                     )
                                 )
                             }
@@ -223,12 +223,12 @@ private fun ProfileHeader(perfil: UsuarioPerfil) {
 
         Surface(
             shape = RoundedCornerShape(20.dp),
-            color = AppColors.PrimaryOrange.copy(alpha = 0.2f)
+            color = AppColors.SecondColor.copy(alpha = 0.2f)
         ) {
             Text(
                 text = perfil.tipoUsuario,
                 fontSize = 12.sp,
-                color = AppColors.PrimaryOrange,
+                color = AppColors.colorFontLogin,
                 modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp)
             )
         }
@@ -243,7 +243,7 @@ private fun ProfileCard(
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(containerColor = Color(0xFF1A1A1A))
+        colors = CardDefaults.cardColors(containerColor = AppColors.colorCard.copy(0.5f))
     ) {
         Column(
             modifier = Modifier.padding(16.dp),
@@ -274,7 +274,7 @@ private fun EventoItem(evento: UsuarioEventoPerfil) {
         verticalArrangement = Arrangement.spacedBy(4.dp)
     ) {
         Text(evento.eventoNome ?: "Evento", fontSize = 14.sp,
-            fontWeight = FontWeight.Medium, color = Color.White)
+            fontWeight = FontWeight.Medium, color = AppColors.colorFontLogin)
 
         val local = listOfNotNull(
             evento.endereco?.cidade,

@@ -84,7 +84,7 @@ fun SmallEventCard(
                 }
                 Text(
                     text  = formatarData(evento.data),
-                    color = AppColors.PrimaryOrange,
+                    color = AppColors.colorFontLogin,
                     fontSize = 9.sp
                 )
             }

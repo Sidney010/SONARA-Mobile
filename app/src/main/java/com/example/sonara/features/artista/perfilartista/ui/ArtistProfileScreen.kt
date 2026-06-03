@@ -8,6 +8,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.sonara.core.ui.theme.AppColors
@@ -68,7 +69,8 @@ fun ArtistProfileScreen(
         snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = {
             TopAppBar(
-                title = { Text("Meu Perfil") },
+                title = { Text("Meu Perfil",
+                    color = AppColors.colorFontLogin) },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
                         Icon(Icons.Outlined.ArrowBack, contentDescription = "Voltar")
@@ -84,7 +86,7 @@ fun ArtistProfileScreen(
                     ) {
                         Text(
                             text  = if (uiState.isEditing) "Salvar" else "Editar",
-                            color = AppColors.PrimaryOrange
+                            color = AppColors.colorFontLogin
                         )
                     }
                     // Logout
@@ -92,7 +94,7 @@ fun ArtistProfileScreen(
                         Icon(
                             imageVector        = Icons.Outlined.ExitToApp,
                             contentDescription = "Sair",
-                            tint               = AppColors.PrimaryOrange
+                            tint               = AppColors.SecondColor
                         )
                     }
                 },
@@ -103,7 +105,7 @@ fun ArtistProfileScreen(
                 )
             )
         },
-        containerColor = Color.Black
+        containerColor = AppColors.colorCard
     ) { padding ->
         Box(
             modifier = Modifier
@@ -113,7 +115,7 @@ fun ArtistProfileScreen(
             when {
                 uiState.isLoading -> CircularProgressIndicator(
                     modifier = Modifier.align(Alignment.Center),
-                    color    = AppColors.PrimaryOrange
+                    color    = AppColors.PrimaryColor
                 )
 
 //                uiState.perfil != null -> ProfileContent(
@@ -125,12 +127,12 @@ fun ArtistProfileScreen(
                     modifier            = Modifier.align(Alignment.Center),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    Text(uiState.errorMessage!!, color = Color.Gray)
+                    Text(uiState.errorMessage!!, color = Color.Gray, fontWeight = FontWeight.Medium)
                     Spacer(modifier = Modifier.height(12.dp))
                     Button(
                         onClick = viewModel::loadPerfil,
                         colors  = ButtonDefaults.buttonColors(
-                            containerColor = AppColors.PrimaryOrange
+                            containerColor = AppColors.colorFontLogin
                         )
                     ) { Text("Tentar novamente") }
                 }

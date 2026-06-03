@@ -22,6 +22,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
+import com.example.sonara.core.ui.theme.AppColors
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 import java.util.Locale
@@ -54,7 +55,7 @@ fun ImageCarousel(
     fotos: List<String>?,
     modifier: Modifier = Modifier,
     height: Dp = 220.dp,
-    placeholderColor: Color = Color.DarkGray
+    placeholderColor: Color = AppColors.SecondColor.copy(0.9f)
 ) {
     val safeFotos = fotos ?: emptyList()
 

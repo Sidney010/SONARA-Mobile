@@ -26,6 +26,7 @@ import androidx.compose.ui.unit.sp
 import com.example.sonara.core.layout.ScreenContainer
 import com.example.sonara.core.ui.components.header.HeaderUiState
 import com.example.sonara.core.ui.components.header.HomeHeader
+import com.example.sonara.core.ui.theme.AppColors
 import com.example.sonara.core.ui.theme.DarkGradients
 
 @Composable
@@ -67,7 +68,7 @@ fun MyEvents(modifier: Modifier = Modifier) {
                         shape = RoundedCornerShape(16.dp)
                     ),
                 shape = RoundedCornerShape(16.dp),
-                colors = CardDefaults.cardColors(containerColor = Color.Transparent)
+                colors = CardDefaults.cardColors(containerColor = AppColors.colorCard.copy(0.5f))
             ) {
                 Column(
                     modifier = Modifier
@@ -76,7 +77,8 @@ fun MyEvents(modifier: Modifier = Modifier) {
                         .padding(16.dp),
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    Text("Meus Eventos")
+                    Text("Meus Eventos",
+                    color = AppColors.colorFontLogin)
 
                     eventoCardItem()
                     eventoCardItem()
@@ -115,7 +117,7 @@ fun eventoCardItem(modifier: Modifier = Modifier) {
             Text(
                 text = "Nome do Evento",
                 fontSize = 14.sp,
-                color = Color.White
+                color = AppColors.colorFontLogin
             )
             Text(
                 text = "22/09/2026   23:00",

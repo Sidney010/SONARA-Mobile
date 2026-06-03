@@ -24,6 +24,7 @@ import com.example.sonara.features.home.ui.HomeScreen
 //import com.example.sonara.features.meusEventos.ui.MyEventsScreen
 import com.example.sonara.features.artista.perfilartista.ui.ArtistProfileScreen
 import com.example.sonara.features.artista.sobreEvento.ui.AboutEventsScreen
+import com.example.sonara.features.cadidatar.ui.ApplyScreen
 import com.example.sonara.features.organizador.criareventoorganizador.ui.CreateEventOrganizerScreen
 import com.example.sonara.features.organizador.homeorganizador.ui.HomeOrganizerScreen
 import com.example.sonara.features.organizador.meuseventosorganizador.ui.MyEventsOrganizerScreen
@@ -142,7 +143,8 @@ fun NavGraphBuilder.mainGraph(
                 }
 
                 composable(Routes.Search.route) {
-                     SearchScreen()
+//                     SearchScreen()
+                    ApplyScreen()
                 }
 
                 composable(Routes.Events.route) {

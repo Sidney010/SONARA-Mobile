@@ -24,7 +24,7 @@ fun ProfileSection(
     Column(modifier = Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(4.dp)) {
         Text(
             text     = title,
-            color    = AppColors.PrimaryOrange,
+            color    = AppColors.colorFontLogin,
             fontSize = 13.sp,
             fontWeight = FontWeight.Medium,
             modifier = Modifier.padding(bottom = 4.dp)

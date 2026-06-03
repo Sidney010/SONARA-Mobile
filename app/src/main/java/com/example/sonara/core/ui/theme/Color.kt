@@ -30,27 +30,30 @@ object AppColors {
     //Font Login
     val colorFontLogin = Color(0xFFFC4C13)
 
+
+    //As minhas são para cima
+
     // Text
-    val PrimaryOrange = Color(0xFFFF710C)
-
-    // Botão de Login
-    val SecondOrange = Color(0xFFFC7427)
-
-
-    // Popup
-    val ThirdOrange = Color(0xFF963B08)
-
-    // CardPlanoBackgroud
-    val ForthOrange = Color(0xFFFF710C)
-
-    // CardPlano
-    val FifthOrange = Color(0xFFCD4F08)
-
-    //CardArtista
-    val PrimaryRed = Color(0xFFFF0000)
-
-    //Card escuro Planos
-    val colorOrangeDark = Color(0xFFE25E13)
-
-    val colorOrangeMoreDark = Color(0xFFCD4F08)
+//    val PrimaryOrange = Color(0xFFFF710C)
+//
+//    // Botão de Login
+//    val SecondOrange = Color(0xFFFC7427)
+//
+//
+//    // Popup
+//    val ThirdOrange = Color(0xFF963B08)
+//
+//    // CardPlanoBackgroud
+//    val ForthOrange = Color(0xFFFF710C)
+//
+//    // CardPlano
+//    val FifthOrange = Color(0xFFCD4F08)
+//
+//    //CardArtista
+//    val PrimaryRed = Color(0xFFFF0000)
+//
+//    //Card escuro Planos
+//    val colorOrangeDark = Color(0xFFE25E13)
+//
+//    val colorOrangeMoreDark = Color(0xFFCD4F08)
 }

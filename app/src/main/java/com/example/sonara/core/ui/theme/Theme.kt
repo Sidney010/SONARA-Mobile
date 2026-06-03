@@ -11,15 +11,15 @@ val LocalGradients = staticCompositionLocalOf {
     LightGradients
 }
 
-private val DarkColorScheme = darkColorScheme(
-    primary = AppColors.PrimaryOrange,
-    background = AppColors.BLack,
-    surface = AppColors.BLack,
-    onPrimary = AppColors.White,
-    onBackground = AppColors.White,
-    tertiary = AppColors.colorOrangeDark,
-    outline = AppColors.colorOrangeMoreDark
-)
+//private val DarkColorScheme = darkColorScheme(
+////    primary = AppColors.PrimaryOrange,
+//    background = AppColors.BLack,
+//    surface = AppColors.BLack,
+//    onPrimary = AppColors.White,
+//    onBackground = AppColors.White,
+//    tertiary = AppColors.colorOrangeDark,
+//    outline = AppColors.colorOrangeMoreDark
+//)
 
 private val LightColorScheme = darkColorScheme(
     primary        = AppColors.PrimaryColor,

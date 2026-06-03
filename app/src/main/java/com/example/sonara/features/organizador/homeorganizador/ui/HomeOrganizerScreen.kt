@@ -36,6 +36,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.sonara.core.layout.ScreenContainer
 import com.example.sonara.core.ui.components.header.HeaderUiState
 import com.example.sonara.core.ui.components.header.HomeHeader
+import com.example.sonara.core.ui.theme.AppColors
 import com.example.sonara.core.ui.theme.DarkGradients
 import com.example.sonara.features.organizador.homeorganizador.viewmodel.HomeOrganizerViewModel
 
@@ -76,7 +77,7 @@ fun HomeOrganizerScreen(
                 .fillMaxWidth()
                 .wrapContentHeight(),
             shape = RoundedCornerShape(16.dp),
-            colors = CardDefaults.cardColors(containerColor = Color.Transparent)
+            colors = CardDefaults.cardColors(containerColor = AppColors.colorCard.copy(0.5f))
         ) {
             Column(
                 modifier = Modifier
@@ -90,7 +91,7 @@ fun HomeOrganizerScreen(
                     text = "Olá $displayFirstName, o que vamos fazer hoje?",
                     fontSize = 18.sp,
                     fontWeight = FontWeight.Bold,
-                    color = Color.White
+                    color = AppColors.colorFontLogin
                 )
 
                 Row(
@@ -122,7 +123,7 @@ fun HomeOrganizerScreen(
                         text = "Meus Próximos Eventos",
                         fontSize = 16.sp,
                         fontWeight = FontWeight.SemiBold,
-                        color = Color.White,
+                        color = AppColors.colorFontLogin,
                         modifier = Modifier.padding(top = 8.dp)
                     )
 

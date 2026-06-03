@@ -37,6 +37,7 @@ import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
+import com.example.sonara.core.ui.theme.AppColors
 
 @Composable
 fun YourCandidacyScreen(modifier: Modifier = Modifier) {
@@ -76,7 +77,7 @@ fun YourCandidacyScreen(modifier: Modifier = Modifier) {
                     )
                     .padding( bottom = 20.dp),
                 shape = RoundedCornerShape(16.dp),
-                colors = CardDefaults.cardColors(containerColor = Color.Transparent)
+                colors = CardDefaults.cardColors(containerColor = AppColors.colorCard.copy(0.5f))
             ) {
                 Column {
                     Column(
@@ -88,7 +89,7 @@ fun YourCandidacyScreen(modifier: Modifier = Modifier) {
                             text = "Meus Eventos",
                             fontSize = 18.sp,
                             fontWeight = FontWeight.Medium,
-                            color = Color.White
+                            color = AppColors.colorFontLogin
                         )
 
                         Box(
@@ -103,7 +104,7 @@ fun YourCandidacyScreen(modifier: Modifier = Modifier) {
                             Icon(
                                 imageVector = Icons.Default.Person,
                                 contentDescription = null,
-                                tint = Color.LightGray,
+                                tint = AppColors.SecondColor,
                                 modifier = Modifier.size(48.dp).align(Alignment.Center)
                             )
 
@@ -120,7 +121,7 @@ fun YourCandidacyScreen(modifier: Modifier = Modifier) {
                                 .width(345.dp)
                                 .wrapContentHeight()
                                 .background(
-                                    Color.LightGray.copy(alpha = 0.2f),
+                                    AppColors.PrimaryColor.copy(alpha = 0.2f),
                                     shape = RoundedCornerShape(12.dp)
                                 )
                                 .padding(start =10.dp)
@@ -130,7 +131,7 @@ fun YourCandidacyScreen(modifier: Modifier = Modifier) {
                                 text = "Nosso evento de música promete uma noite cheia de energia, apresentações ao vivo e muita diversão. Um espaço pensado para reunir pessoas," +
                                         " criar momentos especiais e celebrar a música em um ambiente animado e inesquecível.\n",
                                 fontSize = 15.sp,
-                                color = Color.White
+                                color = AppColors.colorFontLogin
                             )
                         }
                     }
@@ -140,7 +141,7 @@ fun YourCandidacyScreen(modifier: Modifier = Modifier) {
                     modifier = Modifier
                         .size(345.dp)
                         .background(
-                            Color.LightGray.copy(alpha = 0.1f),
+                            AppColors.PrimaryColor.copy(alpha = 0.2f),
                             shape = RoundedCornerShape(12.dp)
                         )
                         .padding(12.dp)
@@ -288,7 +289,7 @@ fun CacheInputField(
                 singleLine = true,
                 textStyle = TextStyle(
                     fontSize = 14.sp,
-                    color = Color(0xFFFFAA70).copy(alpha = 0.9f)
+                    color = AppColors.colorFontLogin.copy(0.9f)
                 ),
                 cursorBrush = SolidColor(Color(0xFFFFAA70)),
                 modifier = Modifier

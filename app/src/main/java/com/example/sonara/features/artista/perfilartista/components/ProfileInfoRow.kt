@@ -20,7 +20,7 @@ fun ProfileInfoRow(icon: ImageVector, label: String, value: String) {
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-        Icon(icon, null, tint = AppColors.PrimaryOrange, modifier = Modifier.size(18.dp))
+        Icon(icon, null, tint = AppColors.SecondColor, modifier = Modifier.size(18.dp))
         Column {
             Text(label, color = Color.Gray, fontSize = 11.sp)
             Text(value, color = Color.White, fontSize = 14.sp)

@@ -44,6 +44,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.sonara.core.layout.ScreenContainer
 import com.example.sonara.core.ui.components.header.HeaderUiState
 import com.example.sonara.core.ui.components.header.HeaderUserSection
+import com.example.sonara.core.ui.theme.AppColors
 import com.example.sonara.core.ui.theme.DarkGradients
 import com.example.sonara.features.artista.sobreEvento.ui.components.EventMapView
 import com.example.sonara.features.artista.sobreEvento.viewmodel.AboutEventViewModel
@@ -101,7 +102,7 @@ fun AboutEventsScreen(
         when {
             uiState.isLoading -> {
                 Box(modifier = Modifier.fillMaxWidth().height(300.dp), contentAlignment = Alignment.Center) {
-                    CircularProgressIndicator(color = Color(0xFFFF710C))
+                    CircularProgressIndicator(color = AppColors.PrimaryColor)
                 }
             }
             uiState.errorMessage != null -> {
@@ -116,11 +117,12 @@ fun AboutEventsScreen(
                 Card(
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(16.dp),
-                    colors = CardDefaults.cardColors(containerColor = Color.Transparent)
+                    colors = CardDefaults.cardColors(
+                        contentColor = AppColors.PrimaryColor
+                    )
                 ) {
                     Column(
                         modifier = Modifier
-                            .background(brush = gradients.secondaryCard)
                             .padding(16.dp),
                         verticalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
@@ -128,7 +130,7 @@ fun AboutEventsScreen(
                             text = "Sobre o Evento",
                             fontSize = 18.sp,
                             fontWeight = FontWeight.Bold,
-                            color = Color.White
+                            color = AppColors.colorFontLogin
                         )
 
                         // Carrossel de Fotos
@@ -160,9 +162,9 @@ fun AboutEventsScreen(
                         ) {
                             Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                                 EventDetailRow("Nome do Evento", evento.nome)
-                                HorizontalDivider(color = Color.White.copy(alpha = 0.1f))
+                                HorizontalDivider(color = Color.White)
                                 EventDetailRow("Descrição", evento.descricao ?: "Sem descrição disponível")
-                                HorizontalDivider(color = Color.White.copy(alpha = 0.1f))
+                                HorizontalDivider(color = Color.White)
                                 
                                 Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
                                     EventDetailRow("DATA", formatarData(evento.data), Modifier.weight(1f))
@@ -177,11 +179,12 @@ fun AboutEventsScreen(
                 Card(
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(16.dp),
-                    colors = CardDefaults.cardColors(containerColor = Color.Transparent)
+                    colors = CardDefaults.cardColors(
+                        containerColor = AppColors.PrimaryColor
+                    )
                 ) {
                     Column(
                         modifier = Modifier
-                            .background(brush = gradients.secondaryCard)
                             .padding(16.dp),
                         verticalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
@@ -189,14 +192,14 @@ fun AboutEventsScreen(
                             text = "Localização",
                             fontSize = 18.sp,
                             fontWeight = FontWeight.Bold,
-                            color = Color.White
+                            color = AppColors.colorFontLogin
                         )
 
                         Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                            Text("Rua: ${evento.logradouro ?: "N/A"}", color = Color.White.copy(alpha = 0.8f))
-                            Text("Número: ${evento.numero ?: "S/N"}", color = Color.White.copy(alpha = 0.8f))
-                            Text("Bairro: ${evento.bairro ?: "N/A"}", color = Color.White.copy(alpha = 0.8f))
-                            Text("Cidade: ${evento.cidade ?: "N/A"} - ${evento.estado ?: ""}", color = Color.White.copy(alpha = 0.8f))
+                            Text("Rua: ${evento.logradouro ?: "N/A"}", color = Color.White.copy(alpha = 0.8f),fontWeight = FontWeight.Medium)
+                            Text("Número: ${evento.numero ?: "S/N"}", color = Color.White.copy(alpha = 0.8f),fontWeight = FontWeight.Medium)
+                            Text("Bairro: ${evento.bairro ?: "N/A"}", color = Color.White.copy(alpha = 0.8f),fontWeight = FontWeight.Medium)
+                            Text("Cidade: ${evento.cidade ?: "N/A"} - ${evento.estado ?: ""}", color = Color.White.copy(alpha = 0.8f),fontWeight = FontWeight.Medium)
                         }
 
                         // Placeholder do Mapa
@@ -221,12 +224,12 @@ fun AboutEventsScreen(
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .height(150.dp)
-                                    .background(Color(0xFF2A2A2A), RoundedCornerShape(12.dp)),
+                                    .background(AppColors.SecondColor.copy(0.5f), RoundedCornerShape(12.dp)),
                                 contentAlignment = Alignment.Center
                             ) {
                                 Text(
                                     text = "Localização não disponível",
-                                    color = Color.Gray
+                                    color = Color.Red
                                 )
                             }
                         }
@@ -236,7 +239,7 @@ fun AboutEventsScreen(
                             onClick = { /* Implementar lógica de candidatura */ },
                             modifier = Modifier.fillMaxWidth().height(48.dp),
                             shape = RoundedCornerShape(10.dp),
-                            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFF710C))
+                            colors = ButtonDefaults.buttonColors(containerColor = AppColors.colorFontLogin)
                         ) {
                             Text("Inscreva-se", color = Color.White, fontWeight = FontWeight.Bold)
                         }
@@ -251,8 +254,8 @@ fun AboutEventsScreen(
 @Composable
 fun EventDetailRow(label: String, value: String, modifier: Modifier = Modifier, textAlign: TextAlign = TextAlign.Start) {
     Column(modifier = modifier) {
-        Text(text = label.uppercase(), fontSize = 10.sp, color = Color.White.copy(alpha = 0.5f), textAlign = textAlign, modifier = Modifier.fillMaxWidth())
-        Text(text = value, fontSize = 14.sp, color = Color(0xFFFFAA70), fontWeight = FontWeight.Medium, textAlign = textAlign, modifier = Modifier.fillMaxWidth())
+        Text(text = label.uppercase(), fontSize = 12.sp, color = AppColors.colorFontLogin,fontWeight = FontWeight.Medium, textAlign = textAlign, modifier = Modifier.fillMaxWidth())
+        Text(text = value, fontSize = 14.sp, color = Color.White, fontWeight = FontWeight.Medium, textAlign = textAlign, modifier = Modifier.fillMaxWidth())
     }
 }
 

@@ -59,7 +59,7 @@ fun EventHighlightCard(
             ImageCarousel(
                 fotos = evento.fotosUrls,
                 height = 240.dp,
-                placeholderColor = Color(0xFF1A1A2E)
+                placeholderColor = Color(0xFF121212)
             )
 
             // Gradiente overlay para legibilidade do texto
@@ -131,12 +131,12 @@ fun EventHighlightCard(
                     Spacer(modifier = Modifier.height(2.dp))
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Icon(Icons.Default.MusicNote, null,
-                            tint = AppColors.PrimaryOrange,
+                            tint = AppColors.PrimaryColor,
                             modifier = Modifier.size(12.dp))
                         Spacer(modifier = Modifier.width(4.dp))
                         Text(
                             text  = artistaNome,
-                            color = AppColors.PrimaryOrange,
+                            color = AppColors.colorFontLogin,
                             fontSize = 12.sp,
                             fontWeight = FontWeight.Medium
                         )
@@ -152,15 +152,15 @@ fun EventHighlightCard(
                     .align(Alignment.BottomEnd)
                     .padding(12.dp),
                 colors   = ButtonDefaults.buttonColors(
-                    containerColor = AppColors.PrimaryOrange,
-                    disabledContainerColor = Color.Gray.copy(alpha = 0.5f)
+                    containerColor = AppColors.colorFontLogin,
+                    disabledContainerColor = AppColors.SecondColor.copy(alpha = 0.5f)
                 ),
                 shape    = RoundedCornerShape(20.dp),
                 contentPadding = PaddingValues(horizontal = 16.dp, vertical = 6.dp)
             ) {
                 Text(
                     text  = if (isLoggedIn) "Ver mais" else "Faça login",
-                    color = Color.White,
+                    color = AppColors.colorFontLogin,
                     fontSize = 12.sp
                 )
             }

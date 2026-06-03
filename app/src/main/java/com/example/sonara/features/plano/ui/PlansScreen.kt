@@ -67,27 +67,29 @@ fun PlansScreen(
             Text(
                 text      = "Planos",
                 textAlign = TextAlign.Center,
-                color     = Color.White,
+                color     = AppColors.colorFontLogin,
                 fontSize  = 26.sp
             )
             PlanCard(
                 title       = "Plano Diamante",
+                color = AppColors.PrimaryColor,
                 textContent = "Tenha mais destaque na plataforma!\n\nCom o Plano Diamante, seu perfil aparece com mais frequência nas pesquisas, ganha mais visibilidade no feed e aumenta suas chances de ser reconhecido por empresas e recrutadores."
             )
             PlanCard(
                 title       = "Plano Platina",
-                textContent = "Tenha mais visibilidade e aumente sua presença na plataforma.\n\nApareça mais nas pesquisas e conquiste mais reconhecimento."
+                color = AppColors.PrimaryColor,
+                textContent = "Tenha mais visibilidade e aumente sua presença na plataforma.\n\nApareça mais nas pesquisas e conquiste mais reconhecimento.",
             )
         }
     }
 }
 
 @Composable
-private fun PlanCard(title: String, textContent: String) {
+private fun PlanCard(title: String, textContent: String, color: Color) {
     Card(
         modifier  = Modifier.fillMaxWidth().height(280.dp),
         shape     = RoundedCornerShape(24.dp),
-        colors    = CardDefaults.cardColors(containerColor = AppColors.PrimaryOrange),
+        colors    = CardDefaults.cardColors(containerColor = AppColors.PrimaryColor.copy(0.5f)),
         elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
     ) {
         Column(
@@ -97,14 +99,14 @@ private fun PlanCard(title: String, textContent: String) {
         ) {
             Text(
                 text       = title,
-                color      = Color.White,
+                color      = AppColors.colorFontLogin,
                 fontSize   = 16.sp,
                 fontWeight = FontWeight.Bold,
                 textAlign  = TextAlign.Center
             )
             Surface(
                 modifier = Modifier.fillMaxWidth().weight(1f),
-                color    = AppColors.colorOrangeMoreDark,
+                color    = color,
                 shape    = RoundedCornerShape(16.dp)
             ) {
                 Text(

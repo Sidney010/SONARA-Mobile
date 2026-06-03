@@ -10,6 +10,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import com.example.sonara.core.ui.theme.AppColors
 
 @Composable
 fun BottomNavigationBar(
@@ -30,7 +31,7 @@ fun BottomNavigationBar(
             .fillMaxWidth()
             .height(BottomNavDimens.NavigationHeight)
             .background(
-                color = Color(0xffEA6012),
+                color = AppColors.SecondColor,
                 shape = RoundedCornerShape(
                     BottomNavDimens.CornerRadius
                 )
