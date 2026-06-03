@@ -8,6 +8,7 @@ import androidx.compose.runtime.staticCompositionLocalOf
 
 val LocalGradients = staticCompositionLocalOf {
     DarkGradients
+    LightGradients
 }
 
 private val DarkColorScheme = darkColorScheme(
@@ -20,15 +21,27 @@ private val DarkColorScheme = darkColorScheme(
     outline = AppColors.colorOrangeMoreDark
 )
 
+private val LightColorScheme = darkColorScheme(
+    primary        = AppColors.PrimaryColor,
+    background     = AppColors.Background,
+    surface        = AppColors.BLack,
+    onPrimary      = AppColors.White,
+    onBackground   = AppColors.White,
+    tertiary       = AppColors.SecondColor,
+    outline        = AppColors.colorThirt
+)
+
+
 @Composable
 fun SonaraTheme(
     darkTheme: Boolean = true,
+    lightTheme: Boolean = false,
     content: @Composable () -> Unit
 ) {
 
-    val colorScheme = DarkColorScheme
+    val colorScheme = LightColorScheme
 
-    val gradients = DarkGradients
+    val gradients = LightGradients
 
     CompositionLocalProvider(
         LocalGradients provides gradients

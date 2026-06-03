@@ -28,6 +28,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import com.example.sonara.R
+import com.example.sonara.core.ui.theme.AppColors
 
 @Composable
 fun EnterButton(
@@ -39,6 +41,7 @@ fun EnterButton(
     val interactionSource = remember { MutableInteractionSource() }
     val isPressed by interactionSource.collectIsPressedAsState()
 
+
     val scale by animateFloatAsState(
         targetValue = if (isPressed) 0.95f else 1f,
         animationSpec = spring(
@@ -48,10 +51,12 @@ fun EnterButton(
         label = ""
     )
 
+
     val elevation by animateDpAsState(
         targetValue = if (isPressed) 2.dp else 8.dp,
         label = ""
     )
+
 
     Card(
         modifier = modifier
@@ -65,12 +70,13 @@ fun EnterButton(
         shape = MaterialTheme.shapes.medium,
         elevation = CardDefaults.cardElevation(elevation),
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surface,
+            containerColor = AppColors.colorFontLogin.copy(0.9f),
             contentColor = MaterialTheme.colorScheme.onSurface
         ),
         onClick = onClick
     ) {
         Box(modifier = Modifier.fillMaxSize()) {
+
 
             Row(
                 modifier = Modifier
@@ -84,6 +90,7 @@ fun EnterButton(
                     style = MaterialTheme.typography.titleMedium
                 )
             }
+
 
             Column(
                 modifier = Modifier
@@ -101,3 +108,75 @@ fun EnterButton(
         }
     }
 }
+
+//fun EnterButton(
+//    title: String,
+//    icon: Int,
+//    onClick: () -> Unit,
+//    modifier: Modifier = Modifier,
+//) {
+//    val interactionSource = remember { MutableInteractionSource() }
+//    val isPressed by interactionSource.collectIsPressedAsState()
+//
+//    val scale by animateFloatAsState(
+//        targetValue = if (isPressed) 0.95f else 1f,
+//        animationSpec = spring(
+//            dampingRatio = Spring.DampingRatioMediumBouncy,
+//            stiffness = Spring.StiffnessLow
+//        ),
+//        label = ""
+//    )
+//
+//    val elevation by animateDpAsState(
+//        targetValue = if (isPressed) 2.dp else 8.dp,
+//        label = ""
+//    )
+//
+//    Card(
+//        modifier = modifier
+//            .fillMaxWidth()
+//            .height(140.dp)
+//            .graphicsLayer {
+//                scaleX = scale
+//                scaleY = scale
+//            },
+//        interactionSource = interactionSource,
+//        shape = MaterialTheme.shapes.medium,
+//        elevation = CardDefaults.cardElevation(elevation),
+//        colors = CardDefaults.cardColors(
+//            containerColor = MaterialTheme.colorScheme.surface,
+//            contentColor = MaterialTheme.colorScheme.onSurface
+//        ),
+//        onClick = onClick
+//    ) {
+//        Box(modifier = Modifier.fillMaxSize()) {
+//
+//            Row(
+//                modifier = Modifier
+//                    .fillMaxWidth()
+//                    .padding(12.dp),
+//                verticalAlignment = Alignment.Top,
+//                horizontalArrangement = Arrangement.Start
+//            ) {
+//                Text(
+//                    text = title,
+//                    style = MaterialTheme.typography.titleMedium
+//                )
+//            }
+//
+//            Column(
+//                modifier = Modifier
+//                    .fillMaxSize()
+//                    .padding(end = 12.dp),
+//                verticalArrangement = Arrangement.Center,
+//                horizontalAlignment = Alignment.End
+//            ) {
+//                Icon(
+//                    modifier = Modifier.fillMaxHeight(0.6f),
+//                    painter = painterResource(icon),
+//                    contentDescription = title
+//                )
+//            }
+//        }
+//    }
+//}

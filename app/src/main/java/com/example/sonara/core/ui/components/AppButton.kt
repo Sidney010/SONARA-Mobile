@@ -16,8 +16,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.unit.dp
+import com.example.sonara.core.ui.theme.AppColors
 
 @Composable
 fun AppButton(
@@ -28,6 +30,7 @@ fun AppButton(
     val interactionSource = remember { MutableInteractionSource() }
     val isPressed by interactionSource.collectIsPressedAsState()
 
+
     val scale by animateFloatAsState(
         targetValue = if (isPressed) 0.96f else 1f,
         animationSpec = spring(
@@ -37,10 +40,12 @@ fun AppButton(
         label = ""
     )
 
+
     val elevation by animateDpAsState(
         targetValue = if (isPressed) 2.dp else 4.dp,
         label = ""
     )
+
 
     Button(
         modifier = modifier
@@ -53,8 +58,51 @@ fun AppButton(
         onClick = onClick,
         interactionSource = interactionSource,
         shape = MaterialTheme.shapes.medium,
-        elevation = ButtonDefaults.buttonElevation(elevation)
+        elevation = ButtonDefaults.buttonElevation(elevation),
+        colors = ButtonDefaults.buttonColors(
+            containerColor = AppColors.colorFontLogin,
+            contentColor   = Color.White
+        )
     ) {
         Text(text)
     }
 }
+
+//fun AppButton(
+//    modifier: Modifier = Modifier,
+//    text: String,
+//    onClick: () -> Unit
+//) {
+//    val interactionSource = remember { MutableInteractionSource() }
+//    val isPressed by interactionSource.collectIsPressedAsState()
+//
+//    val scale by animateFloatAsState(
+//        targetValue = if (isPressed) 0.96f else 1f,
+//        animationSpec = spring(
+//            dampingRatio = Spring.DampingRatioMediumBouncy,
+//            stiffness = Spring.StiffnessLow
+//        ),
+//        label = ""
+//    )
+//
+//    val elevation by animateDpAsState(
+//        targetValue = if (isPressed) 2.dp else 4.dp,
+//        label = ""
+//    )
+//
+//    Button(
+//        modifier = modifier
+//            .fillMaxWidth(0.5f)
+//            .height(50.dp)
+//            .graphicsLayer {
+//                scaleX = scale
+//                scaleY = scale
+//            },
+//        onClick = onClick,
+//        interactionSource = interactionSource,
+//        shape = MaterialTheme.shapes.medium,
+//        elevation = ButtonDefaults.buttonElevation(elevation)
+//    ) {
+//        Text(text)
+//    }
+//}

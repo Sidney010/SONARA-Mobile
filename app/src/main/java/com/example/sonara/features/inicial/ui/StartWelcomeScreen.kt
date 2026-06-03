@@ -8,6 +8,7 @@ import androidx.compose.ui.unit.dp
 import com.example.sonara.R
 import com.example.sonara.core.ui.components.SonaraLogo
 import com.example.sonara.core.layout.ScreenContainer
+import com.example.sonara.core.ui.theme.AppColors
 import com.example.sonara.features.inicial.components.EnterButton
 import com.example.sonara.features.inicial.components.WelcomeHeader
 
@@ -18,14 +19,18 @@ fun StartWelcomeScreen(
 ) {
     ScreenContainer() {
 
-        SonaraLogo()
 
+        SonaraLogo()
+        val title: String = "SONARA"
         WelcomeHeader(
-            title = "BEM-VINDO A SONARA",
-            subtitle = "UNIFICANDO IDEIAS, REALIZANDO SONHOS"
+            title = "BEM-VINDO A $title",
+            subtitle = "UNIFICANDO IDEIAS, REALIZANDO SONHOS",
+            color     = AppColors.colorFontLogin,
         )
 
+
         Spacer(modifier = Modifier.height(32.dp))
+
 
         EnterButton(
             title = "Anonimo",
@@ -33,12 +38,44 @@ fun StartWelcomeScreen(
             onClick = onNavigateAnonymous
         )
 
+
         EnterButton(
             title = "Login",
             icon = R.drawable.sonara_logo,
             onClick = onNavigateToLogin
         )
 
+
     }
 }
+
+//fun StartWelcomeScreen(
+//    onNavigateToLogin: () -> Unit,
+//    onNavigateAnonymous: () -> Unit
+//) {
+//    ScreenContainer() {
+//
+//        SonaraLogo()
+//
+//        WelcomeHeader(
+//            title = "BEM-VINDO A SONARA",
+//            subtitle = "UNIFICANDO IDEIAS, REALIZANDO SONHOS"
+//        )
+//
+//        Spacer(modifier = Modifier.height(32.dp))
+//
+//        EnterButton(
+//            title = "Anonimo",
+//            icon = R.drawable.sonara_logo,
+//            onClick = onNavigateAnonymous
+//        )
+//
+//        EnterButton(
+//            title = "Login",
+//            icon = R.drawable.sonara_logo,
+//            onClick = onNavigateToLogin
+//        )
+//
+//    }
+//}
 

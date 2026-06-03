@@ -21,12 +21,14 @@ fun BottomNavIcon(
     isSelected: Boolean
 ) {
 
+
     val icon = when(item) {
         BottomNavItemData.Home -> Icons.Default.Home
         BottomNavItemData.Search -> Icons.Default.Search
         BottomNavItemData.Events -> Icons.Default.CheckCircle
         BottomNavItemData.Plans -> Icons.Default.Build
     }
+
 
     Box(
         modifier = Modifier
@@ -35,13 +37,16 @@ fun BottomNavIcon(
                 color = if (isSelected)
                     Color.White
                 else
-                    Color.LightGray,
+                    Color.DarkGray,
+
 
                 shape = CircleShape
             ),
 
+
         contentAlignment = Alignment.Center
     ) {
+
 
         Icon(
             imageVector = icon,
@@ -53,3 +58,41 @@ fun BottomNavIcon(
         )
     }
 }
+
+//fun BottomNavIcon(
+//    item: BottomNavItemData,
+//    isSelected: Boolean
+//) {
+//
+//    val icon = when(item) {
+//        BottomNavItemData.Home -> Icons.Default.Home
+//        BottomNavItemData.Search -> Icons.Default.Search
+//        BottomNavItemData.Events -> Icons.Default.CheckCircle
+//        BottomNavItemData.Plans -> Icons.Default.Build
+//    }
+//
+//    Box(
+//        modifier = Modifier
+//            .fillMaxSize(0.7f)
+//            .background(
+//                color = if (isSelected)
+//                    Color.White
+//                else
+//                    Color.LightGray,
+//
+//                shape = CircleShape
+//            ),
+//
+//        contentAlignment = Alignment.Center
+//    ) {
+//
+//        Icon(
+//            imageVector = icon,
+//            contentDescription = item.title,
+//            tint = if (isSelected)
+//                Color(0xffEA6012)
+//            else
+//                Color.White
+//        )
+//    }
+//}

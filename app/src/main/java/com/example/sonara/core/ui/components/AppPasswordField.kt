@@ -14,6 +14,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
+import com.example.sonara.core.ui.theme.AppColors
 
 @Composable
 fun AppPasswordField(
@@ -26,24 +27,25 @@ fun AppPasswordField(
 ) {
     var visible by remember { mutableStateOf(false) }
 
+
     Column(modifier = modifier, verticalArrangement = Arrangement.spacedBy(4.dp)) {
         TextField(
             modifier = Modifier.fillMaxWidth(),
             value    = value,
             onValueChange = onValueChange,
             placeholder = {
-                Text(text = placeholder, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f))
+                Text(text = placeholder, color = AppColors.colorFontLogin.copy(alpha = 0.6f))
             },
             singleLine = true,
             shape = MaterialTheme.shapes.small,
             colors = TextFieldDefaults.colors(
-                focusedContainerColor   = MaterialTheme.colorScheme.surface,
-                unfocusedContainerColor = MaterialTheme.colorScheme.surface,
-                focusedTextColor        = MaterialTheme.colorScheme.onSurface,
-                unfocusedTextColor      = MaterialTheme.colorScheme.onSurface,
-                cursorColor             = MaterialTheme.colorScheme.primary,
-                focusedIndicatorColor   = if (isError) MaterialTheme.colorScheme.error else Color.Transparent,
-                unfocusedIndicatorColor = if (isError) MaterialTheme.colorScheme.error else Color.Transparent,
+                focusedContainerColor   = AppColors.PrimaryColor.copy(0.5f),
+                unfocusedContainerColor = AppColors.PrimaryColor,
+                focusedTextColor        = AppColors.colorFontLogin,
+                unfocusedTextColor      = AppColors.colorFontLogin,
+                cursorColor             = AppColors.colorFontLogin,
+                focusedIndicatorColor   = if (isError) Color.Red else Color.Red,
+                unfocusedIndicatorColor = if (isError) AppColors.colorFontLogin else AppColors.colorFontLogin,
             ),
             visualTransformation = if (visible) VisualTransformation.None else PasswordVisualTransformation(),
             trailingIcon = {
@@ -66,3 +68,54 @@ fun AppPasswordField(
         }
     }
 }
+
+//fun AppPasswordField(
+//    value: String,
+//    onValueChange: (String) -> Unit,
+//    isError: Boolean      = false,
+//    placeholder: String   = "Senha *",
+//    errorMessage: String? = null,
+//    modifier: Modifier    = Modifier
+//) {
+//    var visible by remember { mutableStateOf(false) }
+//
+//    Column(modifier = modifier, verticalArrangement = Arrangement.spacedBy(4.dp)) {
+//        TextField(
+//            modifier = Modifier.fillMaxWidth(),
+//            value    = value,
+//            onValueChange = onValueChange,
+//            placeholder = {
+//                Text(text = placeholder, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f))
+//            },
+//            singleLine = true,
+//            shape = MaterialTheme.shapes.small,
+//            colors = TextFieldDefaults.colors(
+//                focusedContainerColor   = MaterialTheme.colorScheme.surface,
+//                unfocusedContainerColor = MaterialTheme.colorScheme.surface,
+//                focusedTextColor        = MaterialTheme.colorScheme.onSurface,
+//                unfocusedTextColor      = MaterialTheme.colorScheme.onSurface,
+//                cursorColor             = MaterialTheme.colorScheme.primary,
+//                focusedIndicatorColor   = if (isError) MaterialTheme.colorScheme.error else Color.Transparent,
+//                unfocusedIndicatorColor = if (isError) MaterialTheme.colorScheme.error else Color.Transparent,
+//            ),
+//            visualTransformation = if (visible) VisualTransformation.None else PasswordVisualTransformation(),
+//            trailingIcon = {
+//                IconButton(onClick = { visible = !visible }) {
+//                    Icon(
+//                        imageVector = if (visible) Icons.Outlined.Visibility else Icons.Outlined.VisibilityOff,
+//                        contentDescription = if (visible) "Ocultar senha" else "Mostrar senha",
+//                        tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+//                    )
+//                }
+//            }
+//        )
+//        if (isError && errorMessage != null) {
+//            Text(
+//                text     = errorMessage,
+//                color    = MaterialTheme.colorScheme.error,
+//                style    = MaterialTheme.typography.bodySmall,
+//                modifier = Modifier.padding(start = 4.dp)
+//            )
+//        }
+//    }
+//}

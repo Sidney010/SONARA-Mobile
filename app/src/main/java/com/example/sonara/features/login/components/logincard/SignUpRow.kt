@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import com.example.sonara.core.ui.theme.AppColors
 
 @Composable
 fun SignUpRow(onClick: () -> Unit) {
@@ -15,7 +16,8 @@ fun SignUpRow(onClick: () -> Unit) {
         Text("Não tem conta? ")
         Text(
             text = "Cadastre-se",
-            modifier = Modifier.clickable { onClick() }
+            modifier = Modifier.clickable { onClick() },
+            color = AppColors.colorFontLogin
         )
     }
 }

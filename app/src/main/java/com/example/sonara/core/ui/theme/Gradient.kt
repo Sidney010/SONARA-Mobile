@@ -40,26 +40,30 @@ internal val DarkGradients = AppGradientColors(
 internal val LightGradients = AppGradientColors(
     primaryBackground = Brush.verticalGradient(
         colorStops = arrayOf(
-            0.0f to Color(0xFFFFFFFF),
-            1.0f to Color(0xFFFFE0D6)
+            0.36f to Color(0xFF000000),
+            1.0f  to Color(0xFF464646)
         )
     ),
     primaryCard = Brush.verticalGradient(
         colorStops = arrayOf(
-            0f to Color(0x33FC4C13),
-            1.0f to Color(0xFFFFA07A)
+            0f    to Color(0x99121212),
+            1.0f  to Color(0xFF464646)
         )
     ),
     secondaryCard = Brush.verticalGradient(
         colorStops = arrayOf(
-            0.6f to Color(0x1AFC4C13),
-            1.0f to Color(0xFFFFC1A6)
+            0.6f  to Color(0x3C121212),
+            1.0f  to Color(0xFF464646)
         )
+
+
     ),
     thirdCard = Brush.verticalGradient(
         colorStops = arrayOf(
-            0.6f to Color(0x3CFF0000),
-            0.6f to Color(0x3C831414),
+            0.6f  to Color(0x40121212),
+            1.0f  to Color(0x46464646)
         )
+
+
     )
 )

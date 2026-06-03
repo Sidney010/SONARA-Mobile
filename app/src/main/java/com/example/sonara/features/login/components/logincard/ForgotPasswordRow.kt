@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import com.example.sonara.core.ui.theme.AppColors
 
 @Composable
 fun ForgotPasswordRow(onClick: () -> Unit) {
@@ -15,7 +16,20 @@ fun ForgotPasswordRow(onClick: () -> Unit) {
         Text("Esqueceu a senha? ")
         Text(
             text = "Clique aqui",
-            modifier = Modifier.clickable { onClick() }
+            modifier = Modifier.clickable { onClick() },
+            color = AppColors.colorFontLogin
         )
     }
 }
+
+//fun ForgotPasswordRow(onClick: () -> Unit) {
+//    Row(
+//        horizontalArrangement = Arrangement.Center
+//    ) {
+//        Text("Esqueceu a senha? ")
+//        Text(
+//            text = "Clique aqui",
+//            modifier = Modifier.clickable { onClick() }
+//        )
+//    }
+//}
