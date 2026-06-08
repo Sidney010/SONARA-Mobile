@@ -134,7 +134,7 @@ fun AboutEventsScreen(
                             color = AppColors.colorFontLogin
                         )
 
-                        // Carrossel de Fotos
+
                         ImageCarousel(
                             fotos = evento.fotosUrls,
                             height = 200.dp,

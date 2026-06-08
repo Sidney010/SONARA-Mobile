@@ -18,6 +18,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.sonara.core.navigation.Routes
 import com.example.sonara.core.ui.components.navigation.BottomNavigationBar
 import com.example.sonara.core.ui.components.navigation.BottomNavigationState
+import com.example.sonara.features.artista.candidaturaStatus.ui.YourCandidacyScreen
 import com.example.sonara.features.home.ui.HomeScreen
 //import com.example.sonara.features.meusEventos.ui.MyEventsScreen
 import com.example.sonara.features.artista.perfilartista.ui.ArtistProfileScreen
@@ -151,7 +152,14 @@ fun NavGraphBuilder.mainGraph(
 
                 composable(Routes.Search.route) {
 //                     SearchScreen()
-                    ApplyScreen()
+//                   SearchArtistHouseshowScreen()
+//                    CreateEventOrganizerScreen ()
+//                    MyEventsOrganizerScreen ()
+//                    SelectArtistScreen ()
+//                    OrganizerProfileScreen()
+//                    SeeArtistsHouseShowScreen()
+//                    SearchScreen()
+                    YourCandidacyScreen()
                 }
 
                 composable(Routes.Events.route) {

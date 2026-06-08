@@ -38,6 +38,7 @@ import androidx.compose.ui.unit.sp
 import com.example.sonara.core.layout.ScreenContainer
 import com.example.sonara.core.ui.components.header.HeaderUiState
 import com.example.sonara.core.ui.components.header.HomeHeader
+import com.example.sonara.core.ui.theme.AppColors
 import com.example.sonara.core.ui.theme.DarkGradients
 
 @Composable
@@ -46,7 +47,7 @@ fun CreateEventOrganizerScreen(
     onBackClick: () -> Unit = {}
 ) {
 
-    val gradients = DarkGradients
+
 
     Box(
         modifier = Modifier
@@ -72,17 +73,27 @@ fun CreateEventOrganizerScreen(
                 onNotificationClick = {}
             )
 
+
+
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
                     .wrapContentHeight()
                     .background(
-                        brush = gradients.secondaryCard,
+                       color = AppColors.PrimaryColor,
                         shape = RoundedCornerShape(16.dp)
                     ),
                 shape = RoundedCornerShape(16.dp),
                 colors = CardDefaults.cardColors(containerColor = Color.Transparent)
             ) {
+                Text(
+                    modifier = Modifier.padding(start = 20.dp).padding(top = 10.dp),
+                    text = "Criar Evento",
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 18.sp,
+                    color = AppColors.colorFontLogin
+                )
+
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -114,7 +125,7 @@ fun CreateEventOrganizerScreen(
                             modifier = Modifier
                                 .size(72.dp)
                                 .clip(RoundedCornerShape(10.dp))
-                                .background(Color(0xFFFFAA70).copy(alpha = 0.85f)),
+                                .background(Color.White.copy(alpha = 0.85f)),
                             contentAlignment = Alignment.Center
                         ) {
                             Icon(
@@ -170,7 +181,7 @@ fun CreateEventOrganizerScreen(
                             Text(
                                 text = "DATA",
                                 fontSize = 12.sp,
-                                color = Color.White.copy(alpha = 0.6f),
+                                color = AppColors.colorFontLogin,
                                 fontWeight = FontWeight.Medium
                             )
                             Box(
@@ -197,7 +208,7 @@ fun CreateEventOrganizerScreen(
                             Text(
                                 text = "HORA",
                                 fontSize = 12.sp,
-                                color = Color.White.copy(alpha = 0.6f),
+                                color = AppColors.colorFontLogin,
                                 fontWeight = FontWeight.Medium
                             )
                             Box(
@@ -227,7 +238,7 @@ fun CreateEventOrganizerScreen(
                             .height(52.dp),
                         shape = RoundedCornerShape(26.dp),
                         colors = ButtonDefaults.buttonColors(
-                            containerColor = Color.Black
+                            containerColor = AppColors.colorFontLogin
                         )
                     ) {
                         Text(
@@ -252,9 +263,9 @@ private fun FormField(
     Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
         Text(
             text = label,
-            fontSize = 12.sp,
-            color = Color.White.copy(alpha = 0.6f),
-            fontWeight = FontWeight.Medium
+            fontSize = 14.sp,
+            color = AppColors.colorFontLogin,
+            fontWeight = FontWeight.Bold
         )
         Box(
             modifier = Modifier

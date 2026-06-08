@@ -44,6 +44,7 @@ import com.example.sonara.R
 import com.example.sonara.core.layout.ScreenContainer
 import com.example.sonara.core.ui.components.header.HeaderUiState
 import com.example.sonara.core.ui.components.header.HomeHeader
+import com.example.sonara.core.ui.theme.AppColors
 import com.example.sonara.core.ui.theme.DarkGradients
 
 @Composable
@@ -52,7 +53,6 @@ fun SelectArtistScreen(
     onBackClick: () -> Unit = {}
 ) {
 
-    val gradients = DarkGradients
 
     ScreenContainer(
 
@@ -82,10 +82,17 @@ fun SelectArtistScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .wrapContentHeight()
-                    .background(brush = gradients.secondaryCard, shape = RoundedCornerShape(16.dp)),
+                    .background(color = AppColors.PrimaryColor, shape = RoundedCornerShape(16.dp)),
                 shape = RoundedCornerShape(16.dp),
                 colors = CardDefaults.cardColors(containerColor = Color.Transparent)
             ) {
+                Text(
+                    modifier = Modifier.padding(start = 20.dp).padding(top = 10.dp),
+                    text = "Selecione o Artista",
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = AppColors.colorFontLogin
+                )
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -128,7 +135,7 @@ fun SelectArtistScreen(
                         modifier = Modifier.fillMaxWidth(),
                         text = "Itapevi, Casa de House n56",
                         fontSize = 14.sp,
-                        color = Color.White.copy(alpha = 0.75f),
+                        color = AppColors.colorFontLogin,
                         textAlign = TextAlign.Center
                     )
 
@@ -152,7 +159,7 @@ fun SelectArtistScreen(
                         Text(
                             text = "Cachê Pretendido:\n R$1000.00",
                             fontSize = 14.sp,
-                            color = Color.White.copy(alpha = 0.75f)
+                            color = AppColors.colorFontLogin
                         )
 
 

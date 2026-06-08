@@ -12,8 +12,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import com.example.sonara.features.home.components.SmallEventCard
@@ -37,7 +35,6 @@ import com.example.sonara.core.layout.ScreenContainer
 import com.example.sonara.core.ui.components.header.HeaderUiState
 import com.example.sonara.core.ui.components.header.HomeHeader
 import com.example.sonara.core.ui.theme.AppColors
-import com.example.sonara.core.ui.theme.DarkGradients
 import com.example.sonara.features.organizador.homeorganizador.viewmodel.HomeOrganizerViewModel
 
 @Composable
@@ -51,7 +48,7 @@ fun HomeOrganizerScreen(
     onNavigateToEventDetails: (Int) -> Unit = {}
 ) {
     val uiState by viewModel.uiState.collectAsState()
-    val gradients = DarkGradients
+
 
     ScreenContainer(
         modifier = modifier.verticalScroll(rememberScrollState()),
@@ -77,11 +74,10 @@ fun HomeOrganizerScreen(
                 .fillMaxWidth()
                 .wrapContentHeight(),
             shape = RoundedCornerShape(16.dp),
-            colors = CardDefaults.cardColors(containerColor = AppColors.colorCard.copy(0.5f))
+            colors = CardDefaults.cardColors(containerColor = AppColors.PrimaryColor.copy(0.5f))
         ) {
             Column(
                 modifier = Modifier
-                    .background(brush = gradients.secondaryCard)
                     .padding(16.dp),
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
@@ -102,20 +98,23 @@ fun HomeOrganizerScreen(
                     OrganizerActionBox(
                         text = "Criar Evento",
                         modifier = Modifier.weight(1f),
-                        onClick = onNavigateToCreateEvent
+                        onClick = onNavigateToCreateEvent,
+                        colors = AppColors.colorFontLogin
                     )
 
                     OrganizerActionBox(
                         text = "Contratar Artista",
                         modifier = Modifier.weight(1f),
-                        onClick = onNavigateToHireArtist
+                        onClick = onNavigateToHireArtist,
+                        colors = AppColors.colorFontLogin
                     )
                 }
 
                 OrganizerActionBox(
                     text = "Gerenciar Meus Eventos",
                     modifier = Modifier.fillMaxWidth(),
-                    onClick = onNavigateToMyEvents
+                    onClick = onNavigateToMyEvents,
+                    colors = AppColors.colorFontLogin
                 )
 
                 if (uiState.events.isNotEmpty()) {
@@ -150,13 +149,14 @@ fun HomeOrganizerScreen(
 private fun OrganizerActionBox(
     text: String,
     modifier: Modifier = Modifier,
-    onClick: () -> Unit
+    onClick: () -> Unit,
+    colors: Color
 ) {
     Box(
         modifier = modifier
             .height(140.dp)
             .background(
-                Color.White.copy(alpha = 0.05f),
+                color = colors,
                 shape = RoundedCornerShape(12.dp)
             )
             .clickable(onClick = onClick),
@@ -165,7 +165,7 @@ private fun OrganizerActionBox(
         Text(
             text = text,
             fontSize = 15.sp,
-            fontWeight = FontWeight.Medium,
+            fontWeight = FontWeight.Bold,
             color = Color.White,
             textAlign = TextAlign.Center,
             modifier = Modifier.padding(8.dp)

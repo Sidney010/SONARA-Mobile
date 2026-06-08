@@ -33,7 +33,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+<<<<<<< Updated upstream
 import androidx.compose.ui.layout.ContentScale
+=======
+>>>>>>> Stashed changes
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -42,6 +45,7 @@ import coil.compose.AsyncImage
 import com.example.sonara.core.layout.ScreenContainer
 import com.example.sonara.core.ui.components.header.HeaderUiState
 import com.example.sonara.core.ui.components.header.HomeHeader
+import com.example.sonara.core.ui.theme.AppColors
 import com.example.sonara.core.ui.theme.DarkGradients
 import com.example.sonara.domain.model.Evento
 import com.example.sonara.features.home.components.formatarData
@@ -55,8 +59,12 @@ fun MyEventsOrganizerScreen(
     onEventClick: (Int) -> Unit = {},
     onBackClick: () -> Unit = {}
 ) {
+<<<<<<< Updated upstream
     val uiState by viewModel.uiState.collectAsState()
     val gradients = DarkGradients
+=======
+
+>>>>>>> Stashed changes
 
     ScreenContainer(
         modifier = Modifier,
@@ -75,7 +83,39 @@ fun MyEventsOrganizerScreen(
             onNotificationClick = {}
         )
 
+<<<<<<< Updated upstream
         Spacer(modifier = Modifier.height(16.dp))
+=======
+        Column(
+            modifier = Modifier.fillMaxWidth(),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
+
+        ) {
+            Card(
+                 modifier = Modifier
+                        .fillMaxWidth()
+                    .wrapContentHeight()
+                    .background(
+                       color = AppColors.PrimaryColor.copy(0.5f).copy(0.5f),
+                        shape = RoundedCornerShape(16.dp)
+                    ),
+                shape = RoundedCornerShape(16.dp),
+//                colors = CardDefaults.cardColors(containerColor = Color.Transparent)
+            ) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .wrapContentHeight()
+                        .padding(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    Text("Meus Eventos",
+                        color = AppColors.colorFontLogin,
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 18.sp
+                    )
+>>>>>>> Stashed changes
 
         Text(
             "Meus Eventos",
@@ -111,17 +151,30 @@ fun MyEventsOrganizerScreen(
 }
 
 @Composable
+<<<<<<< Updated upstream
 fun EventoCardItem(
     evento: Evento,
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val gradients = DarkGradients
+=======
+fun eventoCardItem(modifier: Modifier = Modifier) {
+
+>>>>>>> Stashed changes
 
     Card(
         modifier = modifier
             .fillMaxWidth()
+<<<<<<< Updated upstream
             .clickable(onClick = onClick),
+=======
+            .wrapContentHeight()
+            .background(
+              color = AppColors.colorCard.copy(0.5f),
+                shape = RoundedCornerShape(16.dp)
+            ),
+>>>>>>> Stashed changes
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(containerColor = Color.Transparent)
     ) {
@@ -133,6 +186,7 @@ fun EventoCardItem(
             horizontalArrangement = Arrangement.spacedBy(16.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
+<<<<<<< Updated upstream
             AsyncImage(
                 model = evento.fotosUrls.firstOrNull(),
                 contentDescription = null,
@@ -164,6 +218,27 @@ fun EventoCardItem(
                     maxLines = 2
                 )
             }
+=======
+            Text(
+                text = "Nome do Evento",
+                fontSize = 14.sp,
+                color = Color.White,
+                fontWeight = FontWeight.Bold
+            )
+            Text(
+                text = "22/09/2026   23:00",
+                fontSize = 12.sp,
+                color = AppColors.colorFontLogin,
+                fontWeight = FontWeight.Bold
+            )
+            Text(
+                text = "Descrição do evento aqui",
+                fontSize = 11.sp,
+                color = AppColors.colorFontLogin,
+                fontWeight = FontWeight.Bold
+            )
+
+>>>>>>> Stashed changes
         }
     }
 }

@@ -38,6 +38,7 @@ import androidx.compose.ui.unit.sp
 import com.example.sonara.core.layout.ScreenContainer
 import com.example.sonara.core.ui.components.header.HeaderUiState
 import com.example.sonara.core.ui.components.header.HomeHeader
+import com.example.sonara.core.ui.theme.AppColors
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
@@ -116,9 +117,11 @@ fun SearchArtistHouseshowScreen(
             ) {
                 Text(
                     text = "Nenhum Artista cadastrado",
-                    color = Color.Gray,
+                    color = AppColors.colorFontLogin,
                     fontSize = 16.sp,
                     textAlign = TextAlign.Center
+
+
                 )
             }
         } else {
@@ -133,7 +136,7 @@ fun SearchArtistHouseshowScreen(
                     text = "Artistas Próximos",
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Bold,
-                    color = Color.White
+                    color = AppColors.colorFontLogin
                 )
 
                 val totalArtists = 9

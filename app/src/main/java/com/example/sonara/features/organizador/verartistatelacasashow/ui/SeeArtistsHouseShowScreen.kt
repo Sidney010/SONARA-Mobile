@@ -37,6 +37,7 @@ import androidx.compose.ui.unit.sp
 import com.example.sonara.core.layout.ScreenContainer
 import com.example.sonara.core.ui.components.header.HeaderUiState
 import com.example.sonara.core.ui.components.header.HomeHeader
+import com.example.sonara.core.ui.theme.AppColors
 import com.example.sonara.core.ui.theme.DarkGradients
 
 @Composable
@@ -61,7 +62,7 @@ fun   SeeArtistsHouseShowScreen(modifier: Modifier = Modifier) {
             modifier = Modifier
                 .fillMaxWidth()
                 .wrapContentHeight()
-                .background(brush = gradients.secondaryCard, shape = RoundedCornerShape(16.dp)),
+                .background(color = AppColors.PrimaryColor, shape = RoundedCornerShape(16.dp)),
             shape = RoundedCornerShape(16.dp),
             colors = CardDefaults.cardColors(containerColor = Color.Transparent)
         ) {
@@ -73,9 +74,9 @@ fun   SeeArtistsHouseShowScreen(modifier: Modifier = Modifier) {
             ) {
                 Text(
                     text = "Artistas Próximos",
-                    fontSize = 20.sp,
+                    fontSize = 18.sp,
                     fontWeight = FontWeight.Bold,
-                    color = Color.White
+                    color = AppColors.colorFontLogin
                 )
 
                 val totalArtists = 9
@@ -122,7 +123,7 @@ fun ArtistCard(
     Card(
         modifier = modifier.wrapContentHeight(),
         shape = RoundedCornerShape(12.dp),
-        colors = CardDefaults.cardColors(containerColor = Color(0xFFF5C5B0))
+        colors = CardDefaults.cardColors(containerColor = Color.White)
     ) {
         Column(
             modifier = Modifier.fillMaxWidth(),
@@ -132,7 +133,7 @@ fun ArtistCard(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(60.dp)
-                    .background(Color(0xFFCC2200)),
+                    .background(AppColors.colorFontLogin),
                 contentAlignment = Alignment.BottomCenter
             ) {
                 Box(
@@ -159,8 +160,8 @@ fun ArtistCard(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.spacedBy(2.dp)
             ) {
-                Text(text = "Pedro", fontSize = 13.sp, fontWeight = FontWeight.SemiBold, color = Color.Black)
-                Text(text = "Artista Musical", fontSize = 11.sp, color = Color.Black.copy(alpha = 0.7f))
+                Text(text = "Pedro", fontSize = 14.sp, fontWeight = FontWeight.Bold, color = AppColors.colorFontLogin)
+                Text(text = "Artista Musical", fontSize = 14.sp, fontWeight = FontWeight.Bold, color = Color.Black)
 
 
                 Row(horizontalArrangement = Arrangement.spacedBy(1.dp)) {
@@ -182,8 +183,8 @@ fun ArtistCard(
                     }
                 }
 
-                Text(text = "Jandira", fontSize = 11.sp, color = Color.Black.copy(alpha = 0.8f))
-                Text(text = "Eletronica & Clássica", fontSize = 10.sp, color = Color.Black.copy(alpha = 0.6f))
+                Text(text = "Jandira", fontWeight = FontWeight.Bold,fontSize = 14.sp, color = Color.Black)
+                Text(text = "Eletronica & Clássica", fontWeight = FontWeight.Bold, fontSize = 13.sp, color = Color.Black)
 
                 Spacer(modifier = Modifier.height(2.dp))
 
