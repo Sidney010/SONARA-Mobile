@@ -151,7 +151,13 @@ fun NavGraphBuilder.mainGraph(
 
                 composable(Routes.Search.route) {
 //                     SearchScreen()
-                    ApplyScreen()
+//                    ApplyScreen()
+                    AboutSelectionEventScreen(
+                        onNavigateToProfile = {rootNavController.navigate(Routes.Profile.route) },
+                        onNavigateToLogin = {rootNavController.navigate(Routes.Login.route) },
+                        eventId = 0,
+                        onBackClick = { bottomNavController.popBackStack() }
+                    )
                 }
 
                 composable(Routes.Events.route) {

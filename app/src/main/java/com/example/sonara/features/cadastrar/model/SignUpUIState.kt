@@ -58,6 +58,7 @@ data class SignUpUIState(
     val address: AddressUiState   = AddressUiState(),
 
     // Controle de UI
+    val currentStep: SignUpStep   = SignUpStep.PERSONAL_DATA,
     val isLoading: Boolean        = false,
     val isLoadingCatalogs: Boolean = false
 )
