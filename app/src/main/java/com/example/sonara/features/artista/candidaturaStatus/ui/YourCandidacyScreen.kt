@@ -291,7 +291,7 @@ fun YourCandidacyScreen(
                         Text(if (uiState.eventoArtista == null) "Inscrever-se" else "Atualizar")
                     }
 
-                    Spacer(modifier = Modifier.height(200.dp))
+                    Spacer(modifier = Modifier.height(30.dp))
                 }
             }
         }
