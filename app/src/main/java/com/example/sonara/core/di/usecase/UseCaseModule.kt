@@ -5,18 +5,9 @@ import com.example.sonara.domain.repository.EnderecoRepository
 import com.example.sonara.domain.repository.EventoRepository
 import com.example.sonara.domain.repository.GeneroMusicalRepository
 import com.example.sonara.domain.repository.NacionalidadeRepository
+import com.example.sonara.domain.repository.RedeSocialRepository
 import com.example.sonara.domain.repository.UsuarioRepository
-import com.example.sonara.domain.usecase.BuscarEnderecoPorCepUseCase
-import com.example.sonara.domain.usecase.BuscarUsuarioPorIdUseCase
-import com.example.sonara.domain.usecase.ClearFormUseCase
-import com.example.sonara.domain.usecase.GetFormUseCase
-import com.example.sonara.domain.usecase.ListarEventosUseCase
-import com.example.sonara.domain.usecase.ListarGenerosMusicaisUseCase
-import com.example.sonara.domain.usecase.ListarNacionalidadesUseCase
-import com.example.sonara.domain.usecase.LoginUseCase
-import com.example.sonara.domain.usecase.ProcessImageUseCase
-import com.example.sonara.domain.usecase.RegisterUserUseCase
-import com.example.sonara.domain.usecase.SaveFormUseCase
+import com.example.sonara.domain.usecase.*
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -37,4 +28,9 @@ object UseCaseModule {
     @Provides fun provideListarGenerosMusicaisUseCase(r: GeneroMusicalRepository) = ListarGenerosMusicaisUseCase(r)
     @Provides fun provideListarEventosUseCase(r: EventoRepository)             = ListarEventosUseCase(r)
     @Provides fun provideBuscarUsuarioPorIdUseCase(r: UsuarioRepository)        = BuscarUsuarioPorIdUseCase(r)
+    @Provides fun provideListarEventosPorOrganizadorUseCase(r: EventoRepository) = ListarEventosPorOrganizadorUseCase(r)
+    @Provides fun provideBuscarCandidaturasPorArtistaUseCase(r: UsuarioRepository) = BuscarCandidaturasPorArtistaUseCase(r)
+
+    @Provides fun provideListarTiposRedesSociaisUseCase(r: RedeSocialRepository) = ListarTiposRedesSociaisUseCase(r)
+    @Provides fun provideCreateRedeSocialUseCase(r: RedeSocialRepository) = CreateRedeSocialUseCase(r)
 }

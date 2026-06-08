@@ -90,6 +90,13 @@ fun SignUpScreen(
                 // Artísticos
                 nomeArtistico = uiState.nomeArtistico.value, onNomeArtisticoChange = viewModel::onNomeArtisticoChange,
                 descricao     = uiState.descricao.value,     onDescricaoChange     = viewModel::onDescricaoChange,
+                // Redes Sociais
+                redesSociais = uiState.redesSociais,
+                onAddRedeSocial = viewModel::onAddRedeSocial,
+                onRemoveRedeSocial = viewModel::onRemoveRedeSocial,
+                onRedeSocialLinkChange = viewModel::onRedeSocialLinkChange,
+                onRedeSocialTipoChange = viewModel::onRedeSocialTipoChange,
+                tiposRedesSociais = uiState.tiposRedesSociais,
                 // Imagem
                 profileImageUri   = uiState.profileImageUri,
                 profileImageError = uiState.profileImageError,

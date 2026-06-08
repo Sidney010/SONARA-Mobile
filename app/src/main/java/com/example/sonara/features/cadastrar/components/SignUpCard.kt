@@ -32,13 +32,16 @@ import com.example.sonara.core.ui.mask.TelefoneVisualTransformation
 import com.example.sonara.domain.model.Gender
 import com.example.sonara.domain.model.GeneroMusical
 import com.example.sonara.domain.model.Nacionalidade
+import com.example.sonara.domain.model.TipoRedeSocial
 import com.example.sonara.domain.model.UserType
 import com.example.sonara.features.cadastrar.components.signupcard.DatePickerField
 import com.example.sonara.features.cadastrar.components.signupcard.GenderComboBox
 import com.example.sonara.features.cadastrar.components.signupcard.GeneroMusicalMultiSelect
 import com.example.sonara.features.cadastrar.components.signupcard.NacionalidadeComboBox
+import com.example.sonara.features.cadastrar.components.signupcard.RedeSocialSection
 import com.example.sonara.features.cadastrar.components.signupcard.UserProfileImagePicker
 import com.example.sonara.features.cadastrar.components.signupcard.UserTypeSingleSelector
+import com.example.sonara.features.cadastrar.model.RedeSocialDraft
 
 @Composable
 fun SignUpCard(
@@ -72,6 +75,14 @@ fun SignUpCard(
     // Dados artísticos (só exibidos para Artista)
     nomeArtistico: String, onNomeArtisticoChange: (String) -> Unit,
     descricao: String, onDescricaoChange: (String) -> Unit,
+
+    // Redes Sociais
+    redesSociais: List<RedeSocialDraft>,
+    onAddRedeSocial: () -> Unit,
+    onRemoveRedeSocial: (Int) -> Unit,
+    onRedeSocialLinkChange: (Int, String) -> Unit,
+    onRedeSocialTipoChange: (Int, TipoRedeSocial) -> Unit,
+    tiposRedesSociais: List<TipoRedeSocial>,
 
     // Foto
     profileImageUri: Uri?, profileImageError: String?, onImageClick: () -> Unit,
@@ -208,6 +219,16 @@ fun SignUpCard(
                 }
             }
             // ─────────────────────────────────────────────────────────
+
+            // Redes Sociais
+            RedeSocialSection(
+                redesSociais = redesSociais,
+                onAdd = onAddRedeSocial,
+                onRemove = onRemoveRedeSocial,
+                onLinkChange = onRedeSocialLinkChange,
+                onTipoChange = onRedeSocialTipoChange,
+                tiposDisponiveis = tiposRedesSociais
+            )
 
             // Email
             AppTextField(

@@ -3,11 +3,14 @@ package com.example.sonara.data.remote.api
 import com.example.sonara.core.network.ApiResponse
 import com.example.sonara.data.remote.dto.request.CandidaturaCreateRequestDto
 import com.example.sonara.data.remote.dto.request.CandidaturaUpdateRequestDto
+import com.example.sonara.data.remote.dto.request.EventoArtistaRequestDto
 import com.example.sonara.data.remote.dto.request.EventoCreateRequestDto
 import com.example.sonara.data.remote.dto.request.LoginRequestDto
 import com.example.sonara.data.remote.dto.request.RedeSocialRequestDto
 import com.example.sonara.data.remote.dto.response.candidatura.CandidaturaDto
 import com.example.sonara.data.remote.dto.response.candidatura.CandidaturaListDto
+import com.example.sonara.data.remote.dto.response.evento.EventoArtistaDto
+import com.example.sonara.data.remote.dto.response.evento.EventoArtistaResponseDto
 import com.example.sonara.data.remote.dto.response.evento.EventoDto
 import com.example.sonara.data.remote.dto.response.evento.EventoResponseDto
 import com.example.sonara.data.remote.dto.response.evento.EventoListDto
@@ -57,6 +60,23 @@ interface SonaraApi {
     @GET("evento/{id}")
     suspend fun getEventoById(@Path("id") id: Int): Response<ApiResponse<EventoResponseDto>>
 
+    @GET("eventoArtista/{id}")
+    suspend fun getEventoArtistaById(@Path("id") id: Int): Response<EventoArtistaResponseDto>
+
+    @POST("eventoArtista")
+    suspend fun criarEventoArtista(
+        @Body request: EventoArtistaRequestDto
+    ): Response<EventoArtistaResponseDto>
+
+    @PUT("eventoArtista/{id}")
+    suspend fun atualizarEventoArtista(
+        @Path("id") id: Int,
+        @Body request: EventoArtistaRequestDto
+    ): Response<EventoArtistaResponseDto>
+
+    @DELETE("eventoArtista/{id}")
+    suspend fun deletarEventoArtista(@Path("id") id: Int): Response<ApiResponse<Unit>>
+
     @GET("evento/organizador/{organizadorId}")
     suspend fun getEventosPorOrganizador(
         @Path("organizadorId") organizadorId: Int
@@ -100,6 +120,12 @@ interface SonaraApi {
 
     @POST("redesSociais")
     suspend fun createRedeSocial(
+        @Body request: RedeSocialRequestDto
+    ): Response<ApiResponse<RedeSocialDto>>
+
+    @PUT("redesSociais/{id}")
+    suspend fun updateRedeSocial(
+        @Path("id") id: Int,
         @Body request: RedeSocialRequestDto
     ): Response<ApiResponse<RedeSocialDto>>
 

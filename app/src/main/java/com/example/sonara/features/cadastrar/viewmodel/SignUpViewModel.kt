@@ -17,18 +17,25 @@ import com.example.sonara.core.validation.PasswordValidator
 import com.example.sonara.core.validation.getErrorOrNull
 import com.example.sonara.domain.model.Gender
 import com.example.sonara.domain.model.Nacionalidade
+import com.example.sonara.domain.model.TipoRedeSocial
 import com.example.sonara.domain.model.UserType
 import com.example.sonara.domain.model.Usuario
+import com.example.sonara.core.validation.UrlValidator
+import com.example.sonara.core.validation.ValidationResult
+import com.example.sonara.domain.model.RedeSocial
 import com.example.sonara.domain.usecase.BuscarEnderecoPorCepUseCase
 import com.example.sonara.domain.usecase.ClearFormUseCase
+import com.example.sonara.domain.usecase.CreateRedeSocialUseCase
 import com.example.sonara.domain.usecase.GetFormUseCase
 import com.example.sonara.domain.usecase.ListarGenerosMusicaisUseCase
 import com.example.sonara.domain.usecase.ListarNacionalidadesUseCase
+import com.example.sonara.domain.usecase.ListarTiposRedesSociaisUseCase
 import com.example.sonara.domain.usecase.ProcessImageUseCase
 import com.example.sonara.domain.usecase.RegisterUserUseCase
 import com.example.sonara.domain.usecase.SaveFormUseCase
 import com.example.sonara.features.cadastrar.event.SignUpEvent
 import com.example.sonara.features.cadastrar.form.AddressFormManager
+import com.example.sonara.features.cadastrar.model.RedeSocialDraft
 import com.example.sonara.features.cadastrar.model.SignUpUIState
 import com.example.sonara.features.cadastrar.validation.CepValidator
 import com.example.sonara.features.cadastrar.validation.GenderValidator
@@ -49,6 +56,8 @@ class SignUpViewModel @Inject constructor(
     private val buscarEnderecoPorCepUseCase: BuscarEnderecoPorCepUseCase,
     private val listarNacionalidadesUseCase: ListarNacionalidadesUseCase,
     private val listarGenerosMusicaisUseCase: ListarGenerosMusicaisUseCase,
+    private val listarTiposRedesSociaisUseCase: ListarTiposRedesSociaisUseCase,
+    private val createRedeSocialUseCase: CreateRedeSocialUseCase,
     private val processImageUseCase: ProcessImageUseCase,
     private val saveFormUseCase: SaveFormUseCase,
     private val getFormUseCase: GetFormUseCase,
@@ -77,9 +86,11 @@ class SignUpViewModel @Inject constructor(
             _uiState.value = _uiState.value.copy(isLoadingCatalogs = true)
             val nacs = (listarNacionalidadesUseCase() as? AppResult.Success)?.data ?: emptyList()
             val gens = (listarGenerosMusicaisUseCase() as? AppResult.Success)?.data ?: emptyList()
+            val tiposRS = (listarTiposRedesSociaisUseCase() as? AppResult.Success)?.data ?: emptyList()
             _uiState.value = _uiState.value.copy(
                 nacionalidades            = nacs,
                 generosMusicaisDisponiveis = gens,
+                tiposRedesSociais         = tiposRS,
                 isLoadingCatalogs         = false
             )
         }
@@ -207,6 +218,37 @@ class SignUpViewModel @Inject constructor(
         _uiState.value = _uiState.value.copy(
             descricao = _uiState.value.descricao.copy(value = v)
         )
+    }
+
+    fun onAddRedeSocial() {
+        val current = _uiState.value.redesSociais
+        _uiState.value = _uiState.value.copy(
+            redesSociais = current + RedeSocialDraft()
+        )
+    }
+
+    fun onRemoveRedeSocial(index: Int) {
+        val current = _uiState.value.redesSociais.toMutableList()
+        if (index in current.indices) {
+            current.removeAt(index)
+            _uiState.value = _uiState.value.copy(redesSociais = current)
+        }
+    }
+
+    fun onRedeSocialLinkChange(index: Int, link: String) {
+        val current = _uiState.value.redesSociais.toMutableList()
+        if (index in current.indices) {
+            current[index] = current[index].copy(link = link)
+            _uiState.value = _uiState.value.copy(redesSociais = current)
+        }
+    }
+
+    fun onRedeSocialTipoChange(index: Int, tipo: TipoRedeSocial) {
+        val current = _uiState.value.redesSociais.toMutableList()
+        if (index in current.indices) {
+            current[index] = current[index].copy(tipo = tipo)
+            _uiState.value = _uiState.value.copy(redesSociais = current)
+        }
     }
 
     // ── Endereço ────────────────────────────────────────────────────────
@@ -369,6 +411,21 @@ class SignUpViewModel @Inject constructor(
 
             when (val result = registerUserUseCase(usuario, photoFilePath)) {
                 is AppResult.Success -> {
+                    val userId = result.data.id ?: 0
+
+                    // Criação de múltiplas redes sociais
+                    state.redesSociais.forEach { draft ->
+                        if (draft.link.isNotBlank() && draft.tipo != null && UrlValidator.validate(draft.link) is ValidationResult.Success) {
+                            createRedeSocialUseCase(
+                                RedeSocial(
+                                    link = draft.link.trim(),
+                                    tipoId = draft.tipo.id,
+                                    usuarioId = userId
+                                )
+                            )
+                        }
+                    }
+
                     clearFormUseCase()
                     _uiState.value = _uiState.value.copy(isLoading = false)
                     _event.emit(SignUpEvent.NavigateToLogin)

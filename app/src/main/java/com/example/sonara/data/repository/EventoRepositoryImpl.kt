@@ -26,4 +26,11 @@ class EventoRepositoryImpl @Inject constructor(
             mapper  = { dto -> dto.evento.toDomain() }
         )
     }
+
+    override suspend fun listarEventosPorOrganizador(organizadorId: Int): AppResult<List<Evento>> {
+        return safeApiCall(
+            apiCall = { remoteDataSource.getEventosPorOrganizador(organizadorId) },
+            mapper  = { dto -> dto.eventos.map { it.toDomain() } }
+        )
+    }
 }

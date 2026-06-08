@@ -1,9 +1,7 @@
 package com.example.sonara.core.navigation.graphs
 
-import SeeArtistsHouseShowScreen
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -24,21 +22,17 @@ import com.example.sonara.features.home.ui.HomeScreen
 //import com.example.sonara.features.meusEventos.ui.MyEventsScreen
 import com.example.sonara.features.artista.perfilartista.ui.ArtistProfileScreen
 import com.example.sonara.features.artista.sobreEvento.ui.AboutEventsScreen
-import com.example.sonara.features.cadidatar.ui.ApplyScreen
+import com.example.sonara.features.artista.ui.ApplyScreen
 import com.example.sonara.features.organizador.criareventoorganizador.ui.CreateEventOrganizerScreen
 import com.example.sonara.features.organizador.homeorganizador.ui.HomeOrganizerScreen
 import com.example.sonara.features.organizador.meuseventosorganizador.ui.MyEventsOrganizerScreen
-import com.example.sonara.features.organizador.pesquisarartistacasadeshow.ui.SearchArtistHouseshowScreen
 import com.example.sonara.features.organizador.selectartist.ui.SelectArtistScreen
 import com.example.sonara.features.organizador.sobreeventoorganizador.ui.AboutEventOrganizerScreen
-import com.example.sonara.features.organizador.telaperfilorganizador.ui.OrganizerProfileScreen
-import com.example.sonara.features.pesquisar.ui.SearchScreen
 import com.example.sonara.features.plano.ui.PlansScreen
 import com.example.sonara.features.usuario.sobreoeventoselecionado.ui.AboutSelectionEventScreen
-import com.example.sonara.features.usuario.telahomeusuario.HomeUserScreen
-import com.example.sonara.features.usuario.telaperfilusuario.ui.ProfileUserScreen
-import com.example.sonara.features.usuario.telausuariopesquisar.ui.SearchEventsUserScreen
 
+
+import com.example.sonara.features.artista.candidaturaStatus.ui.YourCandidacyScreen
 
 fun NavGraphBuilder.mainGraph(
     rootNavController: NavController
@@ -116,7 +110,20 @@ fun NavGraphBuilder.mainGraph(
                         onNavigateToProfile = { rootNavController.navigate(Routes.Profile.route) },
                         onNavigateToLogin = { rootNavController.navigate(Routes.Login.route) },
                         eventId = eventId,
-                        onBackClick = { bottomNavController.popBackStack() }
+                        onBackClick = { bottomNavController.popBackStack() },
+                        onApplyClick = {
+                            bottomNavController.navigate("your_candidacy/$eventId")
+                        }
+                    )
+                }
+
+                composable("your_candidacy/{eventId}?eaId={eaId}") { backStackEntry ->
+                    val eventId = backStackEntry.arguments?.getString("eventId")?.toInt() ?: 0
+                    val eaId = backStackEntry.arguments?.getString("eaId")?.toIntOrNull()
+                    YourCandidacyScreen(
+                        eventoId = eventId,
+                        eventoArtistaId = eaId,
+                        onBack = { bottomNavController.popBackStack() }
                     )
                 }
 
@@ -151,12 +158,21 @@ fun NavGraphBuilder.mainGraph(
                     val viewModel: HomeViewModel = hiltViewModel()
                     val uiState by viewModel.uiState.collectAsState()
 
-                    if (uiState.userRole == "ORGANIZADOR") {
+                    if (uiState.userRole == "ORGANIZADOR" || uiState.userRole == "Organizador") {
                         MyEventsOrganizerScreen(
+                            onEventClick = { eventId ->
+                                bottomNavController.navigate("about_event_organizer/$eventId")
+                            },
                             onBackClick = { bottomNavController.popBackStack() }
                         )
+                    } else if (uiState.userRole == "ARTISTA" || uiState.userRole == "Artista") {
+                        com.example.sonara.features.artista.meusEventos.ui.MyEvents(
+                            onEventClick = { eventId, eaId ->
+                                bottomNavController.navigate("your_candidacy/$eventId?eaId=$eaId")
+                            }
+                        )
                     } else {
-                        // MyEventsScreen() // Se existir para outros papeis
+                        // MyEventsScreen() // Para usuários comuns se necessário
                     }
                 }
 
@@ -174,6 +190,9 @@ fun NavGraphBuilder.mainGraph(
 
                 composable(Routes.MyEvents.route) {
                     MyEventsOrganizerScreen(
+                        onEventClick = { eventId ->
+                            bottomNavController.navigate("about_event_organizer/$eventId")
+                        },
                         onBackClick = { bottomNavController.popBackStack() }
                     )
                 }
@@ -200,14 +219,32 @@ fun NavGraphBuilder.mainGraph(
 
     // ── Perfil (fora do BottomNav) ────────────────────────────────────
     composable(Routes.Profile.route) {
-        ArtistProfileScreen(
-            onNavigateBack    = { rootNavController.popBackStack() },
-            onNavigateToStart = {
-                // Volta para a tela inicial removendo todo o back-stack
-                rootNavController.navigate(Routes.Start.route) {
-                    popUpTo(0) { inclusive = true }
+        val homeViewModel: HomeViewModel = hiltViewModel()
+        val homeUiState by homeViewModel.uiState.collectAsState()
+
+        // Decidir qual tela de perfil mostrar baseado no cargo do usuário
+        val userRole = homeUiState.userRole?.uppercase()
+        
+        if (userRole == "USUARIO" || userRole == "USER") {
+             // Por enquanto redireciona ou usa ArtistProfileScreen que já é genérica o suficiente 
+             // mas vamos tentar usar a ArtistProfileScreen que já lida com UsuarioPerfil genérico
+             ArtistProfileScreen(
+                onNavigateBack    = { rootNavController.popBackStack() },
+                onNavigateToStart = {
+                    rootNavController.navigate(Routes.Start.route) {
+                        popUpTo(0) { inclusive = true }
+                    }
                 }
-            }
-        )
+            )
+        } else {
+            ArtistProfileScreen(
+                onNavigateBack    = { rootNavController.popBackStack() },
+                onNavigateToStart = {
+                    rootNavController.navigate(Routes.Start.route) {
+                        popUpTo(0) { inclusive = true }
+                    }
+                }
+            )
+        }
     }
 }

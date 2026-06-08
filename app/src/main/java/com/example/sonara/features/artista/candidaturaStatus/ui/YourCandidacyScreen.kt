@@ -39,11 +39,48 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import com.example.sonara.core.ui.theme.AppColors
 
-@Composable
-fun YourCandidacyScreen(modifier: Modifier = Modifier) {
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.IconButton
+import androidx.compose.ui.layout.ContentScale
+import coil.compose.AsyncImage
+import com.example.sonara.features.artista.candidaturaStatus.viewmodel.YourCandidacyViewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 
+@Composable
+fun YourCandidacyScreen(
+    eventoId: Int,
+    eventoArtistaId: Int? = null,
+    onBack: () -> Unit,
+    viewModel: YourCandidacyViewModel = hiltViewModel()
+) {
+    val uiState by viewModel.uiState.collectAsState()
     val gradients = DarkGradients
+    
     var cacheEsperado by remember { mutableStateOf("") }
+    var sobreArtista by remember { mutableStateOf("") }
+
+    LaunchedEffect(eventoId, eventoArtistaId) {
+        viewModel.loadData(eventoId, eventoArtistaId)
+    }
+
+    LaunchedEffect(uiState.eventoArtista) {
+        uiState.eventoArtista?.let {
+            cacheEsperado = it.cacheEsperado?.toString() ?: ""
+            sobreArtista = it.sobreArtista ?: ""
+        }
+    }
+
+    LaunchedEffect(uiState.isSuccess) {
+        if (uiState.isSuccess) {
+            onBack()
+        }
+    }
 
     Box(
         modifier = Modifier
@@ -51,170 +88,156 @@ fun YourCandidacyScreen(modifier: Modifier = Modifier) {
             .background(brush = gradients.secondaryCard)
     ) {
         ScreenContainer(
-            modifier = Modifier.verticalScroll(rememberScrollState()).fillMaxSize(),
-            verticalArrangement = Arrangement.SpaceBetween,
-            verticalSpacing = 6.dp,
-            padding = PaddingValues(start = 12.dp, end = 12.dp, top = 40.dp, bottom = 130.dp)
+            modifier = Modifier
+                .verticalScroll(rememberScrollState())
+                .fillMaxSize(),
+            verticalArrangement = Arrangement.spacedBy(16.dp),
+            padding = PaddingValues(start = 12.dp, end = 12.dp, top = 40.dp, bottom = 40.dp)
         ) {
 
             HomeHeader(
                 state = HeaderUiState(
-                    userName = "UserName",
-                    userRole = "TipodeUsuario"
+                    userName = uiState.userName,
+                    userRole = uiState.userRole
                 ),
-                onLogoClick = {},
+                onLogoClick = onBack,
                 onAvatarClick = {},
                 onNotificationClick = {}
             )
 
-            Card(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .wrapContentHeight()
-                    .background(
-                        brush = gradients.secondaryCard,
-                        shape = RoundedCornerShape(16.dp)
-                    )
-                    .padding( bottom = 20.dp),
-                shape = RoundedCornerShape(16.dp),
-                colors = CardDefaults.cardColors(containerColor = AppColors.colorCard.copy(0.5f))
-            ) {
-                Column {
-                    Column(
-                        modifier = Modifier.padding(16.dp),
-                        verticalArrangement = Arrangement.spacedBy(12.dp)
-                    ) {
-
-                        Text(
-                            text = "Meus Eventos",
-                            fontSize = 18.sp,
-                            fontWeight = FontWeight.Medium,
-                            color = AppColors.colorFontLogin
-                        )
-
-                        Box(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(160.dp)
-                                .background(
-                                    Color.LightGray.copy(alpha = 0.2f),
-                                    shape = RoundedCornerShape(12.dp)
-                                )
+            if (uiState.isLoading) {
+                CircularProgressIndicator(
+                    modifier = Modifier.align(Alignment.CenterHorizontally),
+                    color = AppColors.SecondColor
+                )
+            } else {
+                Card(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .wrapContentHeight(),
+                    shape = RoundedCornerShape(16.dp),
+                    colors = CardDefaults.cardColors(containerColor = AppColors.colorCard.copy(0.5f))
+                ) {
+                    Column {
+                        Column(
+                            modifier = Modifier.padding(16.dp),
+                            verticalArrangement = Arrangement.spacedBy(12.dp)
                         ) {
-                            Icon(
-                                imageVector = Icons.Default.Person,
-                                contentDescription = null,
-                                tint = AppColors.SecondColor,
-                                modifier = Modifier.size(48.dp).align(Alignment.Center)
-                            )
-
-                        }
-                    }
-
-                    Column(
-                        modifier = Modifier.padding(12.dp).align(Alignment.CenterHorizontally),
-                        verticalArrangement = Arrangement.spacedBy(12.dp)
-                    ) {
-
-                        Box(
-                            modifier = Modifier
-                                .width(345.dp)
-                                .wrapContentHeight()
-                                .background(
-                                    AppColors.PrimaryColor.copy(alpha = 0.2f),
-                                    shape = RoundedCornerShape(12.dp)
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Text(
+                                    text = if (uiState.eventoArtista == null) "Nova Candidatura" else "Minha Candidatura",
+                                    fontSize = 18.sp,
+                                    fontWeight = FontWeight.Medium,
+                                    color = AppColors.colorFontLogin
                                 )
-                                .padding(start =10.dp)
+                                
+                                if (uiState.eventoArtista != null) {
+                                    IconButton(onClick = { viewModel.deleteCandidacy() }) {
+                                        Icon(
+                                            imageVector = Icons.Default.Close,
+                                            contentDescription = "Cancelar Candidatura",
+                                            tint = Color.Red
+                                        )
+                                    }
+                                }
+                            }
+
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(160.dp)
+                                    .background(
+                                        Color.LightGray.copy(alpha = 0.2f),
+                                        shape = RoundedCornerShape(12.dp)
+                                    )
+                            ) {
+                                if (uiState.evento?.fotosUrls?.isNotEmpty() == true) {
+                                    AsyncImage(
+                                        model = uiState.evento?.fotosUrls?.first(),
+                                        contentDescription = null,
+                                        modifier = Modifier.fillMaxSize(),
+                                        contentScale = ContentScale.Crop
+                                    )
+                                } else {
+                                    Icon(
+                                        imageVector = Icons.Default.Person,
+                                        contentDescription = null,
+                                        tint = AppColors.SecondColor,
+                                        modifier = Modifier
+                                            .size(48.dp)
+                                            .align(Alignment.Center)
+                                    )
+                                }
+                            }
+                        }
+
+                        Column(
+                            modifier = Modifier
+                                .padding(12.dp)
+                                .align(Alignment.CenterHorizontally),
+                            verticalArrangement = Arrangement.spacedBy(12.dp)
                         ) {
                             Text(
-                                modifier = Modifier.padding(start = 3.dp),
-                                text = "Nosso evento de música promete uma noite cheia de energia, apresentações ao vivo e muita diversão. Um espaço pensado para reunir pessoas," +
-                                        " criar momentos especiais e celebrar a música em um ambiente animado e inesquecível.\n",
-                                fontSize = 15.sp,
+                                text = uiState.evento?.nome ?: "Carregando...",
+                                fontSize = 16.sp,
+                                fontWeight = FontWeight.Bold,
                                 color = AppColors.colorFontLogin
                             )
+
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .wrapContentHeight()
+                                    .background(
+                                        AppColors.PrimaryColor.copy(alpha = 0.2f),
+                                        shape = RoundedCornerShape(12.dp)
+                                    )
+                                    .padding(10.dp)
+                            ) {
+                                Text(
+                                    text = uiState.evento?.descricao ?: "Sem descrição.",
+                                    fontSize = 15.sp,
+                                    color = AppColors.colorFontLogin
+                                )
+                            }
                         }
                     }
-                }
 
-                Box(
-                    modifier = Modifier
-                        .size(345.dp)
-                        .background(
-                            AppColors.PrimaryColor.copy(alpha = 0.2f),
-                            shape = RoundedCornerShape(12.dp)
-                        )
-                        .padding(12.dp)
-                        .align(Alignment.CenterHorizontally)
-                ) {
-                    Column() {
-
-                        Column(
-                            modifier = Modifier.padding(vertical = 8.dp),
-                            verticalArrangement = Arrangement.spacedBy(4.dp)
-                        ) {
-
-                            CacheInputField(
-                                label = "Cachê Esperado:",
-                                value = cacheEsperado,
-                                onValueChange = { cacheEsperado = it },
-                                placeholder = "Digite aqui..."
+                    Column(
+                        modifier = Modifier
+                            .padding(12.dp)
+                            .background(
+                                AppColors.PrimaryColor.copy(alpha = 0.2f),
+                                shape = RoundedCornerShape(12.dp)
                             )
+                            .padding(12.dp)
+                    ) {
+                        CacheInputField(
+                            label = "Cachê Esperado:",
+                            value = cacheEsperado,
+                            onValueChange = { cacheEsperado = it },
+                            placeholder = "Digite aqui..."
+                        )
+                        
+                        CacheInputField(
+                            label = "Sobre Você:",
+                            value = sobreArtista,
+                            onValueChange = { sobreArtista = it },
+                            placeholder = "Fale um pouco sobre você..."
+                        )
+
+                        if (uiState.eventoArtista != null) {
+                            DividerItem()
+                            InfoRow(label = "Cachê Ofertado:", value = "R$ ${uiState.eventoArtista?.cacheOfertado ?: "0.0"}")
+                            DividerItem()
+                            InfoRow(label = "Cachê Final:", value = "R$ ${uiState.eventoArtista?.cacheFinal ?: "0.0"}")
                         }
 
-                        Box(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(1.dp)
-                                .background(Color.White.copy(alpha = 0.12f))
-                        )
-
-                        Column(
-                            modifier = Modifier.padding(vertical = 8.dp),
-                            verticalArrangement = Arrangement.spacedBy(4.dp)
-                        ) {
-                            Text(
-                                text = "Cachê Ofertado:",
-                                fontSize = 13.sp,
-                                color = Color.White.copy(alpha = 0.55f)
-                            )
-                            Text(
-                                text = "(Vem do Banco o valor)",
-                                fontSize = 14.sp,
-                                color = Color(0xFFFFAA70).copy(alpha = 0.6f)
-                            )
-                        }
-
-                        Box(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(1.dp)
-                                .background(Color.White.copy(alpha = 0.12f))
-                        )
-
-                        Column(
-                            modifier = Modifier.padding(vertical = 8.dp),
-                            verticalArrangement = Arrangement.spacedBy(4.dp)
-                        ) {
-                            Text(
-                                text = "Status:",
-                                fontSize = 13.sp,
-                                color = Color.White.copy(alpha = 0.55f)
-                            )
-                            Text(
-                                text = "(Muda de acordo com o status do Evento)",
-                                fontSize = 14.sp,
-                                color = Color(0xFFFFAA70).copy(alpha = 0.6f)
-                            )
-                        }
-
-
-                        Box(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(1.dp)
-                                .background(Color.White.copy(alpha = 0.12f))
-                        )
+                        DividerItem()
 
                         Row(
                             modifier = Modifier
@@ -229,7 +252,7 @@ fun YourCandidacyScreen(modifier: Modifier = Modifier) {
                                     color = Color.White.copy(alpha = 0.55f)
                                 )
                                 Text(
-                                    text = "DD/MM/AAAA",
+                                    text = uiState.evento?.data ?: "DD/MM/AAAA",
                                     fontSize = 14.sp,
                                     color = Color.White.copy(alpha = 0.7f)
                                 )
@@ -244,18 +267,66 @@ fun YourCandidacyScreen(modifier: Modifier = Modifier) {
                                     color = Color.White.copy(alpha = 0.55f)
                                 )
                                 Text(
-                                    text = "00:00",
+                                    text = uiState.evento?.horaInicio ?: "00:00",
                                     fontSize = 14.sp,
                                     color = Color.White.copy(alpha = 0.7f)
                                 )
                             }
                         }
                     }
+                    
+                    Button(
+                        onClick = { 
+                            viewModel.submitCandidacy(
+                                eventoId = eventoId,
+                                cacheEsperado = cacheEsperado.toDoubleOrNull() ?: 0.0,
+                                sobreArtista = sobreArtista
+                            )
+                        },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp),
+                        colors = ButtonDefaults.buttonColors(containerColor = AppColors.SecondColor)
+                    ) {
+                        Text(if (uiState.eventoArtista == null) "Inscrever-se" else "Atualizar")
+                    }
+
+                    Spacer(modifier = Modifier.height(200.dp))
                 }
             }
         }
     }
 }
+
+@Composable
+fun InfoRow(label: String, value: String) {
+    Column(
+        modifier = Modifier.padding(vertical = 8.dp),
+        verticalArrangement = Arrangement.spacedBy(4.dp)
+    ) {
+        Text(
+            text = label,
+            fontSize = 13.sp,
+            color = Color.White.copy(alpha = 0.55f)
+        )
+        Text(
+            text = value,
+            fontSize = 14.sp,
+            color = Color(0xFFFFAA70).copy(alpha = 0.6f)
+        )
+    }
+}
+
+@Composable
+fun DividerItem() {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(1.dp)
+            .background(Color.White.copy(alpha = 0.12f))
+    )
+}
+
 
 @Composable
 fun CacheInputField(

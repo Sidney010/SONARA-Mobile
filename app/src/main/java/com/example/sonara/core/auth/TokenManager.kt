@@ -47,6 +47,14 @@ class TokenManager @Inject constructor(
         it[USER_PHOTO_KEY]?.takeIf { p -> p.isNotBlank() }
     }
 
+    val organizerId: Flow<String?> = context.authDataStore.data.map {
+        it[ORGANIZER_ID_KEY]?.takeIf { id -> id.isNotBlank() }
+    }
+
+    val artistId: Flow<String?> = context.authDataStore.data.map {
+        it[ARTIST_ID_KEY]?.takeIf { id -> id.isNotBlank() }
+    }
+
     /**
      * Salva sessão autenticada (após login ou cadastro bem-sucedido).
      * [userType] não vem na resposta de login da API, use o valor salvo no cadastro

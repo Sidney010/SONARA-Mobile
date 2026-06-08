@@ -140,8 +140,13 @@ fun ArtistProfileScreen(
                 else -> {
                     uiState.perfil?.let { perfil ->
                         ProfileContent(
-                            perfil    = perfil,
+                            perfil = perfil,
                             isEditing = uiState.isEditing,
+                            redesSociaisDrafts = uiState.redesSociais,
+                            tiposRedesSociais = uiState.tiposRedesSociais,
+                            onAddRedeSocial = viewModel::onAddRedeSocial,
+                            onRemoveRedeSocial = viewModel::onRemoveRedeSocial,
+                            onRedeSocialChange = viewModel::onRedeSocialChange
                         )
                     }
                 }

@@ -59,7 +59,8 @@ fun AboutEventsScreen(
     viewModel: AboutEventViewModel = hiltViewModel(),
     onNavigateToProfile: () -> Unit = {},
     onNavigateToLogin: () -> Unit = {},
-    onBackClick: () -> Unit = {}
+    onBackClick: () -> Unit = {},
+    onApplyClick: (Int) -> Unit = {}
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val gradients = DarkGradients
@@ -236,7 +237,7 @@ fun AboutEventsScreen(
 
                         // Botão de Inscrição
                         Button(
-                            onClick = { /* Implementar lógica de candidatura */ },
+                            onClick = { onApplyClick(evento.id) },
                             modifier = Modifier.fillMaxWidth().height(48.dp),
                             shape = RoundedCornerShape(10.dp),
                             colors = ButtonDefaults.buttonColors(containerColor = AppColors.colorFontLogin)

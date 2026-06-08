@@ -1,4 +1,4 @@
-package com.example.sonara.features.cadidatar.ui
+package com.example.sonara.features.artista.ui
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column

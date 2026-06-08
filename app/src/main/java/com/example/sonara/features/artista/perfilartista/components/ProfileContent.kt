@@ -23,16 +23,24 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.example.sonara.core.ui.theme.AppColors
+import com.example.sonara.domain.model.TipoRedeSocial
 import com.example.sonara.domain.model.usuarioperfil.UsuarioCachePerfil
 import com.example.sonara.domain.model.usuarioperfil.UsuarioPerfil
 import com.example.sonara.domain.model.usuarioperfil.UsuarioEventoPerfil
 import com.example.sonara.domain.model.Fotos
 import com.example.sonara.domain.model.usuarioperfil.UsuarioPerfilEventosEndereco
+import com.example.sonara.features.cadastrar.components.signupcard.RedeSocialSection
+import com.example.sonara.features.cadastrar.model.RedeSocialDraft
 
 @Composable
 fun ProfileContent(
     perfil: UsuarioPerfil,
     isEditing: Boolean,
+    redesSociaisDrafts: List<RedeSocialDraft> = emptyList(),
+    tiposRedesSociais: List<TipoRedeSocial> = emptyList(),
+    onAddRedeSocial: () -> Unit = {},
+    onRemoveRedeSocial: (Int) -> Unit = {},
+    onRedeSocialChange: (Int, RedeSocialDraft) -> Unit = { _, _ -> },
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -120,7 +128,22 @@ fun ProfileContent(
         }
 
         // ── Redes sociais ─────────────────────────────────────────────
-        if (perfil.redesSociais.isNotEmpty()) {
+        if (isEditing) {
+            ProfileCard(title = "Redes Sociais") {
+                RedeSocialSection(
+                    redesSociais = redesSociaisDrafts,
+                    tiposDisponiveis = tiposRedesSociais,
+                    onAdd = onAddRedeSocial,
+                    onRemove = onRemoveRedeSocial,
+                    onLinkChange = { index, link ->
+                        onRedeSocialChange(index, redesSociaisDrafts[index].copy(link = link))
+                    },
+                    onTipoChange = { index, tipo ->
+                        onRedeSocialChange(index, redesSociaisDrafts[index].copy(tipo = tipo))
+                    }
+                )
+            }
+        } else if (perfil.redesSociais.isNotEmpty()) {
             ProfileCard(title = "Redes Sociais") {
                 perfil.redesSociais.forEach { rs ->
                     InfoRow(label = rs.tipoNome ?: "Link", value = rs.link)

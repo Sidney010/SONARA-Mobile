@@ -6,7 +6,14 @@ import com.example.sonara.core.form.SelectionFieldState
 import com.example.sonara.domain.model.Gender
 import com.example.sonara.domain.model.GeneroMusical
 import com.example.sonara.domain.model.Nacionalidade
+import com.example.sonara.domain.model.TipoRedeSocial
 import com.example.sonara.domain.model.UserType
+
+data class RedeSocialDraft(
+    val id: Int? = null,
+    val link: String = "",
+    val tipo: TipoRedeSocial? = null
+)
 
 data class SignUpUIState(
     // ── Dados pessoais ────────────────────────────────────────────────────────
@@ -33,6 +40,10 @@ data class SignUpUIState(
     val generosMusicaisSelected: Set<Int> = emptySet(),   // IDs selecionados
     val generosMusicaisError: String?     = null,
     val generosMusicaisDisponiveis: List<GeneroMusical> = emptyList(),
+
+    // ── Redes Sociais ────────────────────────────────────────────────────────
+    val redesSociais: List<RedeSocialDraft> = emptyList(),
+    val tiposRedesSociais: List<TipoRedeSocial> = emptyList(),
 
     // Dados artísticos (opcionais conforme tipo)
     val nomeArtistico: FieldState = FieldState(),
