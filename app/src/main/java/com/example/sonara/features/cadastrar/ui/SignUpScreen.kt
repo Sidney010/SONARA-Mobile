@@ -2,6 +2,7 @@ package com.example.sonara.features.cadastrar.ui
 
 import android.Manifest
 import android.net.Uri
+import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.clickable
@@ -51,6 +52,9 @@ fun SignUpScreen(
             when (event) {
                 is SignUpEvent.NavigateToLogin -> onNavigateToLogin()
                 is SignUpEvent.ShowError       -> snackbarHostState.showSnackbar(event.message, duration = SnackbarDuration.Short)
+                is SignUpEvent.ShowSuccess     -> {
+                    snackbarHostState.showSnackbar(event.message, duration = SnackbarDuration.Long)
+                }
             }
         }
     }

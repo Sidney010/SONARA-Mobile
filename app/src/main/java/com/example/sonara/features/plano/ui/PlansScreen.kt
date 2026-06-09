@@ -40,7 +40,7 @@ fun PlansScreen(
     val uiState by viewModel.uiState.collectAsState()
 
     ScreenContainer(
-        verticalArrangement = Arrangement.SpaceBetween,
+        verticalArrangement = Arrangement.Top,
         verticalSpacing     = 6.dp,
         padding             = PaddingValues(12.dp, 40.dp)
     ) {
@@ -48,6 +48,7 @@ fun PlansScreen(
             state = HeaderUiState(
                 userName   = uiState.userName,
                 userRole   = uiState.userRole,
+                avatarUrl  = uiState.userPhoto,
                 isLoggedIn = uiState.isLoggedIn
             ),
             onLogoClick          = onNavigateToHome,
@@ -60,15 +61,16 @@ fun PlansScreen(
                 .fillMaxWidth()
                 .weight(1f)
                 .verticalScroll(rememberScrollState())
-                .padding(top = 30.dp),
+                .padding(top = 16.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(12.dp)
+            verticalArrangement = Arrangement.spacedBy(24.dp)
         ) {
             Text(
                 text      = "Planos",
                 textAlign = TextAlign.Center,
-                color     = AppColors.colorFontLogin,
-                fontSize  = 26.sp
+                color     = Color.White,
+                fontSize  = 26.sp,
+                fontWeight = FontWeight.Bold
             )
             PlanCard(
                 title       = "Plano Diamante",
@@ -87,9 +89,11 @@ fun PlansScreen(
 @Composable
 private fun PlanCard(title: String, textContent: String, color: Color) {
     Card(
-        modifier  = Modifier.fillMaxWidth().height(280.dp),
+        modifier  = Modifier
+            .fillMaxWidth()
+            .height(280.dp),
         shape     = RoundedCornerShape(24.dp),
-        colors    = CardDefaults.cardColors(containerColor = AppColors.PrimaryColor.copy(0.5f)),
+        colors    = CardDefaults.cardColors(containerColor = AppColors.PrimaryColor.copy(0.3f)),
         elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
     ) {
         Column(
@@ -99,8 +103,8 @@ private fun PlanCard(title: String, textContent: String, color: Color) {
         ) {
             Text(
                 text       = title,
-                color      = AppColors.colorFontLogin,
-                fontSize   = 16.sp,
+                color      = Color.White,
+                fontSize   = 20.sp,
                 fontWeight = FontWeight.Bold,
                 textAlign  = TextAlign.Center
             )

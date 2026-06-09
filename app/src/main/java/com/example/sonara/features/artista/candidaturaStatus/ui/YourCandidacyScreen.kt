@@ -1,56 +1,60 @@
 package com.example.sonara.features.artista.candidaturaStatus.ui
 
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
+import coil.compose.AsyncImage
 import com.example.sonara.core.layout.ScreenContainer
+import com.example.sonara.core.ui.components.AppButton
 import com.example.sonara.core.ui.components.header.HeaderUiState
 import com.example.sonara.core.ui.components.header.HomeHeader
-import com.example.sonara.core.ui.theme.DarkGradients
-import androidx.compose.ui.graphics.SolidColor
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
 import com.example.sonara.core.ui.theme.AppColors
-
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.material.icons.filled.Close
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.IconButton
-import androidx.compose.ui.layout.ContentScale
-import coil.compose.AsyncImage
+import com.example.sonara.core.ui.theme.DarkGradients
 import com.example.sonara.features.artista.candidaturaStatus.viewmodel.YourCandidacyViewModel
-import androidx.hilt.navigation.compose.hiltViewModel
 
 @Composable
 fun YourCandidacyScreen(
@@ -60,10 +64,12 @@ fun YourCandidacyScreen(
     viewModel: YourCandidacyViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
+    val context = LocalContext.current
     val gradients = DarkGradients
     
     var cacheEsperado by remember { mutableStateOf("") }
     var sobreArtista by remember { mutableStateOf("") }
+    var motivoInscricao by remember { mutableStateOf("") }
 
     LaunchedEffect(eventoId, eventoArtistaId) {
         viewModel.loadData(eventoId, eventoArtistaId)
@@ -73,12 +79,20 @@ fun YourCandidacyScreen(
         uiState.eventoArtista?.let {
             cacheEsperado = it.cacheEsperado?.toString() ?: ""
             sobreArtista = it.sobreArtista ?: ""
+            motivoInscricao = it.motivoInscricao ?: ""
         }
     }
 
     LaunchedEffect(uiState.isSuccess) {
-        if (uiState.isSuccess) {
+        if (uiState.isSuccess && uiState.successMessage != null) {
+            Toast.makeText(context, uiState.successMessage, Toast.LENGTH_LONG).show()
             onBack()
+        }
+    }
+
+    LaunchedEffect(uiState.error) {
+        uiState.error?.let {
+            Toast.makeText(context, it, Toast.LENGTH_LONG).show()
         }
     }
 
@@ -218,8 +232,14 @@ fun YourCandidacyScreen(
                             )
                             .padding(12.dp)
                     ) {
+                        InfoRow(
+                            label = "Cachê sugerido pelo contratante:",
+                            value = if (uiState.eventoArtista?.cacheEsperado != null) "R$ ${uiState.eventoArtista?.cacheEsperado}" else "A definir"
+                        )
+                        DividerItem()
+
                         CacheInputField(
-                            label = "Cachê Esperado:",
+                            label = "Seu Cachê Esperado:",
                             value = cacheEsperado,
                             onValueChange = { cacheEsperado = it },
                             placeholder = "Digite aqui..."
@@ -230,6 +250,13 @@ fun YourCandidacyScreen(
                             value = sobreArtista,
                             onValueChange = { sobreArtista = it },
                             placeholder = "Fale um pouco sobre você..."
+                        )
+
+                        CacheInputField(
+                            label = "Motivo da Inscrição:",
+                            value = motivoInscricao,
+                            onValueChange = { motivoInscricao = it },
+                            placeholder = "Por que você quer participar?"
                         )
 
                         if (uiState.eventoArtista != null) {
@@ -276,24 +303,34 @@ fun YourCandidacyScreen(
                             }
                         }
                     }
-                    
+
                     Button(
                         onClick = { 
                             viewModel.submitCandidacy(
                                 eventoId = eventoId,
                                 cacheEsperado = cacheEsperado.toDoubleOrNull() ?: 0.0,
-                                sobreArtista = sobreArtista
+                                sobreArtista = sobreArtista,
+                                motivoInscricao = motivoInscricao
                             )
                         },
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(16.dp),
-                        colors = ButtonDefaults.buttonColors(containerColor = AppColors.SecondColor)
-                    ) {
-                        Text(if (uiState.eventoArtista == null) "Inscrever-se" else "Atualizar")
+                        enabled = !uiState.isLoading,
+                        shape = RoundedCornerShape(8.dp),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = AppColors.colorFontLogin,
+                            contentColor = Color.White
+                        )
+                   ) {
+                        if (uiState.isLoading) {
+                            CircularProgressIndicator(modifier = Modifier.size(24.dp), color = Color.White)
+                        } else {
+                            Text(if (uiState.eventoArtista == null) "Inscrever-se" else "Atualizar")
+                        }
                     }
 
-                    Spacer(modifier = Modifier.height(30.dp))
+                    Spacer(modifier = Modifier.height(45.dp))
                 }
             }
         }
@@ -367,11 +404,10 @@ fun CacheInputField(
                 cursorBrush = SolidColor(Color(0xFFFFAA70)),
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 0.dp, vertical = 2.dp),
+                    .padding(horizontal = 10.dp, vertical = 8.dp),
                 decorationBox = { innerTextField ->
                     if (value.isEmpty()) {
                         Text(
-                            modifier = Modifier.padding(start = 10.dp),
                             text = placeholder,
                             fontSize = 14.sp,
                             color = Color(0xFFFFAA70).copy(alpha = 0.6f)

@@ -1,19 +1,21 @@
 package com.example.sonara.features.artista.meusEventos.ui
 
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -22,20 +24,13 @@ import coil.compose.AsyncImage
 import com.example.sonara.core.layout.ScreenContainer
 import com.example.sonara.core.ui.components.header.HeaderUiState
 import com.example.sonara.core.ui.components.header.HomeHeader
+import com.example.sonara.core.ui.components.modal.ConfirmModal
 import com.example.sonara.core.ui.theme.AppColors
 import com.example.sonara.core.ui.theme.DarkGradients
 import com.example.sonara.domain.model.usuarioperfil.UsuarioEventoPerfil
 import com.example.sonara.features.artista.meusEventos.viewmodel.MyEventsViewModel
 import com.example.sonara.features.home.components.formatarData
 import com.example.sonara.features.home.components.formatarHora
-
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Delete
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
-import androidx.compose.runtime.mutableStateOf
-import com.example.sonara.core.ui.components.modal.ConfirmModal
 
 @Composable
 fun MyEvents(
@@ -105,7 +100,7 @@ fun MyEvents(
                         modifier = Modifier.padding(16.dp)
                     )
                 }
-            } else {
+            } else{
                 LazyColumn(
                     verticalArrangement = Arrangement.spacedBy(12.dp),
                     contentPadding = PaddingValues(bottom = 80.dp)
@@ -129,10 +124,22 @@ fun EventoCardItem(
     onClick: () -> Unit,
     onDelete: () -> Unit
 ) {
+    val context = LocalContext.current
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable { onClick() },
+            .clickable {
+                val status = evento.status?.lowercase()
+                if (status == "aprovado" || status == "confirmado") {
+                    Toast.makeText(
+                        context,
+                        "Eventos já confirmados não podem ser alterados",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                } else {
+                    onClick()
+                }
+            },
         shape = RoundedCornerShape(12.dp),
         colors = CardDefaults.cardColors(containerColor = AppColors.colorCard.copy(0.4f))
     ) {
@@ -175,11 +182,25 @@ fun EventoCardItem(
                         modifier = Modifier.weight(1f)
                     )
                     
-                    IconButton(onClick = onDelete) {
+                    IconButton(onClick = {
+                        val status = evento.status?.lowercase()
+                        if (status == "aprovado" || status == "confirmado") {
+                            Toast.makeText(
+                                context,
+                                "Eventos já confirmados não podem ser alterados",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        } else {
+                            onDelete()
+                        }
+                    }) {
                         Icon(
                             imageVector = Icons.Default.Delete,
                             contentDescription = "Remover",
-                            tint = Color.Red.copy(alpha = 0.7f),
+                            tint = if (evento.status?.lowercase() == "aprovado" || evento.status?.lowercase() == "confirmado") 
+                                Color.Gray.copy(alpha = 0.5f) 
+                            else 
+                                Color.Red.copy(alpha = 0.7f),
                             modifier = Modifier.size(20.dp)
                         )
                     }

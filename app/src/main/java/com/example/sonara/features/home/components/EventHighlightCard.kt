@@ -160,7 +160,7 @@ fun EventHighlightCard(
             ) {
                 Text(
                     text  = if (isLoggedIn) "Ver mais" else "Faça login",
-                    color = AppColors.colorFontLogin,
+                    color = AppColors.White,
                     fontSize = 12.sp
                 )
             }

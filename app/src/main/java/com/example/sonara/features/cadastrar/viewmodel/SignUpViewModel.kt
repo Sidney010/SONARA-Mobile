@@ -575,6 +575,7 @@ class SignUpViewModel @Inject constructor(
 
                     clearFormUseCase()
                     _uiState.value = _uiState.value.copy(isLoading = false)
+                    _event.emit(SignUpEvent.ShowSuccess("Cadastro realizado com sucesso!"))
                     _event.emit(SignUpEvent.NavigateToLogin)
                 }
                 is AppResult.Error   -> {
