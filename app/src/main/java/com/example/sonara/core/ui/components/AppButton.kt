@@ -25,6 +25,7 @@ import com.example.sonara.core.ui.theme.AppColors
 fun AppButton(
     modifier: Modifier = Modifier,
     text: String,
+    color: Color = AppColors.colorFontLogin,
     onClick: () -> Unit
 ) {
     val interactionSource = remember { MutableInteractionSource() }
@@ -60,7 +61,7 @@ fun AppButton(
         shape = MaterialTheme.shapes.medium,
         elevation = ButtonDefaults.buttonElevation(elevation),
         colors = ButtonDefaults.buttonColors(
-            containerColor = AppColors.colorFontLogin,
+            containerColor = color,
             contentColor   = Color.White
         )
     ) {

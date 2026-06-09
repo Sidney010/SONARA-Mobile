@@ -98,7 +98,9 @@ fun YourCandidacyScreen(
             HomeHeader(
                 state = HeaderUiState(
                     userName = uiState.userName,
-                    userRole = uiState.userRole
+                    userRole = uiState.userRole,
+                    avatarUrl = uiState.userPhoto,
+                    isLoggedIn = uiState.isLoggedIn
                 ),
                 onLogoClick = onBack,
                 onAvatarClick = {},

@@ -38,6 +38,7 @@ import com.example.sonara.features.cadastrar.components.steps.PersonalDataStep
 import com.example.sonara.features.cadastrar.components.steps.ProfileStep
 import com.example.sonara.features.cadastrar.model.RedeSocialDraft
 import com.example.sonara.features.cadastrar.model.SignUpStep
+import com.example.sonara.features.inicial.components.EnterButton
 
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
@@ -179,7 +180,7 @@ fun SignUpCard(
                 }
             }
 
-            Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(30.dp))
 
             // Botões de Navegação
             Row(
@@ -189,23 +190,31 @@ fun SignUpCard(
                 horizontalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 if (currentStep != SignUpStep.PERSONAL_DATA) {
-                    OutlinedButton(
+                    val buttonText = "Voltar"
+                    AppButton(
+                        text = buttonText,
                         modifier = Modifier.weight(1f),
                         onClick = onBackClick
-                    ) {
-                        androidx.compose.material3.Text("Voltar")
-                    }
+                    )
                 }
 
                 if (isLoading) {
                     CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterVertically))
                 } else {
                     val buttonText = if (currentStep == SignUpStep.ADDRESS) "Cadastrar-se" else "Próximo"
-                    AppButton(
-                        modifier = Modifier.weight(1f),
-                        text = buttonText,
-                        onClick = onNextClick
-                    )
+                    if (buttonText == "Cadastrar-se") {
+                        AppButton(
+                            modifier = Modifier.weight(1.5f),
+                            text = buttonText,
+                            onClick = onNextClick
+                        )
+                    } else {
+                        AppButton(
+                            modifier = Modifier.weight(1f),
+                            text = buttonText,
+                            onClick = onNextClick
+                        )
+                    }
                 }
             }
         }

@@ -12,9 +12,15 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import kotlin.collections.component1
+import kotlin.collections.component2
+import kotlin.collections.component3
+import kotlin.collections.component4
 
 data class YourCandidacyUiState(
     val isLoading: Boolean = false,
@@ -23,7 +29,9 @@ data class YourCandidacyUiState(
     val error: String? = null,
     val isSuccess: Boolean = false,
     val userName: String = "",
-    val userRole: String = ""
+    val userRole: String = "",
+    val userPhoto: String? = null,
+    val isLoggedIn: Boolean = false
 )
 
 @HiltViewModel
@@ -39,7 +47,7 @@ class YourCandidacyViewModel @Inject constructor(
     fun loadData(eventoId: Int, eventoArtistaId: Int? = null) {
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(isLoading = true)
-            
+
             val name = tokenManager.userName.first() ?: ""
             val role = tokenManager.userType.first() ?: ""
             _uiState.value = _uiState.value.copy(userName = name, userRole = role)

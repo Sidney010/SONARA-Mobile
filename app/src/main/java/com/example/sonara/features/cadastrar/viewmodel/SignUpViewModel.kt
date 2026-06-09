@@ -80,37 +80,79 @@ class SignUpViewModel @Inject constructor(
         restoreForm()
     }
 
+    private fun List<RedeSocialDraft>.serializeToString(): String =
+        filter { it.tipo != null && it.link.isNotBlank() }
+            .joinToString("|") { draft ->
+                "${draft.tipo!!.id}:${draft.link.trim()}"
+            }
+
+    private fun String.deserializeToRedeSocialDrafts(
+        tiposDisponiveis: List<TipoRedeSocial>
+    ): List<RedeSocialDraft> {
+        if (isBlank()) return emptyList()
+        return split("|").mapNotNull { entry ->
+            val colonIndex = entry.indexOf(':')
+            if (colonIndex < 0) return@mapNotNull null
+            val tipoId = entry.substring(0, colonIndex).toIntOrNull() ?: return@mapNotNull null
+            val link   = entry.substring(colonIndex + 1)
+            val tipo   = tiposDisponiveis.find { it.id == tipoId } ?: return@mapNotNull null
+            RedeSocialDraft(tipo = tipo, link = link)
+        }
+    }
     // ── Catálogos ──────────────────────────────────────────────────────
 
     private fun loadCatalogs() {
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(isLoadingCatalogs = true)
-            val nacs = (listarNacionalidadesUseCase() as? AppResult.Success)?.data ?: emptyList()
-            val gens = (listarGenerosMusicaisUseCase() as? AppResult.Success)?.data ?: emptyList()
-            val tiposRS = (listarTiposRedesSociaisUseCase() as? AppResult.Success)?.data ?: emptyList()
+            val nacs    = (listarNacionalidadesUseCase()     as? AppResult.Success)?.data ?: emptyList()
+            val gens    = (listarGenerosMusicaisUseCase()    as? AppResult.Success)?.data ?: emptyList()
+            val tiposRS = (listarTiposRedesSociaisUseCase()  as? AppResult.Success)?.data ?: emptyList()
+
             _uiState.value = _uiState.value.copy(
-                nacionalidades            = nacs,
+                nacionalidades             = nacs,
                 generosMusicaisDisponiveis = gens,
-                tiposRedesSociais         = tiposRS,
-                isLoadingCatalogs         = false
+                tiposRedesSociais          = tiposRS,
+                isLoadingCatalogs          = false
             )
+
+            // Se restoreForm() já rodou mas os tipos ainda não existiam,
+            // tenta restaurar as redes sociais agora que tiposRS chegou.
+            if (_uiState.value.redesSociais.isEmpty() && tiposRS.isNotEmpty()) {
+                getFormUseCase().collect { form ->
+                    if (form.redesSociais.isNotBlank()) {
+                        val redesRestauradas = form.redesSociais
+                            .deserializeToRedeSocialDrafts(tiposRS)
+                        if (redesRestauradas.isNotEmpty()) {
+                            _uiState.value = _uiState.value.copy(redesSociais = redesRestauradas)
+                        }
+                    }
+                    return@collect   // coleta apenas uma vez
+                }
+            }
         }
     }
-
     // ── Restauração do formulário ──────────────────────────────────────
 
     private fun restoreForm() {
         viewModelScope.launch {
             getFormUseCase().collect { form ->
                 if (_uiState.value.nome.value.isBlank() && form.name.isNotBlank()) {
+
+                    // Restaura redes sociais apenas se os catálogos já chegaram
+                    val redesRestauradas = if (_uiState.value.tiposRedesSociais.isNotEmpty()) {
+                        form.redesSociais.deserializeToRedeSocialDrafts(_uiState.value.tiposRedesSociais)
+                    } else {
+                        emptyList() // será restaurado pela segunda coleta após loadCatalogs()
+                    }
+
                     _uiState.value = _uiState.value.copy(
-                        nome = FieldState(form.name),
-                        email = FieldState(form.email),
-                        cpf = FieldState(form.cpf),
+                        nome           = FieldState(form.name),
+                        email          = FieldState(form.email),
+                        cpf            = FieldState(form.cpf),
                         dataNascimento = FieldState(form.dataNasc),
-                        telefone = FieldState(form.telefone),
-                        nomeArtistico = FieldState(form.nomeArtistico),
-                        descricao = FieldState(form.descricao),
+                        telefone       = FieldState(form.telefone),
+                        nomeArtistico  = FieldState(form.nomeArtistico),
+                        descricao      = FieldState(form.descricao),
                         profileImageUri = form.image?.let { Uri.parse(it) },
                         userType = _uiState.value.userType.copy(
                             value = UserType.entries.find { it.apiValue == form.userType }
@@ -119,14 +161,15 @@ class SignUpViewModel @Inject constructor(
                             value = Gender.entries.find { it.apiId.toString() == form.generoId }
                         ),
                         address = _uiState.value.address.copy(
-                            cep = form.cep,
-                            rua = form.rua,
-                            bairro = form.bairro,
-                            cidade = form.cidade,
-                            uf = form.uf,
-                            numero = form.numero,
+                            cep         = form.cep,
+                            rua         = form.rua,
+                            bairro      = form.bairro,
+                            cidade      = form.cidade,
+                            uf          = form.uf,
+                            numero      = form.numero,
                             complemento = form.complemento
-                        )
+                        ),
+                        redesSociais = redesRestauradas   // <-- novo campo restaurado
                     )
                 }
             }
@@ -480,7 +523,7 @@ class SignUpViewModel @Inject constructor(
 
     fun onRegisterClick() {
         if (!validateAddress()) return
-        
+
         val state     = _uiState.value
         val isArtista = state.userType.value == UserType.ARTISTA
 
@@ -556,26 +599,27 @@ class SignUpViewModel @Inject constructor(
             val s = _uiState.value
             saveFormUseCase(
                 FormData(
-                    name          = s.nome.value,
-                    email         = s.email.value,
-                    cpf           = s.cpf.value,
-                    password      = s.password.value,
-                    image         = s.profileImageUri?.toString(),
-                    dataNasc      = s.dataNascimento.value,
-                    telefone      = s.telefone.value,
-                    userType      = s.userType.value?.apiValue ?: "",
-                    nomeArtistico = s.nomeArtistico.value,
-                    descricao     = s.descricao.value,
+                    name            = s.nome.value,
+                    email           = s.email.value,
+                    cpf             = s.cpf.value,
+                    password        = s.password.value,
+                    image           = s.profileImageUri?.toString(),
+                    dataNasc        = s.dataNascimento.value,
+                    telefone        = s.telefone.value,
+                    userType        = s.userType.value?.apiValue ?: "",
+                    nomeArtistico   = s.nomeArtistico.value,
+                    descricao       = s.descricao.value,
                     nacionalidadeId = s.nacionalidade.value?.id?.toString() ?: "",
-                    generoId      = s.gender.value?.apiId?.toString() ?: "",
+                    generoId        = s.gender.value?.apiId?.toString() ?: "",
                     generosMusicais = s.generosMusicaisSelected.joinToString(","),
-                    cep           = s.address.cep,
-                    rua           = s.address.rua,
-                    bairro        = s.address.bairro,
-                    cidade        = s.address.cidade,
-                    uf            = s.address.uf,
-                    numero        = s.address.numero,
-                    complemento   = s.address.complemento
+                    cep             = s.address.cep,
+                    rua             = s.address.rua,
+                    bairro          = s.address.bairro,
+                    cidade          = s.address.cidade,
+                    uf              = s.address.uf,
+                    numero          = s.address.numero,
+                    complemento     = s.address.complemento,
+                    redesSociais    = s.redesSociais.serializeToString()   // <-- novo campo salvo
                 )
             )
         }

@@ -72,6 +72,17 @@ fun ProfileStep(
             isError = passwordAgainError != null, errorMessage = passwordAgainError
         )
 
+
+        // Redes Sociais
+        RedeSocialSection(
+            redesSociais = redesSociais,
+            onAdd = onAddRedeSocial,
+            onRemove = onRemoveRedeSocial,
+            onLinkChange = onRedeSocialLinkChange,
+            onTipoChange = onRedeSocialTipoChange,
+            tiposDisponiveis = tiposRedesSociais
+        )
+
         // ── Campos exclusivos do ARTISTA ──────────────────────────
         AnimatedVisibility(
             visible = isArtista,
@@ -104,15 +115,6 @@ fun ProfileStep(
                     placeholder = "Descrição / Bio"
                 )
 
-                // Redes Sociais
-                RedeSocialSection(
-                    redesSociais = redesSociais,
-                    onAdd = onAddRedeSocial,
-                    onRemove = onRemoveRedeSocial,
-                    onLinkChange = onRedeSocialLinkChange,
-                    onTipoChange = onRedeSocialTipoChange,
-                    tiposDisponiveis = tiposRedesSociais
-                )
             }
         }
     }

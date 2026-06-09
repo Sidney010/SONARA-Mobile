@@ -29,5 +29,10 @@ data class FormData(
     val cidade: String       = "",
     val uf: String           = "",
     val numero: String       = "",
-    val complemento: String  = ""
+    val complemento: String  = "",
+
+    // Redes sociais — formato: "tipoId:link|tipoId:link|..."
+    // Exemplo: "1:instagram.com/user|3:youtube.com/channel"
+    // String vazia = nenhuma rede social cadastrada
+    val redesSociais: String = ""
 )
