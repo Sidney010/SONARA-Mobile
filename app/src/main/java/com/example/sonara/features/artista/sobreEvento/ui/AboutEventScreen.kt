@@ -1,6 +1,7 @@
 package com.example.sonara.features.artista.sobreEvento.ui
 // Helper imports e correções
 
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -36,6 +37,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -60,10 +62,11 @@ fun AboutEventsScreen(
     onNavigateToProfile: () -> Unit = {},
     onNavigateToLogin: () -> Unit = {},
     onBackClick: () -> Unit = {},
-    onApplyClick: (Int) -> Unit = {}
+    onApplyClick: (Int, Int?) -> Unit = { _, _ -> }
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val gradients = DarkGradients
+    val context = LocalContext.current
 
     LaunchedEffect(eventId) {
         viewModel.loadEvento(eventId)
@@ -237,12 +240,27 @@ fun AboutEventsScreen(
 
                         // Botão de Inscrição
                         Button(
-                            onClick = { onApplyClick(evento.id) },
+                            onClick = {
+                                val status = uiState.statusCandidatura?.lowercase()
+                                if (status == "aprovado" || status == "confirmado") {
+                                    Toast.makeText(
+                                        context,
+                                        "Eventos já confirmados não podem ser alterados",
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+                                } else {
+                                    onApplyClick(evento.id, uiState.eventoArtistaId)
+                                }
+                            },
                             modifier = Modifier.fillMaxWidth().height(48.dp),
                             shape = RoundedCornerShape(10.dp),
                             colors = ButtonDefaults.buttonColors(containerColor = AppColors.colorFontLogin)
                         ) {
-                            Text("Inscreva-se", color = Color.White, fontWeight = FontWeight.Bold)
+                            Text(
+                                text = if (uiState.eventoArtistaId != null) "Editar Candidatura" else "Inscreva-se",
+                                color = Color.White,
+                                fontWeight = FontWeight.Bold
+                            )
                         }
                     }
                 }

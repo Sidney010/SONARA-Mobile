@@ -36,6 +36,7 @@ import com.example.sonara.domain.usecase.SaveFormUseCase
 import com.example.sonara.features.cadastrar.event.SignUpEvent
 import com.example.sonara.features.cadastrar.form.AddressFormManager
 import com.example.sonara.features.cadastrar.model.RedeSocialDraft
+import com.example.sonara.features.cadastrar.model.SignUpStep
 import com.example.sonara.features.cadastrar.model.SignUpUIState
 import com.example.sonara.features.cadastrar.validation.CepValidator
 import com.example.sonara.features.cadastrar.validation.GenderValidator
@@ -79,35 +80,96 @@ class SignUpViewModel @Inject constructor(
         restoreForm()
     }
 
+    private fun List<RedeSocialDraft>.serializeToString(): String =
+        filter { it.tipo != null && it.link.isNotBlank() }
+            .joinToString("|") { draft ->
+                "${draft.tipo!!.id}:${draft.link.trim()}"
+            }
+
+    private fun String.deserializeToRedeSocialDrafts(
+        tiposDisponiveis: List<TipoRedeSocial>
+    ): List<RedeSocialDraft> {
+        if (isBlank()) return emptyList()
+        return split("|").mapNotNull { entry ->
+            val colonIndex = entry.indexOf(':')
+            if (colonIndex < 0) return@mapNotNull null
+            val tipoId = entry.substring(0, colonIndex).toIntOrNull() ?: return@mapNotNull null
+            val link   = entry.substring(colonIndex + 1)
+            val tipo   = tiposDisponiveis.find { it.id == tipoId } ?: return@mapNotNull null
+            RedeSocialDraft(tipo = tipo, link = link)
+        }
+    }
     // ── Catálogos ──────────────────────────────────────────────────────
 
     private fun loadCatalogs() {
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(isLoadingCatalogs = true)
-            val nacs = (listarNacionalidadesUseCase() as? AppResult.Success)?.data ?: emptyList()
-            val gens = (listarGenerosMusicaisUseCase() as? AppResult.Success)?.data ?: emptyList()
-            val tiposRS = (listarTiposRedesSociaisUseCase() as? AppResult.Success)?.data ?: emptyList()
+            val nacs    = (listarNacionalidadesUseCase()     as? AppResult.Success)?.data ?: emptyList()
+            val gens    = (listarGenerosMusicaisUseCase()    as? AppResult.Success)?.data ?: emptyList()
+            val tiposRS = (listarTiposRedesSociaisUseCase()  as? AppResult.Success)?.data ?: emptyList()
+
             _uiState.value = _uiState.value.copy(
-                nacionalidades            = nacs,
+                nacionalidades             = nacs,
                 generosMusicaisDisponiveis = gens,
-                tiposRedesSociais         = tiposRS,
-                isLoadingCatalogs         = false
+                tiposRedesSociais          = tiposRS,
+                isLoadingCatalogs          = false
             )
+
+            // Se restoreForm() já rodou mas os tipos ainda não existiam,
+            // tenta restaurar as redes sociais agora que tiposRS chegou.
+            if (_uiState.value.redesSociais.isEmpty() && tiposRS.isNotEmpty()) {
+                getFormUseCase().collect { form ->
+                    if (form.redesSociais.isNotBlank()) {
+                        val redesRestauradas = form.redesSociais
+                            .deserializeToRedeSocialDrafts(tiposRS)
+                        if (redesRestauradas.isNotEmpty()) {
+                            _uiState.value = _uiState.value.copy(redesSociais = redesRestauradas)
+                        }
+                    }
+                    return@collect   // coleta apenas uma vez
+                }
+            }
         }
     }
-
     // ── Restauração do formulário ──────────────────────────────────────
 
     private fun restoreForm() {
         viewModelScope.launch {
             getFormUseCase().collect { form ->
                 if (_uiState.value.nome.value.isBlank() && form.name.isNotBlank()) {
+
+                    // Restaura redes sociais apenas se os catálogos já chegaram
+                    val redesRestauradas = if (_uiState.value.tiposRedesSociais.isNotEmpty()) {
+                        form.redesSociais.deserializeToRedeSocialDrafts(_uiState.value.tiposRedesSociais)
+                    } else {
+                        emptyList() // será restaurado pela segunda coleta após loadCatalogs()
+                    }
+
                     _uiState.value = _uiState.value.copy(
-                        nome          = FieldState(form.name),
-                        email         = FieldState(form.email),
-                        cpf           = FieldState(form.cpf),
+                        nome           = FieldState(form.name),
+                        email          = FieldState(form.email),
+                        cpf            = FieldState(form.cpf),
                         dataNascimento = FieldState(form.dataNasc),
-                        telefone      = FieldState(form.telefone)
+                        telefone       = FieldState(form.telefone),
+                        nomeArtistico  = FieldState(form.nomeArtistico),
+                        descricao      = FieldState(form.descricao),
+                        profileImageUri = form.image?.let { Uri.parse(it) },
+                        userType = _uiState.value.userType.copy(
+                            value = UserType.entries.find { it.apiValue == form.userType }
+                        ),
+                        gender = _uiState.value.gender.copy(
+                            value = Gender.entries.find { it.apiId.toString() == form.generoId }
+                        ),
+                        address = _uiState.value.address.copy(
+                            cep         = form.cep,
+                            rua         = form.rua,
+                            bairro      = form.bairro,
+                            cidade      = form.cidade,
+                            uf          = form.uf,
+                            numero      = form.numero,
+                            complemento = form.complemento
+                        ),
+                        redesSociais = redesRestauradas   // <-- novo campo restaurado
                     )
                 }
             }
@@ -140,6 +202,7 @@ class SignUpViewModel @Inject constructor(
         _uiState.value = _uiState.value.copy(
             dataNascimento = _uiState.value.dataNascimento.copy(value = v)
         )
+        scheduleSaveForm()
     }
 
     /** Armazena apenas dígitos (máx 11); a máscara é aplicada pelo VisualTransformation na UI. */
@@ -148,6 +211,7 @@ class SignUpViewModel @Inject constructor(
         _uiState.value = _uiState.value.copy(
             telefone = _uiState.value.telefone.copy(value = digits)
         )
+        scheduleSaveForm()
     }
 
     fun onEmailChange(v: String) {
@@ -157,6 +221,7 @@ class SignUpViewModel @Inject constructor(
                 error = EmailValidator.validate(v).getErrorOrNull()
             )
         )
+        scheduleSaveForm()
     }
 
     fun onEmailAgainChange(v: String) {
@@ -164,6 +229,7 @@ class SignUpViewModel @Inject constructor(
         _uiState.value = _uiState.value.copy(
             emailAgain = _uiState.value.emailAgain.copy(value = v, error = error)
         )
+        scheduleSaveForm()
     }
 
     fun onPasswordChange(v: String) {
@@ -173,6 +239,7 @@ class SignUpViewModel @Inject constructor(
                 error = PasswordValidator.validate(v).getErrorOrNull()
             )
         )
+        scheduleSaveForm()
     }
 
     fun onPasswordAgainChange(v: String) {
@@ -180,24 +247,28 @@ class SignUpViewModel @Inject constructor(
         _uiState.value = _uiState.value.copy(
             passwordAgain = _uiState.value.passwordAgain.copy(value = v, error = error)
         )
+        scheduleSaveForm()
     }
 
     fun onUserTypeChange(type: UserType) {
         _uiState.value = _uiState.value.copy(
             userType = _uiState.value.userType.copy(value = type, error = null)
         )
+        scheduleSaveForm()
     }
 
     fun onGenderChange(gender: Gender) {
         _uiState.value = _uiState.value.copy(
             gender = _uiState.value.gender.copy(value = gender, error = null)
         )
+        scheduleSaveForm()
     }
 
     fun onNacionalidadeChange(nac: Nacionalidade) {
         _uiState.value = _uiState.value.copy(
             nacionalidade = _uiState.value.nacionalidade.copy(value = nac)
         )
+        scheduleSaveForm()
     }
 
     fun onGeneroMusicalToggle(id: Int) {
@@ -206,18 +277,21 @@ class SignUpViewModel @Inject constructor(
             generosMusicaisSelected = if (id in current) current - id else current + id,
             generosMusicaisError    = null
         )
+        scheduleSaveForm()
     }
 
     fun onNomeArtisticoChange(v: String) {
         _uiState.value = _uiState.value.copy(
             nomeArtistico = _uiState.value.nomeArtistico.copy(value = v)
         )
+        scheduleSaveForm()
     }
 
     fun onDescricaoChange(v: String) {
         _uiState.value = _uiState.value.copy(
             descricao = _uiState.value.descricao.copy(value = v)
         )
+        scheduleSaveForm()
     }
 
     fun onAddRedeSocial() {
@@ -225,6 +299,7 @@ class SignUpViewModel @Inject constructor(
         _uiState.value = _uiState.value.copy(
             redesSociais = current + RedeSocialDraft()
         )
+        scheduleSaveForm()
     }
 
     fun onRemoveRedeSocial(index: Int) {
@@ -232,6 +307,7 @@ class SignUpViewModel @Inject constructor(
         if (index in current.indices) {
             current.removeAt(index)
             _uiState.value = _uiState.value.copy(redesSociais = current)
+            scheduleSaveForm()
         }
     }
 
@@ -240,6 +316,7 @@ class SignUpViewModel @Inject constructor(
         if (index in current.indices) {
             current[index] = current[index].copy(link = link)
             _uiState.value = _uiState.value.copy(redesSociais = current)
+            scheduleSaveForm()
         }
     }
 
@@ -248,6 +325,7 @@ class SignUpViewModel @Inject constructor(
         if (index in current.indices) {
             current[index] = current[index].copy(tipo = tipo)
             _uiState.value = _uiState.value.copy(redesSociais = current)
+            scheduleSaveForm()
         }
     }
 
@@ -256,6 +334,7 @@ class SignUpViewModel @Inject constructor(
     fun onCepChange(v: String) {
         val newAddr = addressManager.updateCep(_uiState.value.address, v)
         _uiState.value = _uiState.value.copy(address = newAddr)
+        scheduleSaveForm()
         if (newAddr.cep.length == 8) {
             cepJob?.cancel()
             cepJob = viewModelScope.launch {
@@ -269,36 +348,42 @@ class SignUpViewModel @Inject constructor(
         _uiState.value = _uiState.value.copy(
             address = addressManager.updateRua(_uiState.value.address, v)
         )
+        scheduleSaveForm()
     }
 
     fun onBairroChange(v: String) {
         _uiState.value = _uiState.value.copy(
             address = addressManager.updateBairro(_uiState.value.address, v)
         )
+        scheduleSaveForm()
     }
 
     fun onCidadeChange(v: String) {
         _uiState.value = _uiState.value.copy(
             address = addressManager.updateCidade(_uiState.value.address, v)
         )
+        scheduleSaveForm()
     }
 
     fun onUfChange(v: String) {
         _uiState.value = _uiState.value.copy(
             address = addressManager.updateUf(_uiState.value.address, v)
         )
+        scheduleSaveForm()
     }
 
     fun onNumeroChange(v: String) {
         _uiState.value = _uiState.value.copy(
             address = _uiState.value.address.copy(numero = v)
         )
+        scheduleSaveForm()
     }
 
     fun onComplementoChange(v: String) {
         _uiState.value = _uiState.value.copy(
             address = _uiState.value.address.copy(complemento = v)
         )
+        scheduleSaveForm()
     }
 
     private suspend fun buscarCep(cep: String) {
@@ -327,11 +412,14 @@ class SignUpViewModel @Inject constructor(
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(isImageLoading = true)
             when (val r = processImageUseCase(context, uri)) {
-                is AppResult.Success -> _uiState.value = _uiState.value.copy(
-                    profileImageUri   = r.data,
-                    profileImageError = null,
-                    isImageLoading    = false
-                )
+                is AppResult.Success -> {
+                    _uiState.value = _uiState.value.copy(
+                        profileImageUri   = r.data,
+                        profileImageError = null,
+                        isImageLoading    = false
+                    )
+                    scheduleSaveForm()
+                }
                 is AppResult.Error   -> _uiState.value = _uiState.value.copy(
                     profileImageError = "Erro ao processar imagem",
                     isImageLoading    = false
@@ -340,45 +428,104 @@ class SignUpViewModel @Inject constructor(
         }
     }
 
-    // ── Cadastro ────────────────────────────────────────────────────────
+    // ── Navegação entre etapas ──────────────────────────────────────────
 
-    fun onRegisterClick() {
-        val state     = _uiState.value
+    fun nextStep() {
+        val state = _uiState.value
+        when (state.currentStep) {
+            SignUpStep.PERSONAL_DATA -> {
+                if (validatePersonalData()) {
+                    _uiState.value = state.copy(currentStep = SignUpStep.PROFILE_DATA)
+                }
+            }
+            SignUpStep.PROFILE_DATA -> {
+                if (validateProfileData()) {
+                    _uiState.value = state.copy(currentStep = SignUpStep.ADDRESS)
+                }
+            }
+            SignUpStep.ADDRESS -> {
+                onRegisterClick()
+            }
+        }
+    }
+
+    fun previousStep() {
+        val state = _uiState.value
+        val prevStep = when (state.currentStep) {
+            SignUpStep.PERSONAL_DATA -> SignUpStep.PERSONAL_DATA
+            SignUpStep.PROFILE_DATA -> SignUpStep.PERSONAL_DATA
+            SignUpStep.ADDRESS -> SignUpStep.PROFILE_DATA
+        }
+        _uiState.value = state.copy(currentStep = prevStep)
+    }
+
+    private fun validatePersonalData(): Boolean {
+        val state = _uiState.value
+        val nomeError = NomeValidator.validate(state.nome.value).getErrorOrNull()
+        val cpfError = CpfValidator.validate(state.cpf.value).getErrorOrNull()
+        val userTypeError = UserTypeValidator.validate(state.userType.value).getErrorOrNull()
+        val genderError = GenderValidator.validate(state.gender.value).getErrorOrNull()
+
+        _uiState.value = state.copy(
+            nome = state.nome.copy(error = nomeError),
+            cpf = state.cpf.copy(error = cpfError),
+            userType = state.userType.copy(error = userTypeError),
+            gender = state.gender.copy(error = genderError)
+        )
+
+        return listOf(nomeError, cpfError, userTypeError, genderError).all { it == null }
+    }
+
+    private fun validateProfileData(): Boolean {
+        val state = _uiState.value
         val isArtista = state.userType.value == UserType.ARTISTA
 
-        // ── Validações
-        val nomeError          = NomeValidator.validate(state.nome.value).getErrorOrNull()
-        val emailError         = EmailValidator.validate(state.email.value).getErrorOrNull()
-        val emailAgainError    = if (state.emailAgain.value != state.email.value) "Emails não coincidem" else null
-        val passwordError      = PasswordValidator.validate(state.password.value).getErrorOrNull()
+        val emailError = EmailValidator.validate(state.email.value).getErrorOrNull()
+        val emailAgainError = if (state.emailAgain.value != state.email.value) "Emails não coincidem" else null
+        val passwordError = PasswordValidator.validate(state.password.value).getErrorOrNull()
         val passwordAgainError = if (state.passwordAgain.value != state.password.value) "Senhas não coincidem" else null
-        val cpfError           = CpfValidator.validate(state.cpf.value).getErrorOrNull()
-        val userTypeError      = UserTypeValidator.validate(state.userType.value).getErrorOrNull()
-        val genderError        = GenderValidator.validate(state.gender.value).getErrorOrNull()
-        val cepError           = CepValidator.validate(state.address.cep)
         val generosMusicaisError = if (isArtista && state.generosMusicaisSelected.isEmpty())
             "Selecione pelo menos um gênero musical" else null
 
         _uiState.value = state.copy(
-            nome              = state.nome.copy(error = nomeError),
-            email             = state.email.copy(error = emailError),
-            emailAgain        = state.emailAgain.copy(error = emailAgainError),
-            password          = state.password.copy(error = passwordError),
-            passwordAgain     = state.passwordAgain.copy(error = passwordAgainError),
-            cpf               = state.cpf.copy(error = cpfError),
-            userType          = state.userType.copy(error = userTypeError),
-            gender            = state.gender.copy(error = genderError),
-            address           = state.address.copy(cepError = cepError),
+            email = state.email.copy(error = emailError),
+            emailAgain = state.emailAgain.copy(error = emailAgainError),
+            password = state.password.copy(error = passwordError),
+            passwordAgain = state.passwordAgain.copy(error = passwordAgainError),
             generosMusicaisError = generosMusicaisError
         )
 
-        val hasErrors = listOf(
-            nomeError, emailError, emailAgainError, passwordError,
-            passwordAgainError, cpfError, userTypeError, genderError,
-            cepError, generosMusicaisError
-        ).any { it != null }
+        return listOf(emailError, emailAgainError, passwordError, passwordAgainError, generosMusicaisError).all { it == null }
+    }
 
-        if (hasErrors) return
+    private fun validateAddress(): Boolean {
+        val state = _uiState.value
+        val cepError = CepValidator.validate(state.address.cep)
+        val ruaError = NomeValidator.validate(state.address.rua).getErrorOrNull()
+        val bairroError = NomeValidator.validate(state.address.bairro).getErrorOrNull()
+        val cidadeError = NomeValidator.validate(state.address.cidade).getErrorOrNull()
+        val ufError = if (state.address.uf.isBlank()) "Campo obrigatório" else null
+
+        _uiState.value = state.copy(
+            address = state.address.copy(
+                cepError = cepError,
+                ruaError = ruaError,
+                bairroError = bairroError,
+                cidadeError = cidadeError,
+                ufError = ufError
+            )
+        )
+
+        return listOf(cepError, ruaError, bairroError, cidadeError, ufError).all { it == null }
+    }
+
+    // ── Cadastro ────────────────────────────────────────────────────────
+
+    fun onRegisterClick() {
+        if (!validateAddress()) return
+
+        val state     = _uiState.value
+        val isArtista = state.userType.value == UserType.ARTISTA
 
         // ── Monta domínio
         val usuario = Usuario(
@@ -428,6 +575,7 @@ class SignUpViewModel @Inject constructor(
 
                     clearFormUseCase()
                     _uiState.value = _uiState.value.copy(isLoading = false)
+                    _event.emit(SignUpEvent.ShowSuccess("Cadastro realizado com sucesso!"))
                     _event.emit(SignUpEvent.NavigateToLogin)
                 }
                 is AppResult.Error   -> {
@@ -452,25 +600,27 @@ class SignUpViewModel @Inject constructor(
             val s = _uiState.value
             saveFormUseCase(
                 FormData(
-                    name          = s.nome.value,
-                    email         = s.email.value,
-                    cpf           = s.cpf.value,
-                    password      = s.password.value,
-                    dataNasc      = s.dataNascimento.value,
-                    telefone      = s.telefone.value,
-                    userType      = s.userType.value?.apiValue ?: "",
-                    nomeArtistico = s.nomeArtistico.value,
-                    descricao     = s.descricao.value,
+                    name            = s.nome.value,
+                    email           = s.email.value,
+                    cpf             = s.cpf.value,
+                    password        = s.password.value,
+                    image           = s.profileImageUri?.toString(),
+                    dataNasc        = s.dataNascimento.value,
+                    telefone        = s.telefone.value,
+                    userType        = s.userType.value?.apiValue ?: "",
+                    nomeArtistico   = s.nomeArtistico.value,
+                    descricao       = s.descricao.value,
                     nacionalidadeId = s.nacionalidade.value?.id?.toString() ?: "",
-                    generoId      = s.gender.value?.apiId?.toString() ?: "",
+                    generoId        = s.gender.value?.apiId?.toString() ?: "",
                     generosMusicais = s.generosMusicaisSelected.joinToString(","),
-                    cep           = s.address.cep,
-                    rua           = s.address.rua,
-                    bairro        = s.address.bairro,
-                    cidade        = s.address.cidade,
-                    uf            = s.address.uf,
-                    numero        = s.address.numero,
-                    complemento   = s.address.complemento
+                    cep             = s.address.cep,
+                    rua             = s.address.rua,
+                    bairro          = s.address.bairro,
+                    cidade          = s.address.cidade,
+                    uf              = s.address.uf,
+                    numero          = s.address.numero,
+                    complemento     = s.address.complemento,
+                    redesSociais    = s.redesSociais.serializeToString()   // <-- novo campo salvo
                 )
             )
         }

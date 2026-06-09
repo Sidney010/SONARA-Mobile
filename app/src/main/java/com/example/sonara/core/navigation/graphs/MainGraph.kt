@@ -44,11 +44,15 @@ fun NavGraphBuilder.mainGraph(
         val navBackStackEntry   by bottomNavController.currentBackStackEntryAsState()
         val currentRoute        = navBackStackEntry?.destination?.route
         val viewModel: HomeViewModel = hiltViewModel()
+        val uiState by viewModel.uiState.collectAsState()
 
         Scaffold(
             bottomBar = {
                 BottomNavigationBar(
-                    state     = BottomNavigationState(selectedRoute = currentRoute ?: ""),
+                    state     = BottomNavigationState(
+                        selectedRoute = currentRoute ?: "",
+                        userRole = uiState.userRole
+                    ),
                     onNavigate = { route ->
                         bottomNavController.navigate(route) {
                             launchSingleTop = true
@@ -112,8 +116,9 @@ fun NavGraphBuilder.mainGraph(
                         onNavigateToLogin = { rootNavController.navigate(Routes.Login.route) },
                         eventId = eventId,
                         onBackClick = { bottomNavController.popBackStack() },
-                        onApplyClick = {
-                            bottomNavController.navigate("your_candidacy/$eventId")
+                        onApplyClick = { id, eaId ->
+                            val route = if (eaId != null) "your_candidacy/$id?eaId=$eaId" else "your_candidacy/$id"
+                            bottomNavController.navigate(route)
                         }
                     )
                 }
@@ -152,14 +157,13 @@ fun NavGraphBuilder.mainGraph(
 
                 composable(Routes.Search.route) {
 //                     SearchScreen()
-//                   SearchArtistHouseshowScreen()
-//                    CreateEventOrganizerScreen ()
-//                    MyEventsOrganizerScreen ()
-//                    SelectArtistScreen ()
-//                    OrganizerProfileScreen()
-//                    SeeArtistsHouseShowScreen()
-//                    SearchScreen()
-                    YourCandidacyScreen()
+//                    ApplyScreen()
+                    AboutSelectionEventScreen(
+                        onNavigateToProfile = {rootNavController.navigate(Routes.Profile.route) },
+                        onNavigateToLogin = {rootNavController.navigate(Routes.Login.route) },
+                        eventId = 0,
+                        onBackClick = { bottomNavController.popBackStack() }
+                    )
                 }
 
                 composable(Routes.Events.route) {

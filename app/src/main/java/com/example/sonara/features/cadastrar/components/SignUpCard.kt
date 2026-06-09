@@ -1,82 +1,75 @@
 package com.example.sonara.features.cadastrar.components
 
 import android.net.Uri
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.expandVertically
-import androidx.compose.animation.shrinkVertically
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.animation.togetherWith
+import androidx.compose.animation.SizeTransform
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.example.sonara.core.ui.components.AppButton
 import com.example.sonara.core.ui.components.AppCard
 import com.example.sonara.core.ui.components.AppCardHeader
-import com.example.sonara.core.ui.components.AppPasswordField
-import com.example.sonara.core.ui.components.AppTextField
-import com.example.sonara.core.ui.mask.CpfVisualTransformation
-import com.example.sonara.core.ui.mask.TelefoneVisualTransformation
 import com.example.sonara.domain.model.Gender
 import com.example.sonara.domain.model.GeneroMusical
 import com.example.sonara.domain.model.Nacionalidade
 import com.example.sonara.domain.model.TipoRedeSocial
 import com.example.sonara.domain.model.UserType
-import com.example.sonara.features.cadastrar.components.signupcard.DatePickerField
-import com.example.sonara.features.cadastrar.components.signupcard.GenderComboBox
-import com.example.sonara.features.cadastrar.components.signupcard.GeneroMusicalMultiSelect
-import com.example.sonara.features.cadastrar.components.signupcard.NacionalidadeComboBox
-import com.example.sonara.features.cadastrar.components.signupcard.RedeSocialSection
-import com.example.sonara.features.cadastrar.components.signupcard.UserProfileImagePicker
-import com.example.sonara.features.cadastrar.components.signupcard.UserTypeSingleSelector
+import com.example.sonara.features.cadastrar.components.steps.AddressStep
+import com.example.sonara.features.cadastrar.components.steps.PersonalDataStep
+import com.example.sonara.features.cadastrar.components.steps.ProfileStep
 import com.example.sonara.features.cadastrar.model.RedeSocialDraft
+import com.example.sonara.features.cadastrar.model.SignUpStep
+import com.example.sonara.features.inicial.components.EnterButton
 
+@OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun SignUpCard(
+    currentStep: SignUpStep,
     // Dados pessoais
     nome: String, nomeError: String?, onNomeChange: (String) -> Unit,
     cpf: String, cpfError: String?, onCpfChange: (String) -> Unit,
     dataNascimento: String, dataNascimentoError: String?, onDataNascimentoChange: (String) -> Unit,
     telefone: String, onTelefoneChange: (String) -> Unit,
 
-    // Tipo de usuário (único)
+    // Tipo de usuário
     userType: UserType?, userTypeError: String?, onUserTypeChange: (UserType) -> Unit,
 
-    // Gênero da pessoa
+    // Gênero
     gender: Gender?, genderError: String?, onGenderChange: (Gender) -> Unit,
 
     // Nacionalidade
     nacionalidade: Nacionalidade?, nacionalidadeError: String?,
     nacionalidades: List<Nacionalidade>, onNacionalidadeChange: (Nacionalidade) -> Unit,
 
-    // Gêneros musicais (só exibidos para Artista)
-    generosMusicaisDisponiveis: List<GeneroMusical>,
-    generosMusicaisSelected: Set<Int>, generosMusicaisError: String?,
-    onGeneroMusicalToggle: (Int) -> Unit,
-
-    // Email e senha
+    // Perfil / Artístico
     email: String, emailAgain: String, emailError: String?, emailAgainError: String?,
     onEmailChange: (String) -> Unit, onEmailAgainChange: (String) -> Unit,
     password: String, passwordAgain: String, passwordError: String?, passwordAgainError: String?,
     onPasswordChange: (String) -> Unit, onPasswordAgainChange: (String) -> Unit,
-
-    // Dados artísticos (só exibidos para Artista)
+    generosMusicaisDisponiveis: List<GeneroMusical>,
+    generosMusicaisSelected: Set<Int>, generosMusicaisError: String?,
+    onGeneroMusicalToggle: (Int) -> Unit,
     nomeArtistico: String, onNomeArtisticoChange: (String) -> Unit,
     descricao: String, onDescricaoChange: (String) -> Unit,
-
-    // Redes Sociais
     redesSociais: List<RedeSocialDraft>,
     onAddRedeSocial: () -> Unit,
     onRemoveRedeSocial: (Int) -> Unit,
@@ -88,215 +81,141 @@ fun SignUpCard(
     profileImageUri: Uri?, profileImageError: String?, onImageClick: () -> Unit,
 
     // Endereço
-    cep: String, onCepChange: (String) -> Unit,
-    rua: String, onRuaChange: (String) -> Unit,
-    bairro: String, onBairroChange: (String) -> Unit,
-    cidade: String, onCidadeChange: (String) -> Unit,
-    uf: String, onUfChange: (String) -> Unit,
+    cep: String, cepError: String?, onCepChange: (String) -> Unit,
+    rua: String, ruaError: String?, onRuaChange: (String) -> Unit,
+    bairro: String, bairroError: String?, onBairroChange: (String) -> Unit,
+    cidade: String, cidadeError: String?, onCidadeChange: (String) -> Unit,
+    uf: String, ufError: String?, onUfChange: (String) -> Unit,
     numero: String, onNumeroChange: (String) -> Unit,
     complemento: String, onComplementoChange: (String) -> Unit,
     isLoadingCep: Boolean = false,
 
-    // Ação
+    // Controle
     isLoading: Boolean = false,
-    onRegisterClick: () -> Unit,
+    onNextClick: () -> Unit,
+    onBackClick: () -> Unit,
 ) {
-    val isArtista = userType == UserType.ARTISTA
-
     AppCard(modifier = Modifier.fillMaxWidth()) {
         AppCardHeader("Cadastro")
 
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .verticalScroll(rememberScrollState())
-                .imePadding()
-                .padding(0.dp, 0.dp, 0.dp, 8.dp),
-            verticalArrangement   = Arrangement.spacedBy(20.dp),
-            horizontalAlignment   = Alignment.CenterHorizontally
+                .padding(bottom = 8.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            // Foto de perfil
-            UserProfileImagePicker(
-                imageUri = profileImageUri,
-                error    = profileImageError,
-                onClick  = onImageClick
-            )
+            SignUpProgressIndicator(currentStep = currentStep)
+            
+            Spacer(modifier = Modifier.height(24.dp))
 
-            // Nome
-            AppTextField(
-                value = nome, onValueChange = onNomeChange,
-                placeholder = "Nome completo *",
-                isError = nomeError != null, errorMessage = nomeError
-            )
-
-            // CPF
-            AppTextField(
-                value = cpf,
-                onValueChange = { input ->
-                    val filtered = input.filter { it.isDigit() }
-                    if (filtered.length <= 11) onCpfChange(filtered)
-                },
-                placeholder = "CPF *",
-                visualTransformation = CpfVisualTransformation(),
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                isError = cpfError != null, errorMessage = cpfError
-            )
-
-            // Data de nascimento
-            DatePickerField(
-                value = dataNascimento,
-                onDateSelected = onDataNascimentoChange,
-                isError = dataNascimentoError != null,
-                errorMessage = dataNascimentoError
-            )
-
-            // Telefone com máscara (XX) XXXXX-XXXX
-            AppTextField(
-                value = telefone,
-                onValueChange = { input ->
-                    val digits = input.filter { it.isDigit() }
-                    if (digits.length <= 11) onTelefoneChange(digits)
-                },
-                placeholder = "Telefone",
-                visualTransformation = TelefoneVisualTransformation(),
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone)
-            )
-
-            // Tipo de usuário
-            UserTypeSingleSelector(
-                selected = userType,
-                onSelectedChange = onUserTypeChange,
-                isError = userTypeError != null,
-                errorMessage = userTypeError
-            )
-
-            // Gênero da pessoa
-            GenderComboBox(
-                selected = gender, onSelectedChange = onGenderChange,
-                isError = genderError != null, errorMessage = genderError
-            )
-
-            // Nacionalidade
-            NacionalidadeComboBox(
-                selected = nacionalidade,
-                opcoes   = nacionalidades,
-                onSelectedChange = onNacionalidadeChange,
-                isError = nacionalidadeError != null,
-                errorMessage = nacionalidadeError
-            )
-
-            // ── Campos exclusivos do ARTISTA ──────────────────────────
-            AnimatedVisibility(
-                visible = isArtista,
-                enter   = expandVertically(),
-                exit    = shrinkVertically()
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1f, fill = false)
+                    .verticalScroll(rememberScrollState())
+                    .imePadding()
+                    .padding(horizontal = 4.dp),
+                verticalArrangement = Arrangement.spacedBy(20.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Column(
-                    verticalArrangement = Arrangement.spacedBy(20.dp)
-                ) {
-                    // Gêneros musicais
-                    GeneroMusicalMultiSelect(
-                        generos  = generosMusicaisDisponiveis,
-                        selected = generosMusicaisSelected,
-                        onToggle = onGeneroMusicalToggle,
-                        isError  = generosMusicaisError != null,
-                        errorMessage = generosMusicaisError
-                    )
-
-                    // Nome artístico
-                    AppTextField(
-                        value = nomeArtistico,
-                        onValueChange = onNomeArtisticoChange,
-                        placeholder = "Nome artístico"
-                    )
-
-                    // Descrição / Bio
-                    AppTextField(
-                        value = descricao,
-                        onValueChange = onDescricaoChange,
-                        placeholder = "Descrição / Bio"
-                    )
+                AnimatedContent(
+                    targetState = currentStep,
+                    transitionSpec = {
+                        if (targetState.ordinal > initialState.ordinal) {
+                            (slideInHorizontally { width -> width } + fadeIn())
+                                .togetherWith(slideOutHorizontally { width -> -width } + fadeOut())
+                        } else {
+                            (slideInHorizontally { width -> -width } + fadeIn())
+                                .togetherWith(slideOutHorizontally { width -> width } + fadeOut())
+                        }.using(
+                            SizeTransform(clip = false)
+                        )
+                    },
+                    label = "StepTransition"
+                ) { step ->
+                    when (step) {
+                        SignUpStep.PERSONAL_DATA -> {
+                            PersonalDataStep(
+                                nome = nome, nomeError = nomeError, onNomeChange = onNomeChange,
+                                cpf = cpf, cpfError = cpfError, onCpfChange = onCpfChange,
+                                dataNascimento = dataNascimento, dataNascimentoError = dataNascimentoError, onDataNascimentoChange = onDataNascimentoChange,
+                                telefone = telefone, onTelefoneChange = onTelefoneChange,
+                                userType = userType, userTypeError = userTypeError, onUserTypeChange = onUserTypeChange,
+                                gender = gender, genderError = genderError, onGenderChange = onGenderChange,
+                                nacionalidade = nacionalidade, nacionalidadeError = nacionalidadeError,
+                                nacionalidades = nacionalidades, onNacionalidadeChange = onNacionalidadeChange,
+                                profileImageUri = profileImageUri, profileImageError = profileImageError, onImageClick = onImageClick
+                            )
+                        }
+                        SignUpStep.PROFILE_DATA -> {
+                            ProfileStep(
+                                email = email, emailAgain = emailAgain, emailError = emailError, emailAgainError = emailAgainError,
+                                onEmailChange = onEmailChange, onEmailAgainChange = onEmailAgainChange,
+                                password = password, passwordAgain = passwordAgain, passwordError = passwordError, passwordAgainError = passwordAgainError,
+                                onPasswordChange = onPasswordChange, onPasswordAgainChange = onPasswordAgainChange,
+                                userType = userType,
+                                generosMusicaisDisponiveis = generosMusicaisDisponiveis,
+                                generosMusicaisSelected = generosMusicaisSelected, generosMusicaisError = generosMusicaisError,
+                                onGeneroMusicalToggle = onGeneroMusicalToggle,
+                                nomeArtistico = nomeArtistico, onNomeArtisticoChange = onNomeArtisticoChange,
+                                descricao = descricao, onDescricaoChange = onDescricaoChange,
+                                redesSociais = redesSociais, onAddRedeSocial = onAddRedeSocial,
+                                onRemoveRedeSocial = onRemoveRedeSocial, onRedeSocialLinkChange = onRedeSocialLinkChange,
+                                onRedeSocialTipoChange = onRedeSocialTipoChange, tiposRedesSociais = tiposRedesSociais
+                            )
+                        }
+                        SignUpStep.ADDRESS -> {
+                            AddressStep(
+                                cep = cep, cepError = cepError, onCepChange = onCepChange,
+                                rua = rua, ruaError = ruaError, onRuaChange = onRuaChange,
+                                bairro = bairro, bairroError = bairroError, onBairroChange = onBairroChange,
+                                cidade = cidade, cidadeError = cidadeError, onCidadeChange = onCidadeChange,
+                                uf = uf, ufError = ufError, onUfChange = onUfChange,
+                                numero = numero, onNumeroChange = onNumeroChange,
+                                complemento = complemento, onComplementoChange = onComplementoChange,
+                                isLoadingCep = isLoadingCep
+                            )
+                        }
+                    }
                 }
             }
-            // ─────────────────────────────────────────────────────────
 
-            // Redes Sociais
-            RedeSocialSection(
-                redesSociais = redesSociais,
-                onAdd = onAddRedeSocial,
-                onRemove = onRemoveRedeSocial,
-                onLinkChange = onRedeSocialLinkChange,
-                onTipoChange = onRedeSocialTipoChange,
-                tiposDisponiveis = tiposRedesSociais
-            )
+            Spacer(modifier = Modifier.height(30.dp))
 
-            // Email
-            AppTextField(
-                value = email, onValueChange = onEmailChange,
-                placeholder = "Email *",
-                isError = emailError != null, errorMessage = emailError,
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email)
-            )
-            AppTextField(
-                value = emailAgain, onValueChange = onEmailAgainChange,
-                placeholder = "Confirmar email *",
-                isError = emailAgainError != null, errorMessage = emailAgainError,
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email)
-            )
-
-            // Senha
-            AppPasswordField(
-                value = password, onValueChange = onPasswordChange,
-                isError = passwordError != null, errorMessage = passwordError
-            )
-            AppPasswordField(
-                value = passwordAgain, onValueChange = onPasswordAgainChange,
-                placeholder = "Confirmar senha *",
-                isError = passwordAgainError != null, errorMessage = passwordAgainError
-            )
-
-            // Endereço
-            Text(
-                "Endereço",
-                style = MaterialTheme.typography.labelLarge,
-                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
-            )
-
-            AppTextField(
-                value = cep, onValueChange = onCepChange,
-                placeholder = "CEP *",
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                trailingContent = if (isLoadingCep) {
-                    { CircularProgressIndicator(modifier = Modifier.size(20.dp), strokeWidth = 2.dp) }
-                } else null
-            )
-            AppTextField(value = rua,    onValueChange = onRuaChange,    placeholder = "Rua")
-            AppTextField(value = bairro, onValueChange = onBairroChange, placeholder = "Bairro")
-
+            // Botões de Navegação
             Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp),
+                horizontalArrangement = Arrangement.spacedBy(16.dp)
             ) {
-                AppTextField(value = cidade, onValueChange = onCidadeChange, placeholder = "Cidade",    modifier = Modifier.weight(2f))
-                AppTextField(value = uf,     onValueChange = onUfChange,     placeholder = "UF",        modifier = Modifier.weight(1f))
-            }
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                AppTextField(value = numero,      onValueChange = onNumeroChange,      placeholder = "Número",      modifier = Modifier.weight(1f), keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number))
-                AppTextField(value = complemento, onValueChange = onComplementoChange, placeholder = "Complemento", modifier = Modifier.weight(2f))
-            }
+                if (currentStep != SignUpStep.PERSONAL_DATA) {
+                    val buttonText = "Voltar"
+                    AppButton(
+                        text = buttonText,
+                        modifier = Modifier.weight(1f),
+                        onClick = onBackClick
+                    )
+                }
 
-            // Botão de cadastro
-            if (isLoading) {
-                CircularProgressIndicator()
-            } else {
-                AppButton(
-                    modifier = Modifier.fillMaxWidth(0.7f),
-                    text     = "Cadastrar-se",
-                    onClick  = onRegisterClick
-                )
+                if (isLoading) {
+                    CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterVertically))
+                } else {
+                    val buttonText = if (currentStep == SignUpStep.ADDRESS) "Cadastrar-se" else "Próximo"
+                    if (buttonText == "Cadastrar-se") {
+                        AppButton(
+                            modifier = Modifier.weight(1.5f),
+                            text = buttonText,
+                            onClick = onNextClick
+                        )
+                    } else {
+                        AppButton(
+                            modifier = Modifier.weight(1f),
+                            text = buttonText,
+                            onClick = onNextClick
+                        )
+                    }
+                }
             }
         }
     }

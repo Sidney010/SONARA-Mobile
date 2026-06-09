@@ -19,12 +19,22 @@ fun BottomNavigationBar(
     onNavigate: (String) -> Unit
 ) {
 
-    val items = listOf(
-        BottomNavItemData.Home,
-        BottomNavItemData.Search,
-        BottomNavItemData.Events,
-        BottomNavItemData.Plans
-    )
+    val items = when (state.userRole.lowercase()) {
+        "artista" -> listOf(
+            BottomNavItemData.Home,
+            BottomNavItemData.Events,
+            BottomNavItemData.Plans
+        )
+        "organizador" -> listOf(
+            BottomNavItemData.Home,
+            BottomNavItemData.Search,
+            BottomNavItemData.Events,
+            BottomNavItemData.Plans
+        )
+        else -> listOf(
+            BottomNavItemData.Home
+        )
+    }
 
     Row(
         modifier = modifier

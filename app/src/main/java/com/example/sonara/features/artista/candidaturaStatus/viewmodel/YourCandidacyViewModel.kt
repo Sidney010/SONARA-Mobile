@@ -12,7 +12,9 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -21,9 +23,12 @@ data class YourCandidacyUiState(
     val evento: Evento? = null,
     val eventoArtista: EventoArtista? = null,
     val error: String? = null,
+    val successMessage: String? = null,
     val isSuccess: Boolean = false,
-    val userName: String = "",
-    val userRole: String = ""
+    val userName: String = "Anônimo",
+    val userRole: String = "Artista",
+    val userPhoto: String? = null,
+    val isLoggedIn: Boolean = false
 )
 
 @HiltViewModel
@@ -36,27 +41,47 @@ class YourCandidacyViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(YourCandidacyUiState())
     val uiState: StateFlow<YourCandidacyUiState> = _uiState.asStateFlow()
 
+    init {
+        observeSession()
+    }
+
+    private fun observeSession() {
+        viewModelScope.launch {
+            combine(
+                tokenManager.userName,
+                tokenManager.userType,
+                tokenManager.token,
+                tokenManager.userPhoto
+            ) { name, type, token, photo ->
+                _uiState.update {
+                    it.copy(
+                        userName = name ?: "Anônimo",
+                        userRole = type ?: "Artista",
+                        userPhoto = photo,
+                        isLoggedIn = !token.isNullOrBlank()
+                    )
+                }
+            }.collect {}
+        }
+    }
+
     fun loadData(eventoId: Int, eventoArtistaId: Int? = null) {
         viewModelScope.launch {
-            _uiState.value = _uiState.value.copy(isLoading = true)
-            
-            val name = tokenManager.userName.first() ?: ""
-            val role = tokenManager.userType.first() ?: ""
-            _uiState.value = _uiState.value.copy(userName = name, userRole = role)
+            _uiState.update { it.copy(isLoading = true, error = null, isSuccess = false, successMessage = null) }
 
             val eventoResult = eventoRepository.buscarEventoPorId(eventoId)
             if (eventoResult is AppResult.Success) {
-                _uiState.value = _uiState.value.copy(evento = eventoResult.data)
+                _uiState.update { it.copy(evento = eventoResult.data) }
             }
 
-            if (eventoArtistaId != null) {
+            if (eventoArtistaId != null && eventoArtistaId != 0) {
                 val eaResult = eventoArtistaRepository.buscarPorId(eventoArtistaId)
                 if (eaResult is AppResult.Success) {
-                    _uiState.value = _uiState.value.copy(eventoArtista = eaResult.data)
+                    _uiState.update { it.copy(eventoArtista = eaResult.data) }
                 }
             }
             
-            _uiState.value = _uiState.value.copy(isLoading = false)
+            _uiState.update { it.copy(isLoading = false) }
         }
     }
 
@@ -64,13 +89,20 @@ class YourCandidacyViewModel @Inject constructor(
         eventoId: Int,
         cacheEsperado: Double,
         sobreArtista: String,
-        motivoInscricao: String? = null
+        motivoInscricao: String
     ) {
         viewModelScope.launch {
-            val artistaId = tokenManager.artistId.first()?.toIntOrNull() ?: return@launch
+            _uiState.update { it.copy(isLoading = true, error = null) }
+            val artistaIdStr = tokenManager.artistId.first()
+            val artistaId = artistaIdStr?.toIntOrNull()
+            
+            if (artistaId == null) {
+                _uiState.update { it.copy(isLoading = false, error = "ID do artista não encontrado. Faça login novamente.") }
+                return@launch
+            }
             
             val currentEA = _uiState.value.eventoArtista
-            val result = if (currentEA != null) {
+            val result = if (currentEA != null && currentEA.idEventoArtista != 0) {
                 // Atualizar
                 eventoArtistaRepository.atualizar(
                     currentEA.idEventoArtista,
@@ -88,9 +120,9 @@ class YourCandidacyViewModel @Inject constructor(
                         artistaId = artistaId,
                         eventoId = eventoId,
                         cacheEsperado = cacheEsperado,
-                        cacheOfertado = 0.0,
-                        cacheFinal = 0.0,
-                        contraProposta = 0.0,
+                        cacheOfertado = null,
+                        cacheFinal = null,
+                        contraProposta = null,
                         sobreArtista = sobreArtista,
                         motivoInscricao = motivoInscricao
                     )
@@ -99,10 +131,17 @@ class YourCandidacyViewModel @Inject constructor(
 
             when (result) {
                 is AppResult.Success -> {
-                    _uiState.value = _uiState.value.copy(isSuccess = true, eventoArtista = result.data)
+                    _uiState.update { 
+                        it.copy(
+                            isLoading = false,
+                            isSuccess = true, 
+                            eventoArtista = result.data,
+                            successMessage = if (currentEA != null && currentEA.idEventoArtista != 0) "Candidatura atualizada com sucesso!" else "Candidatura enviada com sucesso!"
+                        ) 
+                    }
                 }
                 is AppResult.Error -> {
-                    _uiState.value = _uiState.value.copy(error = "Erro ao salvar candidatura")
+                    _uiState.update { it.copy(isLoading = false, error = "Erro ao salvar candidatura: ${result.exception.message}") }
                 }
             }
         }
@@ -110,13 +149,23 @@ class YourCandidacyViewModel @Inject constructor(
 
     fun deleteCandidacy() {
         val eaId = _uiState.value.eventoArtista?.idEventoArtista ?: return
+        if (eaId == 0) return
+        
         viewModelScope.launch {
+            _uiState.update { it.copy(isLoading = true) }
             when (val result = eventoArtistaRepository.deletar(eaId)) {
                 is AppResult.Success -> {
-                    _uiState.value = _uiState.value.copy(isSuccess = true, eventoArtista = null)
+                    _uiState.update { 
+                        it.copy(
+                            isLoading = false,
+                            isSuccess = true, 
+                            eventoArtista = null,
+                            successMessage = "Candidatura cancelada com sucesso!"
+                        ) 
+                    }
                 }
                 is AppResult.Error -> {
-                    _uiState.value = _uiState.value.copy(error = "Erro ao deletar candidatura")
+                    _uiState.update { it.copy(isLoading = false, error = "Erro ao deletar candidatura") }
                 }
             }
         }

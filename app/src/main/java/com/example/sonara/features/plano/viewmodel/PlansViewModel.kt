@@ -27,15 +27,17 @@ class PlansViewModel @Inject constructor(
             combine(
                 tokenManager.userName,
                 tokenManager.userType,
-                tokenManager.token
-            ) { name, type, token ->
-                Triple(name, type, token)
-            }.collect { (name, type, token) ->
+                tokenManager.token,
+                tokenManager.userPhoto
+            ) { name, type, token, photo ->
+                listOf(name, type, token, photo)
+            }.collect { (name, type, token, photo) ->
                 _uiState.update {
                     it.copy(
-                        userName  = name  ?: "Anônimo",
-                        userRole  = type  ?: "Usuário",
-                        isLoggedIn = !token.isNullOrBlank()
+                        userName   = (name as? String) ?: "Anônimo",
+                        userRole   = (type as? String) ?: "Usuário",
+                        userPhoto  = photo as? String,
+                        isLoggedIn = !(token as? String).isNullOrBlank()
                     )
                 }
             }

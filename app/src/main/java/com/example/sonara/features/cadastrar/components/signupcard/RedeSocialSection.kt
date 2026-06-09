@@ -6,10 +6,17 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Email
+import androidx.compose.material.icons.filled.Language
+import androidx.compose.material.icons.filled.MusicNote
+import androidx.compose.material.icons.filled.OndemandVideo
+import androidx.compose.material.icons.filled.People
+import androidx.compose.material.icons.filled.PhotoCamera
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -30,10 +37,34 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
+import com.example.sonara.core.ui.components.AppButton
 import com.example.sonara.core.ui.components.AppTextField
 import com.example.sonara.domain.model.TipoRedeSocial
 import com.example.sonara.features.cadastrar.model.RedeSocialDraft
+
+// ---------------------------------------------------------------------------
+// Mapeamento de nome → ícone Material
+// A comparação é feita em UPPERCASE para ser case-insensitive (vem do backend).
+// Para redes não mapeadas, usamos o ícone genérico "Language" como fallback.
+// ---------------------------------------------------------------------------
+private fun iconForTipoRedeSocial(nome: String): ImageVector {
+    return when (nome.uppercase()) {
+        "INSTAGRAM"  -> Icons.Default.PhotoCamera
+        "YOUTUBE"    -> Icons.Default.OndemandVideo
+        "TIKTOK"     -> Icons.Default.MusicNote
+        "FACEBOOK"   -> Icons.Default.People
+        "TWITTER",
+        "X"          -> Icons.Default.Email          // sem ícone nativo para X/Twitter no Material
+        "LINKEDIN"   -> Icons.Default.People
+        "SOUNDCLOUD" -> Icons.Default.MusicNote
+        "SPOTIFY"    -> Icons.Default.MusicNote
+        else         -> Icons.Default.Language       // fallback genérico
+    }
+}
+
+// ---------------------------------------------------------------------------
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -63,15 +94,13 @@ fun RedeSocialSection(
             )
         }
 
-        OutlinedButton(
+
+        AppButton(
             onClick = onAdd,
             modifier = Modifier.fillMaxWidth(),
-            colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.colorScheme.primary)
-        ) {
-            Icon(Icons.Default.Add, contentDescription = null)
-            Spacer(Modifier.width(8.dp))
-            Text("Adicionar Rede Social")
-        }
+            color = Color(250, 197, 146, 255),
+            text = "+ Adicionar Rede Social",
+        )
     }
 }
 
@@ -106,8 +135,21 @@ private fun RedeSocialItem(
                             color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
                         )
                     },
+                    // Ícone leading: aparece assim que um tipo é selecionado
+                    leadingIcon = rede.tipo?.let { tipo ->
+                        {
+                            Icon(
+                                imageVector = iconForTipoRedeSocial(tipo.nome),
+                                contentDescription = tipo.nome,
+                                modifier = Modifier.size(20.dp),
+                                tint = MaterialTheme.colorScheme.primary
+                            )
+                        }
+                    },
                     trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
-                    modifier = Modifier.fillMaxWidth().menuAnchor(),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .menuAnchor(),
                     colors = TextFieldDefaults.colors(
                         focusedContainerColor = MaterialTheme.colorScheme.surface,
                         unfocusedContainerColor = MaterialTheme.colorScheme.surface,
@@ -117,18 +159,38 @@ private fun RedeSocialItem(
                         unfocusedIndicatorColor = Color.Transparent,
                     )
                 )
-                ExposedDropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
+
+                ExposedDropdownMenu(
+                    expanded = expanded,
+                    onDismissRequest = { expanded = false }
+                ) {
                     tiposDisponiveis.forEach { tipo ->
                         DropdownMenuItem(
+                            // Ícone no menu também, para o usuário reconhecer visualmente
+                            leadingIcon = {
+                                Icon(
+                                    imageVector = iconForTipoRedeSocial(tipo.nome),
+                                    contentDescription = null,
+                                    modifier = Modifier.size(20.dp),
+                                    tint = MaterialTheme.colorScheme.primary
+                                )
+                            },
                             text = { Text(tipo.nome) },
-                            onClick = { onTipoChange(tipo); expanded = false }
+                            onClick = {
+                                onTipoChange(tipo)
+                                expanded = false
+                            }
                         )
                     }
                 }
             }
 
             IconButton(onClick = onRemove) {
-                Icon(Icons.Default.Delete, contentDescription = "Remover", tint = Color.Red.copy(alpha = 0.7f))
+                Icon(
+                    Icons.Default.Delete,
+                    contentDescription = "Remover",
+                    tint = Color.Red.copy(alpha = 0.7f)
+                )
             }
         }
 

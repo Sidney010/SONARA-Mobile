@@ -2,6 +2,7 @@ package com.example.sonara.features.cadastrar.ui
 
 import android.Manifest
 import android.net.Uri
+import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.clickable
@@ -51,6 +52,9 @@ fun SignUpScreen(
             when (event) {
                 is SignUpEvent.NavigateToLogin -> onNavigateToLogin()
                 is SignUpEvent.ShowError       -> snackbarHostState.showSnackbar(event.message, duration = SnackbarDuration.Short)
+                is SignUpEvent.ShowSuccess     -> {
+                    snackbarHostState.showSnackbar(event.message, duration = SnackbarDuration.Long)
+                }
             }
         }
     }
@@ -59,6 +63,7 @@ fun SignUpScreen(
         ScreenContainer {
             SonaraLogo()
             SignUpCard(
+                currentStep = uiState.currentStep,
                 // Pessoais
                 nome = uiState.nome.value, nomeError = uiState.nome.error, onNomeChange = viewModel::onNomeChange,
                 cpf  = uiState.cpf.value,  cpfError  = uiState.cpf.error,  onCpfChange  = viewModel::onCpfChange,
@@ -102,17 +107,18 @@ fun SignUpScreen(
                 profileImageError = uiState.profileImageError,
                 onImageClick      = { showOptions = true },
                 // Endereço
-                cep = uiState.address.cep, onCepChange = viewModel::onCepChange,
-                rua = uiState.address.rua, onRuaChange = viewModel::onRuaChange,
-                bairro = uiState.address.bairro, onBairroChange = viewModel::onBairroChange,
-                cidade = uiState.address.cidade, onCidadeChange = viewModel::onCidadeChange,
-                uf     = uiState.address.uf,     onUfChange     = viewModel::onUfChange,
+                cep = uiState.address.cep, cepError = uiState.address.cepError, onCepChange = viewModel::onCepChange,
+                rua = uiState.address.rua, ruaError = uiState.address.ruaError, onRuaChange = viewModel::onRuaChange,
+                bairro = uiState.address.bairro, bairroError = uiState.address.bairroError, onBairroChange = viewModel::onBairroChange,
+                cidade = uiState.address.cidade, cidadeError = uiState.address.cidadeError, onCidadeChange = viewModel::onCidadeChange,
+                uf     = uiState.address.uf,     ufError     = uiState.address.ufError,     onUfChange     = viewModel::onUfChange,
                 numero = uiState.address.numero, onNumeroChange = viewModel::onNumeroChange,
                 complemento = uiState.address.complemento, onComplementoChange = viewModel::onComplementoChange,
                 isLoadingCep = uiState.address.isLoading,
                 // Controle
                 isLoading = uiState.isLoading,
-                onRegisterClick = viewModel::onRegisterClick
+                onNextClick = viewModel::nextStep,
+                onBackClick = viewModel::previousStep
             )
         }
     }
