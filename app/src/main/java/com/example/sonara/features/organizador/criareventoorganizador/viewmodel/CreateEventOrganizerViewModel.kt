@@ -7,13 +7,16 @@ import androidx.lifecycle.viewModelScope
 import com.example.sonara.core.auth.TokenManager
 import com.example.sonara.core.common.AppResult
 import com.example.sonara.data.remote.dto.request.EventoCreateRequestDto
+import com.example.sonara.domain.usecase.BuscarCoordenadasUseCase
 import com.example.sonara.domain.usecase.BuscarEnderecoPorCepUseCase
 import com.example.sonara.domain.usecase.CreateEventUseCase
 import com.example.sonara.domain.usecase.UploadFotoEventoUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
@@ -58,12 +61,15 @@ class CreateEventOrganizerViewModel @Inject constructor(
     private val createEventUseCase: CreateEventUseCase,
     private val uploadFotoUseCase: UploadFotoEventoUseCase,
     private val buscarEnderecoUseCase: BuscarEnderecoPorCepUseCase,
+    private val buscarCoordenadasUseCase: BuscarCoordenadasUseCase,
     private val tokenManager: TokenManager,
     @ApplicationContext private val context: Context
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(CreateEventUiState())
     val uiState = _uiState.asStateFlow()
+
+    private var geocodeJob: Job? = null
 
     init {
         viewModelScope.launch {
@@ -77,11 +83,17 @@ class CreateEventOrganizerViewModel @Inject constructor(
 
     fun onNomeChange(value: String) = _uiState.update { it.copy(nome = value) }
     fun onDescricaoChange(value: String) = _uiState.update { it.copy(descricao = value) }
-    fun onLocalChange(value: String) = _uiState.update { it.copy(local = value) }
+    fun onLocalChange(value: String) {
+        _uiState.update { it.copy(local = value) }
+        triggerGeocoding()
+    }
     fun onDataChange(value: String) = _uiState.update { it.copy(data = value) }
     fun onHoraInicioChange(value: String) = _uiState.update { it.copy(horaInicio = value) }
     fun onHoraFimChange(value: String) = _uiState.update { it.copy(horaFim = value) }
-    fun onNumeroChange(value: String) = _uiState.update { it.copy(numero = value) }
+    fun onNumeroChange(value: String) {
+        _uiState.update { it.copy(numero = value) }
+        triggerGeocoding()
+    }
     fun onComplementoChange(value: String) = _uiState.update { it.copy(complemento = value) }
     fun onLocationChange(lat: Double, lng: Double) = _uiState.update { it.copy(latitude = lat, longitude = lng) }
 
@@ -89,6 +101,28 @@ class CreateEventOrganizerViewModel @Inject constructor(
         _uiState.update { it.copy(cep = value) }
         if (value.length == 8) {
             buscarEndereco(value)
+        }
+    }
+
+    private fun triggerGeocoding() {
+        geocodeJob?.cancel()
+        geocodeJob = viewModelScope.launch {
+            delay(1000)
+            val state = _uiState.value
+            val enderecoCompleto = "${state.logradouro}, ${state.numero}, ${state.bairro}, ${state.cidade}, ${state.estado}, Brasil"
+            if (state.logradouro.isNotBlank() && state.numero.isNotBlank()) {
+                when (val result = buscarCoordenadasUseCase(enderecoCompleto)) {
+                    is AppResult.Success -> {
+                        _uiState.update { it.copy(
+                            latitude = result.data.first,
+                            longitude = result.data.second
+                        ) }
+                    }
+                    is AppResult.Error -> {
+                        // Opcional: tratar erro de geocoding
+                    }
+                }
+            }
         }
     }
 
@@ -105,6 +139,7 @@ class CreateEventOrganizerViewModel @Inject constructor(
                         estado = endereco.uf,
                         isCepLoading = false
                     ) }
+                    triggerGeocoding()
                 }
                 is AppResult.Error -> {
                     _uiState.update { it.copy(isCepLoading = false) }

@@ -8,4 +8,8 @@ interface EnderecoRepository {
     suspend fun buscarCep(
         cep: String
     ): AppResult<Endereco>
+
+    suspend fun buscarCoordenadas(
+        endereco: String
+    ): AppResult<Pair<Double, Double>>
 }

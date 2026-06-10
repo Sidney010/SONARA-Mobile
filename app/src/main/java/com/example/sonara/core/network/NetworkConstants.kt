@@ -8,5 +8,8 @@ object NetworkConstants {
     const val BASE_URL_VIA_CEP =
         "https://viacep.com.br/ws/"
 
+    const val BASE_URL_GEOAPIFY =
+        "https://api.geoapify.com/"
+
     const val TIME_OUT = 30L
 }

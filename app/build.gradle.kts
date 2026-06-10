@@ -1,3 +1,5 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -20,6 +22,13 @@ android {
         vectorDrawables {
             useSupportLibrary = true
         }
+
+        val props = Properties()
+        val localProperties = rootProject.file("local.properties")
+        if (localProperties.exists()) {
+            localProperties.inputStream().use { props.load(it) }
+        }
+        buildConfigField("String", "GEOAPIFY_API_KEY", "\"${props.getProperty("GEOAPIFY_API_KEY") ?: ""}\"")
     }
 
     buildTypes {
@@ -40,6 +49,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
     composeOptions {
         // Kotlin 1.9.24 casa perfeitamente com o Compiler do Compose 1.5.14

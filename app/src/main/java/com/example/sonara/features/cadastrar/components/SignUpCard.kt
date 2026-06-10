@@ -190,10 +190,10 @@ fun SignUpCard(
                 horizontalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 if (currentStep != SignUpStep.PERSONAL_DATA) {
-                    val buttonText = "Voltar"
                     AppButton(
-                        text = buttonText,
                         modifier = Modifier.weight(1f),
+                        text = "Voltar",
+                        color = androidx.compose.ui.graphics.Color.Gray,
                         onClick = onBackClick
                     )
                 }
@@ -202,19 +202,11 @@ fun SignUpCard(
                     CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterVertically))
                 } else {
                     val buttonText = if (currentStep == SignUpStep.ADDRESS) "Cadastrar-se" else "Próximo"
-                    if (buttonText == "Cadastrar-se") {
-                        AppButton(
-                            modifier = Modifier.weight(1.5f),
-                            text = buttonText,
-                            onClick = onNextClick
-                        )
-                    } else {
-                        AppButton(
-                            modifier = Modifier.weight(1f),
-                            text = buttonText,
-                            onClick = onNextClick
-                        )
-                    }
+                    AppButton(
+                        modifier = Modifier.weight(1f),
+                        text = buttonText,
+                        onClick = onNextClick
+                    )
                 }
             }
         }
