@@ -96,6 +96,7 @@ dependencies {
     implementation(libs.retrofit.converter.gson)
     implementation(libs.androidx.datastore.preferences)
     implementation(libs.okhttp.logging.interceptor)
+    implementation(libs.play.services.location)
 
     // Testes e Debug
     testImplementation(libs.junit)

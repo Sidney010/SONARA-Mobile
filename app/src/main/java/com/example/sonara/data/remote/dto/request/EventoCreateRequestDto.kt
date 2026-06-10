@@ -16,5 +16,7 @@ data class EventoCreateRequestDto(
     @SerializedName("bairro")         val bairro: String?,
     @SerializedName("cidade")         val cidade: String?,
     @SerializedName("estado")         val estado: String?,
-    @SerializedName("organizador_id") val organizador_id: Int
+    @SerializedName("organizador_id") val organizador_id: Int,
+    @SerializedName("latitude")       val latitude: Double? = null,
+    @SerializedName("longitude")      val longitude: Double? = null
 )

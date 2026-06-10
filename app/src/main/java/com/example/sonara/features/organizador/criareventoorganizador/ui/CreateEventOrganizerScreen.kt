@@ -1,53 +1,126 @@
 package com.example.sonara.features.organizador.criareventoorganizador.ui
 
+import android.Manifest
+import android.annotation.SuppressLint
+import android.content.Context
+import android.content.pm.PackageManager
+import android.location.Location
+import android.net.Uri
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AccessTime
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.Image
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Icon
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
+import androidx.compose.material.icons.filled.MyLocation
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.content.ContextCompat
+import androidx.hilt.navigation.compose.hiltViewModel
+import coil.compose.AsyncImage
 import com.example.sonara.core.layout.ScreenContainer
+import com.example.sonara.core.ui.components.AppTextField
 import com.example.sonara.core.ui.components.header.HeaderUiState
 import com.example.sonara.core.ui.components.header.HomeHeader
 import com.example.sonara.core.ui.theme.AppColors
-import com.example.sonara.core.ui.theme.DarkGradients
+import com.example.sonara.features.organizador.criareventoorganizador.viewmodel.CreateEventOrganizerViewModel
+import com.google.android.gms.location.LocationServices
+import java.text.SimpleDateFormat
+import java.util.*
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CreateEventOrganizerScreen(
     modifier: Modifier = Modifier,
-    onBackClick: () -> Unit = {}
+    onBackClick: () -> Unit = {},
+    onEventCreated: () -> Unit = {},
+    viewModel: CreateEventOrganizerViewModel = hiltViewModel()
 ) {
+    val uiState by viewModel.uiState.collectAsState()
+    val context = LocalContext.current
+    val scrollState = rememberScrollState()
 
+    var showDatePicker by remember { mutableStateOf(false) }
+    var showTimePickerInicio by remember { mutableStateOf(false) }
+    var showTimePickerFim by remember { mutableStateOf(false) }
 
+    val fotoPickerLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetMultipleContents()
+    ) { uris ->
+        viewModel.onFotosSelected(uris)
+    }
+
+    val locationPermissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission()
+    ) { isGranted ->
+        if (isGranted) {
+            getCurrentLocation(context) { lat, lng ->
+                viewModel.onLocationChange(lat, lng)
+            }
+        }
+    }
+
+    LaunchedEffect(uiState.successMessage) {
+        uiState.successMessage?.let {
+            viewModel.clearMessages()
+            onEventCreated()
+        }
+    }
+
+    if (showDatePicker) {
+        val datePickerState = rememberDatePickerState()
+        DatePickerDialog(
+            onDismissRequest = { showDatePicker = false },
+            confirmButton = {
+                TextButton(onClick = {
+                    datePickerState.selectedDateMillis?.let { millis ->
+                        val sdf = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+                        viewModel.onDataChange(sdf.format(Date(millis)))
+                    }
+                    showDatePicker = false
+                }) { Text("Confirmar") }
+            }
+        ) {
+            DatePicker(state = datePickerState)
+        }
+    }
+
+    if (showTimePickerInicio || showTimePickerFim) {
+        val timePickerState = rememberTimePickerState()
+        TimePickerDialog(
+            onDismissRequest = {
+                showTimePickerInicio = false
+                showTimePickerFim = false
+            },
+            confirmButton = {
+                TextButton(onClick = {
+                    val timeStr = String.format(Locale.getDefault(), "%02d:%02d", timePickerState.hour, timePickerState.minute)
+                    if (showTimePickerInicio) viewModel.onHoraInicioChange(timeStr)
+                    else viewModel.onHoraFimChange(timeStr)
+                    showTimePickerInicio = false
+                    showTimePickerFim = false
+                }) { Text("Confirmar") }
+            }
+        ) {
+            TimePicker(state = timePickerState)
+        }
+    }
 
     Box(
         modifier = Modifier
@@ -56,197 +129,206 @@ fun CreateEventOrganizerScreen(
     ) {
         ScreenContainer(
             modifier = Modifier
-                .verticalScroll(rememberScrollState())
+                .verticalScroll(scrollState)
                 .fillMaxWidth(),
-            verticalArrangement = Arrangement.SpaceBetween,
-            verticalSpacing = 6.dp,
+            verticalArrangement = Arrangement.Top,
+            verticalSpacing = 16.dp,
             padding = PaddingValues(start = 12.dp, end = 12.dp, top = 40.dp, bottom = 130.dp)
         ) {
-
             HomeHeader(
                 state = HeaderUiState(
-                    userName = "Anônimo",
-                    userRole = "Organizador de Eventos"
+                    userName = uiState.userName,
+                    userRole = uiState.userRole,
+                    avatarUrl = uiState.userPhoto,
+                    isLoggedIn = true
                 ),
                 onLogoClick = {},
                 onAvatarClick = {},
                 onNotificationClick = {}
             )
 
-
-
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .wrapContentHeight()
-                    .background(
-                       color = AppColors.PrimaryColor,
-                        shape = RoundedCornerShape(16.dp)
-                    ),
+                    .wrapContentHeight(),
                 shape = RoundedCornerShape(16.dp),
-                colors = CardDefaults.cardColors(containerColor = Color.Transparent)
+                colors = CardDefaults.cardColors(containerColor = AppColors.PrimaryColor.copy(0.3f))
             ) {
-                Text(
-                    modifier = Modifier.padding(start = 20.dp).padding(top = 10.dp),
-                    text = "Criar Evento",
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 18.sp,
-                    color = AppColors.colorFontLogin
-                )
-
                 Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp),
+                    modifier = Modifier.padding(16.dp),
                     verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
+                    Text(
+                        text = "Criar Evento",
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 20.sp,
+                        color = Color.White
+                    )
 
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(180.dp)
-                            .clip(RoundedCornerShape(12.dp))
-                            .background(Color.Black.copy(alpha = 0.35f)),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Image,
-                            contentDescription = null,
-                            tint = Color.White.copy(alpha = 0.4f),
-                            modifier = Modifier.size(64.dp)
-                        )
-                    }
-
-                    Row(
-                        horizontalArrangement = Arrangement.spacedBy(10.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
+                    // ── SELEÇÃO DE FOTOS ───────────────────────────────────
+                    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                         Box(
                             modifier = Modifier
-                                .size(72.dp)
-                                .clip(RoundedCornerShape(10.dp))
-                                .background(Color.White.copy(alpha = 0.85f)),
+                                .fillMaxWidth()
+                                .height(180.dp)
+                                .clip(RoundedCornerShape(12.dp))
+                                .background(Color.Black.copy(alpha = 0.5f))
+                                .clickable { fotoPickerLauncher.launch("image/*") },
                             contentAlignment = Alignment.Center
                         ) {
-                            Icon(
-                                imageVector = Icons.Default.Add,
-                                contentDescription = "Adicionar foto",
-                                tint = Color.Black,
-                                modifier = Modifier.size(32.dp)
-                            )
+                            if (uiState.fotoUris.isNotEmpty()) {
+                                AsyncImage(
+                                    model = uiState.fotoUris[0],
+                                    contentDescription = null,
+                                    modifier = Modifier.fillMaxSize(),
+                                    contentScale = ContentScale.Crop
+                                )
+                            } else {
+                                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                    Icon(Icons.Default.Image, null, tint = Color.White.copy(0.4f), modifier = Modifier.size(48.dp))
+                                    Text("Foto Principal", color = Color.White.copy(0.4f))
+                                }
+                            }
                         }
 
-                        Box(
-                            modifier = Modifier
-                                .size(72.dp)
-                                .clip(RoundedCornerShape(10.dp))
-                                .background(Color.Black.copy(alpha = 0.3f)),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.Image,
-                                contentDescription = null,
-                                tint = Color.White.copy(alpha = 0.35f),
-                                modifier = Modifier.size(28.dp)
-                            )
-                        }
-
-                        Box(
-                            modifier = Modifier
-                                .size(72.dp)
-                                .clip(RoundedCornerShape(10.dp))
-                                .background(Color.Black.copy(alpha = 0.3f)),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.Image,
-                                contentDescription = null,
-                                tint = Color.White.copy(alpha = 0.35f),
-                                modifier = Modifier.size(28.dp)
-                            )
+                        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                            repeat(3) { index ->
+                                val uri = uiState.fotoUris.getOrNull(index)
+                                Box(
+                                    modifier = Modifier
+                                        .size(80.dp)
+                                        .clip(RoundedCornerShape(8.dp))
+                                        .background(Color.Black.copy(alpha = 0.5f))
+                                        .clickable { fotoPickerLauncher.launch("image/*") },
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    if (uri != null) {
+                                        AsyncImage(model = uri, contentDescription = null, modifier = Modifier.fillMaxSize(), contentScale = ContentScale.Crop)
+                                    } else {
+                                        Icon(if (index == 0 && uiState.fotoUris.isEmpty() || index > 0 && index == uiState.fotoUris.size) Icons.Default.Add else Icons.Default.Image, null, tint = Color.White.copy(0.3f))
+                                    }
+                                }
+                            }
                         }
                     }
 
-                    FormField(label = "Nome do evento:", placeholder = "Digite aqui")
-                    FormField(label = "Descrição:", placeholder = "Digite aqui", minHeight = 80.dp)
+                    // ── CAMPOS BÁSICOS ─────────────────────────────────────
+                    AppTextField(
+                        value = uiState.nome,
+                        onValueChange = viewModel::onNomeChange,
+                        placeholder = "Nome do Evento"
+                    )
 
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(12.dp)
-                    ) {
-                        Column(
+                    AppTextField(
+                        value = uiState.descricao,
+                        onValueChange = viewModel::onDescricaoChange,
+                        placeholder = "Descrição do Evento",
+                        modifier = Modifier.heightIn(min = 100.dp)
+                    )
+
+                    AppTextField(
+                        value = uiState.local,
+                        onValueChange = viewModel::onLocalChange,
+                        placeholder = "Nome do Local (ex: Club, Teatro)"
+                    )
+
+                    // ── DATA E HORA ────────────────────────────────────────
+                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        AppTextField(
+                            value = uiState.data,
+                            onValueChange = viewModel::onDataChange,
+                            placeholder = "Data (AAAA-MM-DD)",
                             modifier = Modifier.weight(1f),
-                            verticalArrangement = Arrangement.spacedBy(6.dp)
-                        ) {
-                            Text(
-                                text = "DATA",
-                                fontSize = 12.sp,
-                                color = AppColors.colorFontLogin,
-                                fontWeight = FontWeight.Medium
-                            )
-                            Box(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .height(40.dp)
-                                    .clip(RoundedCornerShape(8.dp))
-                                    .background(Color.White.copy(alpha = 0.12f))
-                                    .padding(horizontal = 12.dp),
-                                contentAlignment = Alignment.CenterStart
-                            ) {
-                                Text(
-                                    text = "DD/MM/AAAA",
-                                    fontSize = 13.sp,
-                                    color = Color.White.copy(alpha = 0.45f)
-                                )
+                            trailingContent = {
+                                IconButton(onClick = { showDatePicker = true }) {
+                                    Icon(Icons.Default.CalendarMonth, null, tint = Color.White)
+                                }
                             }
-                        }
+                        )
+                        AppTextField(
+                            value = uiState.horaInicio,
+                            onValueChange = viewModel::onHoraInicioChange,
+                            placeholder = "Início",
+                            modifier = Modifier.weight(1f),
+                            trailingContent = {
+                                IconButton(onClick = { showTimePickerInicio = true }) {
+                                    Icon(Icons.Default.AccessTime, null, tint = Color.White)
+                                }
+                            }
+                        )
+                        AppTextField(
+                            value = uiState.horaFim,
+                            onValueChange = viewModel::onHoraFimChange,
+                            placeholder = "Fim",
+                            modifier = Modifier.weight(1f),
+                            trailingContent = {
+                                IconButton(onClick = { showTimePickerFim = true }) {
+                                    Icon(Icons.Default.AccessTime, null, tint = Color.White)
+                                }
+                            }
+                        )
+                    }
 
-                        Column(
-                            modifier = Modifier.width(120.dp),
-                            verticalArrangement = Arrangement.spacedBy(6.dp)
+                    // ── ENDEREÇO ───────────────────────────────────────────
+                    Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        AppTextField(
+                            value = uiState.cep,
+                            onValueChange = viewModel::onCepChange,
+                            placeholder = "CEP",
+                            modifier = Modifier.weight(1f),
+                            trailingContent = { if (uiState.isCepLoading) CircularProgressIndicator(modifier = Modifier.size(24.dp), color = AppColors.colorFontLogin) }
+                        )
+                        IconButton(
+                            onClick = {
+                                if (ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+                                    getCurrentLocation(context) { lat, lng -> viewModel.onLocationChange(lat, lng) }
+                                } else {
+                                    locationPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
+                                }
+                            },
+                            colors = IconButtonDefaults.iconButtonColors(containerColor = AppColors.colorFontLogin)
                         ) {
-                            Text(
-                                text = "HORA",
-                                fontSize = 12.sp,
-                                color = AppColors.colorFontLogin,
-                                fontWeight = FontWeight.Medium
-                            )
-                            Box(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .height(40.dp)
-                                    .clip(RoundedCornerShape(8.dp))
-                                    .background(Color.White.copy(alpha = 0.12f))
-                                    .padding(horizontal = 12.dp),
-                                contentAlignment = Alignment.CenterStart
-                            ) {
-                                Text(
-                                    text = "00:00",
-                                    fontSize = 13.sp,
-                                    color = Color.White.copy(alpha = 0.45f)
-                                )
-                            }
+                            Icon(Icons.Default.MyLocation, "Localização Atual", tint = Color.White)
                         }
                     }
 
+                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        AppTextField(value = uiState.logradouro, onValueChange = {}, placeholder = "Logradouro", modifier = Modifier.weight(2f))
+                        AppTextField(value = uiState.numero, onValueChange = viewModel::onNumeroChange, placeholder = "Nº", modifier = Modifier.weight(1f))
+                    }
 
-                    Spacer(modifier = Modifier.height(4.dp))
-                    Button(
-                        onClick = {},
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(52.dp),
-                        shape = RoundedCornerShape(26.dp),
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = AppColors.colorFontLogin
-                        )
-                    ) {
+                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        AppTextField(value = uiState.bairro, onValueChange = {}, placeholder = "Bairro", modifier = Modifier.weight(1f))
+                        AppTextField(value = uiState.cidade, onValueChange = {}, placeholder = "Cidade", modifier = Modifier.weight(1f))
+                    }
+
+                    AppTextField(value = uiState.complemento, onValueChange = viewModel::onComplementoChange, placeholder = "Complemento (Opcional)")
+
+                    if (uiState.latitude != null) {
                         Text(
-                            text = "Marcar Evento",
-                            fontSize = 16.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = Color.White
+                            text = "Localização capturada: ${String.format(Locale.getDefault(), "%.4f", uiState.latitude)}, ${String.format(Locale.getDefault(), "%.4f", uiState.longitude)}",
+                            color = Color.Green,
+                            fontSize = 12.sp
                         )
+                    }
+
+                    // ── BOTÃO SUBMETER ─────────────────────────────────────
+                    Button(
+                        onClick = viewModel::createEvent,
+                        modifier = Modifier.fillMaxWidth().height(52.dp),
+                        shape = RoundedCornerShape(26.dp),
+                        colors = ButtonDefaults.buttonColors(containerColor = AppColors.colorFontLogin),
+                        enabled = !uiState.isLoading
+                    ) {
+                        if (uiState.isLoading) {
+                            CircularProgressIndicator(modifier = Modifier.size(24.dp), color = Color.White)
+                        } else {
+                            Text("Marcar Evento", fontSize = 16.sp, fontWeight = FontWeight.Bold, color = Color.White)
+                        }
+                    }
+
+                    uiState.errorMessage?.let {
+                        Text(it, color = Color.Red, fontSize = 14.sp, modifier = Modifier.fillMaxWidth())
                     }
                 }
             }
@@ -254,33 +336,25 @@ fun CreateEventOrganizerScreen(
     }
 }
 
-@Composable
-private fun FormField(
-    label: String,
-    placeholder: String,
-    minHeight: Dp = 40.dp
-) {
-    Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
-        Text(
-            text = label,
-            fontSize = 14.sp,
-            color = AppColors.colorFontLogin,
-            fontWeight = FontWeight.Bold
-        )
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(minHeight)
-                .clip(RoundedCornerShape(8.dp))
-                .background(Color.White.copy(alpha = 0.12f))
-                .padding(horizontal = 12.dp, vertical = 10.dp),
-            contentAlignment = Alignment.TopStart
-        ) {
-            Text(
-                text = placeholder,
-                fontSize = 13.sp,
-                color = Color.White.copy(alpha = 0.35f)
-            )
+@SuppressLint("MissingPermission")
+private fun getCurrentLocation(context: Context, onLocationResult: (Double, Double) -> Unit) {
+    val fusedLocationClient = LocationServices.getFusedLocationProviderClient(context)
+    fusedLocationClient.lastLocation.addOnSuccessListener { location: Location? ->
+        location?.let {
+            onLocationResult(it.latitude, it.longitude)
         }
     }
+}
+
+@Composable
+fun TimePickerDialog(
+    onDismissRequest: () -> Unit,
+    confirmButton: @Composable () -> Unit,
+    content: @Composable () -> Unit
+) {
+    AlertDialog(
+        onDismissRequest = onDismissRequest,
+        confirmButton = confirmButton,
+        text = { content() }
+    )
 }
