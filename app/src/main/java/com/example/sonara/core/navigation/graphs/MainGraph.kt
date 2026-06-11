@@ -8,6 +8,7 @@ import androidx.compose.runtime.getValue
 import com.example.sonara.features.home.viewmodel.HomeViewModel
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.compose.ui.Modifier
+import androidx.compose.foundation.layout.padding
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
@@ -18,14 +19,11 @@ import androidx.navigation.compose.rememberNavController
 import com.example.sonara.core.navigation.Routes
 import com.example.sonara.core.ui.components.navigation.BottomNavigationBar
 import com.example.sonara.core.ui.components.navigation.BottomNavigationState
-import com.example.sonara.features.artista.candidaturaStatus.ui.YourCandidacyScreen
 import com.example.sonara.features.home.ui.HomeScreen
-//import com.example.sonara.features.meusEventos.ui.MyEventsScreen
 import com.example.sonara.features.artista.perfilartista.ui.ArtistProfileScreen
 import com.example.sonara.features.artista.sobreEvento.ui.AboutEventsScreen
-import com.example.sonara.features.artista.ui.ApplyScreen
 import com.example.sonara.features.organizador.criareventoorganizador.ui.CreateEventOrganizerScreen
-import com.example.sonara.features.organizador.homeorganizador.ui.HomeOrganizerScreen
+import com.example.sonara.features.organizador.verartistatelacasashow.ui.SeeArtistsHouseShowScreen
 import com.example.sonara.features.organizador.meuseventosorganizador.ui.MyEventsOrganizerScreen
 import com.example.sonara.features.organizador.selectartist.ui.SelectArtistScreen
 import com.example.sonara.features.organizador.sobreeventoorganizador.ui.AboutEventOrganizerScreen
@@ -34,6 +32,7 @@ import com.example.sonara.features.usuario.sobreoeventoselecionado.ui.AboutSelec
 
 
 import com.example.sonara.features.artista.candidaturaStatus.ui.YourCandidacyScreen
+import com.example.sonara.features.organizador.homeorganizador.ui.HomeOrganizerScreen
 
 fun NavGraphBuilder.mainGraph(
     rootNavController: NavController
@@ -67,7 +66,7 @@ fun NavGraphBuilder.mainGraph(
         ) { paddingValues ->
             NavHost(
                 navController    = bottomNavController,
-                startDestination = Routes.Home.route
+                startDestination = Routes.Home.route,
             ) {
                 composable(Routes.Home.route) {
                     val uiState by viewModel.uiState.collectAsState()
@@ -156,14 +155,20 @@ fun NavGraphBuilder.mainGraph(
                 }
 
                 composable(Routes.Search.route) {
-//                     SearchScreen()
-//                    ApplyScreen()
-                    AboutSelectionEventScreen(
-                        onNavigateToProfile = {rootNavController.navigate(Routes.Profile.route) },
-                        onNavigateToLogin = {rootNavController.navigate(Routes.Login.route) },
-                        eventId = 0,
-                        onBackClick = { bottomNavController.popBackStack() }
-                    )
+                    val viewModel: HomeViewModel = hiltViewModel()
+                    val uiState by viewModel.uiState.collectAsState()
+
+                    if (uiState.userRole == "ORGANIZADOR" || uiState.userRole == "Organizador") {
+                        SeeArtistsHouseShowScreen(
+                            onNavigateToProfile = { rootNavController.navigate(Routes.Profile.route) },
+                            onNavigateToArtistDetails = { artistId ->
+                                // TODO: Navigate to artist details when available
+                                // bottomNavController.navigate("artist_details/$artistId")
+                            }
+                        )
+                    } else {
+                        com.example.sonara.features.pesquisar.ui.SearchScreen()
+                    }
                 }
 
                 composable(Routes.Events.route) {

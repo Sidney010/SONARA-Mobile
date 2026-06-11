@@ -22,6 +22,7 @@ import com.example.sonara.data.remote.dto.response.nacionalidade.NacionalidadeLi
 import com.example.sonara.data.remote.dto.response.redesocial.RedeSocialDto
 import com.example.sonara.data.remote.dto.response.redesocial.RedeSocialListDto
 import com.example.sonara.data.remote.dto.response.redesocial.TipoRedeSocialListDto
+import com.example.sonara.data.remote.dto.response.usuario.ArtistaListDto
 import com.example.sonara.data.remote.dto.response.usuario.UsuarioResponseDto
 import com.example.sonara.data.remote.dto.response.usuario.perfil.UsuarioPerfilResponseDto
 import com.example.sonara.data.remote.dto.response.usuario.perfil.UsuarioPerfilWrapperDto
@@ -167,4 +168,7 @@ interface SonaraApi {
 
     @GET("generoMusical")
     suspend fun getGenerosMusicais(): Response<ApiResponse<GeneroMusicalListDto>>
+
+    @GET("artista")
+    suspend fun getArtistas(): Response<ApiResponse<ArtistaListDto>>
 }

@@ -5,7 +5,9 @@ import androidx.lifecycle.viewModelScope
 import com.example.sonara.core.auth.TokenManager
 import com.example.sonara.core.common.AppResult
 import com.example.sonara.domain.model.Evento
-import com.example.sonara.domain.usecase.ListarEventosPorOrganizadorUseCase
+import com.example.sonara.domain.usecase.GetUsuarioPerfilUseCase
+import com.example.sonara.data.mapper.toDomain
+import com.example.sonara.data.mapper.toEventoDomain
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -27,7 +29,7 @@ data class MyEventsOrganizerUiState(
 
 @HiltViewModel
 class MyEventsOrganizerViewModel @Inject constructor(
-    private val listarEventosPorOrganizadorUseCase: ListarEventosPorOrganizadorUseCase,
+    private val getUsuarioPerfilUseCase: GetUsuarioPerfilUseCase,
     private val tokenManager: TokenManager
 ) : ViewModel() {
 
@@ -41,33 +43,36 @@ class MyEventsOrganizerViewModel @Inject constructor(
     private fun observeSessionAndLoadEvents() {
         viewModelScope.launch {
             combine(
-                tokenManager.userName,
-                tokenManager.userType,
-                tokenManager.token,
-                tokenManager.userPhoto,
-                tokenManager.organizerId
-            ) { name, type, token, photo, orgId ->
+                tokenManager.userId,
+                tokenManager.token
+            ) { userId, token ->
                 _uiState.update {
                     it.copy(
-                        userName = name ?: "Organizador",
-                        userRole = type ?: "ORGANIZADOR",
-                        userPhoto = photo,
                         isLoggedIn = !token.isNullOrBlank()
                     )
                 }
-                orgId?.toIntOrNull()
-            }.collect { organizerId ->
-                organizerId?.let { loadEventos(it) }
+                userId?.toIntOrNull()
+            }.collect { userId ->
+                userId?.let { loadEventosDoPerfil(it) }
             }
         }
     }
 
-    private fun loadEventos(organizerId: Int) {
+    private fun loadEventosDoPerfil(userId: Int) {
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true, errorMessage = null) }
-            when (val result = listarEventosPorOrganizadorUseCase(organizerId)) {
+            when (val result = getUsuarioPerfilUseCase(userId)) {
                 is AppResult.Success -> {
-                    _uiState.update { it.copy(eventos = result.data, isLoading = false) }
+                    val perfil = result.data
+                    val eventosDomain = perfil.organizador?.eventos?.map { it.toEventoDomain() } ?: emptyList()
+                    
+                    _uiState.update { it.copy(
+                        eventos = eventosDomain,
+                        isLoading = false,
+                        userName = perfil.nome ?: it.userName,
+                        userPhoto = perfil.foto ?: it.userPhoto,
+                        userRole = perfil.tipoUsuario ?: it.userRole
+                    ) }
                 }
                 is AppResult.Error -> {
                     _uiState.update {

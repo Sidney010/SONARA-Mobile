@@ -1,6 +1,6 @@
 package com.example.sonara.features.organizador.pesquisarartistacasadeshow.ui
 
-import ArtistCard
+import com.example.sonara.features.organizador.verartistatelacasashow.ui.ArtistCard
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -40,24 +41,40 @@ import com.example.sonara.core.ui.components.header.HeaderUiState
 import com.example.sonara.core.ui.components.header.HomeHeader
 import com.example.sonara.core.ui.theme.AppColors
 
-@OptIn(ExperimentalLayoutApi::class)
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.sonara.features.organizador.pesquisarartistacasadeshow.viewmodel.SearchArtistHouseShowViewModel
+
 @Composable
-fun SearchArtistHouseshowScreen(
+fun SearchArtistHouseShowScreen(
     modifier: Modifier = Modifier,
-    eventos: List<Evento> = EventoMock.listaComEventos
+    viewModel: SearchArtistHouseShowViewModel = hiltViewModel(),
+    onNavigateToProfile: () -> Unit = {},
+    onNavigateToArtistDetails: (Int) -> Unit = {}
 ) {
+    val uiState by viewModel.uiState.collectAsState()
+
     ScreenContainer(
-        modifier = Modifier
-            .verticalScroll(rememberScrollState())
-            .wrapContentHeight(),
+        modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.Top,
         verticalSpacing = 6.dp,
         padding = PaddingValues(12.dp, 40.dp)
     ) {
         HomeHeader(
-            state = HeaderUiState(userName = "Anônimo", userRole = "Usuário"),
+            state = HeaderUiState(
+                userName = uiState.userName,
+                userRole = uiState.userRole,
+                avatarUrl = uiState.avatarUrl,
+                isLoggedIn = uiState.isLoggedIn
+            ),
             onLogoClick = {},
-            onAvatarClick = {},
+            onAvatarClick = onNavigateToProfile,
             onNotificationClick = {}
         )
 
@@ -67,11 +84,10 @@ fun SearchArtistHouseshowScreen(
                 .height(80.dp)
         ) {
             TextField(
-                value = "",
-                onValueChange = { },
+                value = uiState.searchQuery,
+                onValueChange = { viewModel.onSearchQueryChange(it) },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .fillMaxHeight()
                     .padding(12.dp)
                     .clip(RoundedCornerShape(16.dp)),
                 placeholder = {
@@ -79,24 +95,15 @@ fun SearchArtistHouseshowScreen(
                 },
                 leadingIcon = {
                     Icon(
-                        modifier = Modifier.fillMaxHeight(0.8f),
-                        imageVector = Icons.Default.Add,
-                        contentDescription = null,
-                        tint = Color.White
-                    )
-                },
-                trailingIcon = {
-                    Icon(
-                        modifier = Modifier.fillMaxHeight(0.8f),
                         imageVector = Icons.Default.Search,
                         contentDescription = null,
                         tint = Color.White
                     )
                 },
                 colors = TextFieldDefaults.colors(
-                    focusedContainerColor = MaterialTheme.colorScheme.primary,
-                    unfocusedContainerColor = MaterialTheme.colorScheme.primary,
-                    focusedTextColor = MaterialTheme.colorScheme.onSurface,
+                    focusedContainerColor = AppColors.PrimaryColor,
+                    unfocusedContainerColor = AppColors.PrimaryColor,
+                    focusedTextColor = Color.White,
                     unfocusedTextColor = Color.White,
                     cursorColor = Color.White,
                     focusedIndicatorColor = Color.Transparent,
@@ -107,90 +114,55 @@ fun SearchArtistHouseshowScreen(
             )
         }
 
-        if (eventos.isEmpty()) {
+        if (uiState.isLoading) {
+            Box(modifier = Modifier.fillMaxWidth().weight(1f), contentAlignment = Alignment.Center) {
+                CircularProgressIndicator(color = AppColors.PrimaryColor)
+            }
+        } else if (uiState.filteredArtists.isEmpty()) {
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(300.dp)
-                    .background(Color.White),
+                    .weight(1f),
                 contentAlignment = Alignment.Center
             ) {
                 Text(
-                    text = "Nenhum Artista cadastrado",
+                    text = "Nenhum Artista encontrado",
                     color = AppColors.colorFontLogin,
                     fontSize = 16.sp,
                     textAlign = TextAlign.Center
-
-
                 )
             }
         } else {
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .wrapContentHeight()
+                    .weight(1f)
                     .padding(16.dp),
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 Text(
-                    text = "Artistas Próximos",
+                    text = "Artistas Encontrados",
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Bold,
                     color = AppColors.colorFontLogin
                 )
 
-                val totalArtists = 9
-                val rows = (totalArtists + 2) / 3
-
-                repeat(rows) { rowIndex ->
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(8.dp)
-                    ) {
-                        val startIndex = rowIndex * 3
-                        val endIndex = minOf(startIndex + 3, totalArtists)
-
-                        repeat(endIndex - startIndex) {
-                            ArtistCard(
-                                modifier = Modifier.weight(1f),
-                                filledStars = when (it % 3) {
-                                    0 -> 4
-                                    1 -> 4
-                                    else -> 3
-                                }
-                            )
-                        }
-                        repeat(3 - (endIndex - startIndex)) {
-                            Spacer(modifier = Modifier.weight(1f))
-                        }
+                LazyVerticalGrid(
+                    columns = GridCells.Fixed(2),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp),
+                    modifier = Modifier.fillMaxSize()
+                ) {
+                    items(uiState.filteredArtists) { artista ->
+                        ArtistCard(
+                            artista = artista,
+                            onClick = { onNavigateToArtistDetails(artista.idUsuario) }
+                        )
                     }
                 }
-                Spacer(modifier = Modifier.height(80.dp))
             }
         }
     }
 }
 
-data class Evento(
-    val id: String = java.util.UUID.randomUUID().toString(),
-    val titulo: String,
-    val imagemUrl: String = "",
-    val categoria: String = "Show"
-)
-
-object EventoMock {
-    val listaComEventos = listOf(
-        Evento(titulo = "Grande Show Amarelo", categoria = "Destaque"),
-        Evento(titulo = "Evento de Rock 1"),
-        Evento(titulo = "Evento de Rock 2"),
-        Evento(titulo = "Evento de Rock 3"),
-        Evento(titulo = "Evento de Rock 4"),
-        Evento(titulo = "Evento de Rock 5"),
-        Evento(titulo = "Evento de Rock 6"),
-        Evento(titulo = "Evento de Rock 7"),
-        Evento(titulo = "Evento de Rock 8"),
-        Evento(titulo = "Evento de Rock 9")
-    )
-
-    val listaVazia = emptyList<Evento>()
-}
+// Removido classes mock não utilizadas

@@ -4,6 +4,7 @@ import com.example.sonara.core.common.AppResult
 import com.example.sonara.domain.model.LoginResult
 import com.example.sonara.domain.model.Usuario
 import com.example.sonara.domain.model.usuarioperfil.UsuarioPerfil
+import com.example.sonara.data.remote.dto.response.usuario.ArtistaDto
 
 interface UsuarioRepository {
     suspend fun register(user: Usuario, photoFilePath: String? = null): AppResult<Usuario>
@@ -11,5 +12,5 @@ interface UsuarioRepository {
 
     suspend fun buscarUsuarioPorId(id: Int): AppResult<UsuarioPerfil>
 
-
+    suspend fun getArtistas(): AppResult<List<ArtistaDto>>
 }

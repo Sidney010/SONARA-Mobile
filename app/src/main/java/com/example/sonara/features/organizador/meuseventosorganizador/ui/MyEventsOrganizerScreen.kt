@@ -29,6 +29,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -55,6 +56,7 @@ fun MyEventsOrganizerScreen(
     ScreenContainer(
         modifier = Modifier,
         verticalArrangement = Arrangement.Top,
+        verticalSpacing = 20.dp,
         padding = PaddingValues(12.dp, 40.dp)
     ) {
         HomeHeader(
@@ -69,15 +71,15 @@ fun MyEventsOrganizerScreen(
             onNotificationClick = {}
         )
 
-        Spacer(modifier = Modifier.height(16.dp))
-
         Text(
-            "Meus Eventos",
+            text ="Meus Eventos",
             fontSize = 20.sp,
             fontWeight = FontWeight.Bold,
             color = Color.White,
-            modifier = Modifier.padding(bottom = 16.dp)
+            textAlign = TextAlign.Center
+
         )
+
 
         if (uiState.isLoading) {
             Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
@@ -89,7 +91,7 @@ fun MyEventsOrganizerScreen(
             }
         } else {
             LazyColumn(
-                verticalArrangement = Arrangement.spacedBy(12.dp),
+                verticalArrangement = Arrangement.spacedBy(16.dp),
                 modifier = Modifier.weight(1f)
             ) {
                 items(uiState.eventos) { evento ->
@@ -100,7 +102,7 @@ fun MyEventsOrganizerScreen(
                 }
             }
         }
-        Spacer(modifier = Modifier.height(80.dp))
+        Spacer(modifier = Modifier.height(50.dp))
     }
 }
 
