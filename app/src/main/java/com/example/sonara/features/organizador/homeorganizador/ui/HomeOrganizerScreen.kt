@@ -119,7 +119,7 @@ fun HomeOrganizerScreen(
 
                 if (uiState.events.isNotEmpty()) {
                     Text(
-                        text = "Meus Próximos Eventos",
+                        text = "Eventos Próximos ",
                         fontSize = 16.sp,
                         fontWeight = FontWeight.SemiBold,
                         color = AppColors.colorFontLogin,

@@ -39,4 +39,7 @@ class UsuarioRemoteDataSource @Inject constructor(
 
     suspend fun getUsuarioById(id: Int): Response<ApiResponse<UsuarioPerfilWrapperDto>> =
         api.getUsuarioById(id)
+
+    suspend fun getArtistas(): Response<ApiResponse<com.example.sonara.data.remote.dto.response.usuario.ArtistaListDto>> =
+        api.getArtistas()
 }

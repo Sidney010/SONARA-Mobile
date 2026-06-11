@@ -237,7 +237,7 @@ fun CreateEventOrganizerScreen(
                         AppTextField(
                             value = uiState.data,
                             onValueChange = viewModel::onDataChange,
-                            placeholder = "Data (AAAA-MM-DD)",
+                            placeholder = "Data",
                             modifier = Modifier.weight(1f),
                             trailingContent = {
                                 IconButton(onClick = { showDatePicker = true }) {

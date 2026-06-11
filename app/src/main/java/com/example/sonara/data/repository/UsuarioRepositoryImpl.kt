@@ -89,4 +89,11 @@ class UsuarioRepositoryImpl @Inject constructor(
             }
         )
     }
+
+    override suspend fun getArtistas(): AppResult<List<com.example.sonara.data.remote.dto.response.usuario.ArtistaDto>> {
+        return safeApiCall(
+            apiCall = { remoteDataSource.getArtistas() },
+            mapper = { it.artistas }
+        )
+    }
 }

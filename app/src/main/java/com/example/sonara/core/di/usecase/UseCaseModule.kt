@@ -30,6 +30,7 @@ object UseCaseModule {
     @Provides fun provideBuscarUsuarioPorIdUseCase(r: UsuarioRepository)        = BuscarUsuarioPorIdUseCase(r)
     @Provides fun provideListarEventosPorOrganizadorUseCase(r: EventoRepository) = ListarEventosPorOrganizadorUseCase(r)
     @Provides fun provideBuscarCandidaturasPorArtistaUseCase(r: UsuarioRepository) = BuscarCandidaturasPorArtistaUseCase(r)
+    @Provides fun provideGetArtistasUseCase(r: UsuarioRepository) = GetArtistasUseCase(r)
 
     @Provides fun provideListarTiposRedesSociaisUseCase(r: RedeSocialRepository) = ListarTiposRedesSociaisUseCase(r)
     @Provides fun provideCreateRedeSocialUseCase(r: RedeSocialRepository) = CreateRedeSocialUseCase(r)
