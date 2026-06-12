@@ -34,14 +34,14 @@ fun StartWelcomeScreen(
 
         EnterButton(
             title = "Anonimo",
-            icon = R.drawable.d,
+            icon = R.drawable.c,
             onClick = onNavigateAnonymous
         )
 
 
         EnterButton(
             title = "Login",
-            icon = R.drawable.c,
+            icon = R.drawable.d,
             onClick = onNavigateToLogin
         )
 
