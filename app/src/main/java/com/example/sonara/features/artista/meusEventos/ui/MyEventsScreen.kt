@@ -10,10 +10,13 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.*
+import androidx.compose.material3.pulltorefresh.PullToRefreshContainer
+import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
@@ -32,6 +35,7 @@ import com.example.sonara.features.artista.meusEventos.viewmodel.MyEventsViewMod
 import com.example.sonara.features.home.components.formatarData
 import com.example.sonara.features.home.components.formatarHora
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MyEvents(
     modifier: Modifier = Modifier,
@@ -40,6 +44,19 @@ fun MyEvents(
 ) {
     val uiState by viewModel.uiState.collectAsState()
     var eventToDelete by remember { mutableStateOf<UsuarioEventoPerfil?>(null) }
+    val pullToRefreshState = rememberPullToRefreshState()
+
+    if (pullToRefreshState.isRefreshing) {
+        LaunchedEffect(true) {
+            uiState.userId?.let { viewModel.loadEventos(it, isRefreshing = true) }
+        }
+    }
+
+    LaunchedEffect(uiState.isRefreshing) {
+        if (!uiState.isRefreshing) {
+            pullToRefreshState.endRefresh()
+        }
+    }
 
     if (eventToDelete != null) {
         ConfirmModal(
@@ -56,7 +73,7 @@ fun MyEvents(
     }
 
     ScreenContainer(
-        modifier = modifier,
+        modifier = modifier.nestedScroll(pullToRefreshState.nestedScrollConnection),
         verticalArrangement = Arrangement.Top,
         verticalSpacing = 16.dp,
         padding = PaddingValues(16.dp, 40.dp)
@@ -75,45 +92,53 @@ fun MyEvents(
             onNotificationClick = {}
         )
 
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .weight(1f)
-        ) {
-            Text(
-                text = "Meus Eventos",
-                color = AppColors.colorFontLogin,
-                fontSize = 20.sp,
-                fontWeight = FontWeight.Bold,
-                modifier = Modifier.padding(vertical = 16.dp)
-            )
+        Box(modifier = Modifier.fillMaxSize()) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+            ) {
+                Text(
+                    text = "Meus Eventos",
+                    color = AppColors.colorFontLogin,
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.padding(vertical = 16.dp)
+                )
 
-            if (uiState.isLoading) {
-                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    CircularProgressIndicator(color = AppColors.colorFontLogin)
-                }
-            } else if (uiState.eventos.isEmpty()) {
-                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    Text(
-                        "Você ainda não se candidatou a nenhum evento.",
-                        color = Color.Gray,
-                        modifier = Modifier.padding(16.dp)
-                    )
-                }
-            } else{
-                LazyColumn(
-                    verticalArrangement = Arrangement.spacedBy(12.dp),
-                    contentPadding = PaddingValues(bottom = 80.dp)
-                ) {
-                    items(uiState.eventos) { evento ->
-                        EventoCardItem(
-                            evento = evento,
-                            onClick = { onEventClick(evento.idEvento, evento.idEventoArtista) },
-                            onDelete = { eventToDelete = evento }
+                if (uiState.isLoading && !uiState.isRefreshing) {
+                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                        CircularProgressIndicator(color = AppColors.colorFontLogin)
+                    }
+                } else if (uiState.eventos.isEmpty()) {
+                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                        Text(
+                            "Você ainda não se candidatou a nenhum evento.",
+                            color = Color.Gray,
+                            modifier = Modifier.padding(16.dp)
                         )
+                    }
+                } else {
+                    LazyColumn(
+                        verticalArrangement = Arrangement.spacedBy(12.dp),
+                        contentPadding = PaddingValues(bottom = 80.dp)
+                    ) {
+                        items(uiState.eventos) { evento ->
+                            EventoCardItem(
+                                evento = evento,
+                                onClick = { onEventClick(evento.idEvento, evento.idEventoArtista) },
+                                onDelete = { eventToDelete = evento }
+                            )
+                        }
                     }
                 }
             }
+
+            PullToRefreshContainer(
+                state = pullToRefreshState,
+                modifier = Modifier.align(Alignment.TopCenter),
+                contentColor = AppColors.colorFontLogin,
+                containerColor = Color.Transparent
+            )
         }
     }
 }
@@ -130,7 +155,7 @@ fun EventoCardItem(
             .fillMaxWidth()
             .clickable {
                 val status = evento.status?.lowercase()
-                if (status == "aprovado" || status == "confirmado") {
+                if (status == "aprovado" || status == "confirmado" || status == "convite aceito") {
                     Toast.makeText(
                         context,
                         "Eventos já confirmados não podem ser alterados",
@@ -197,7 +222,7 @@ fun EventoCardItem(
                         Icon(
                             imageVector = Icons.Default.Delete,
                             contentDescription = "Remover",
-                            tint = if (evento.status?.lowercase() == "aprovado" || evento.status?.lowercase() == "confirmado") 
+                            tint = if (evento.status?.lowercase() == "aprovado" || evento.status?.lowercase() == "confirmado" || evento.status?.lowercase() == "convite aceito")
                                 Color.Gray.copy(alpha = 0.5f) 
                             else 
                                 Color.Red.copy(alpha = 0.7f),
@@ -218,8 +243,8 @@ fun EventoCardItem(
                     text = evento.status ?: "Pendente",
                     fontSize = 12.sp,
                     color = when(evento.status?.lowercase()) {
-                        "aprovado", "confirmado" -> Color.Green
-                        "rejeitado", "recusado" -> Color.Red
+                        "aprovado", "confirmado","convite aceito" -> Color.Green
+                        "rejeitado", "recusado", "convite recusado" -> Color.Red
                         else -> Color(0xFFFF8A50)
                     },
                     fontWeight = FontWeight.SemiBold

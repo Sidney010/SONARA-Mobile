@@ -17,6 +17,7 @@ data class HomeOrganizerUiState(
     val userRole: String = "ORGANIZADOR",
     val userPhoto: String? = null,
     val isLoading: Boolean = false,
+    val isRefreshing: Boolean = false,
     val events: List<com.example.sonara.domain.model.Evento> = emptyList()
 )
 
@@ -34,15 +35,19 @@ class HomeOrganizerViewModel @Inject constructor(
         loadEvents()
     }
 
-    private fun loadEvents() {
+    fun loadEvents(isRefreshing: Boolean = false) {
         viewModelScope.launch {
-            _uiState.update { it.copy(isLoading = true) }
+            if (isRefreshing) {
+                _uiState.update { it.copy(isRefreshing = true) }
+            } else {
+                _uiState.update { it.copy(isLoading = true) }
+            }
             when (val result = listarEventosUseCase()) {
                 is com.example.sonara.core.common.AppResult.Success -> {
-                    _uiState.update { it.copy(events = result.data, isLoading = false) }
+                    _uiState.update { it.copy(events = result.data, isLoading = false, isRefreshing = false) }
                 }
                 is com.example.sonara.core.common.AppResult.Error -> {
-                    _uiState.update { it.copy(isLoading = false) }
+                    _uiState.update { it.copy(isLoading = false, isRefreshing = false) }
                 }
             }
         }

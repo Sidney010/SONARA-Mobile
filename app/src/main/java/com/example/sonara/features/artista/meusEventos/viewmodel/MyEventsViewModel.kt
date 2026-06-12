@@ -19,10 +19,12 @@ import javax.inject.Inject
 data class MyEventsUiState(
     val eventos: List<UsuarioEventoPerfil> = emptyList(),
     val isLoading: Boolean = false,
+    val isRefreshing: Boolean = false,
     val errorMessage: String? = null,
     val userName: String = "Artista",
     val userRole: String = "ARTISTA",
     val userPhoto: String? = null,
+    val userId: Int? = null,
     val isLoggedIn: Boolean = false
 )
 
@@ -49,33 +51,41 @@ class MyEventsViewModel @Inject constructor(
                 tokenManager.userPhoto,
                 tokenManager.userId
             ) { name, type, token, photo, userId ->
+                val id = userId?.toIntOrNull()
                 _uiState.update {
                     it.copy(
                         userName = name ?: "Artista",
                         userRole = type ?: "ARTISTA",
                         userPhoto = photo,
+                        userId = id,
                         isLoggedIn = !token.isNullOrBlank()
                     )
                 }
-                userId?.toIntOrNull()
+                id
             }.collect { userId ->
                 userId?.let { loadEventos(it) }
             }
         }
     }
 
-    fun loadEventos(userId: Int) {
+    fun loadEventos(userId: Int, isRefreshing: Boolean = false) {
         viewModelScope.launch {
-            _uiState.update { it.copy(isLoading = true, errorMessage = null) }
+            if (isRefreshing) {
+                _uiState.update { it.copy(isRefreshing = true, errorMessage = null) }
+            } else {
+                _uiState.update { it.copy(isLoading = true, errorMessage = null) }
+            }
             when (val result = buscarUsuarioPorIdUseCase(userId)) {
                 is AppResult.Success -> {
                     val candidaturas = result.data.artista?.eventos?.filterNotNull() ?: emptyList()
-                    _uiState.update { it.copy(eventos = candidaturas, isLoading = false) }
+                    _uiState.update { it.copy(eventos = candidaturas, isLoading = false, isRefreshing = false) }
                 }
                 is AppResult.Error -> {
                     _uiState.update {
                         it.copy(
                             isLoading = false,
+
+                            isRefreshing = false,
                             errorMessage = result.exception.message ?: "Erro ao carregar seus eventos"
                         )
                     }

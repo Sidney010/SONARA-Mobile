@@ -53,11 +53,15 @@ fun NavGraphBuilder.mainGraph(
                         userRole = uiState.userRole
                     ),
                     onNavigate = { route ->
+                        // NOVA LÓGICA DE NAVEGAÇÃO CORRETA:
                         bottomNavController.navigate(route) {
+                            // Evita criar múltiplas instâncias da mesma tela se o usuário clicar várias vezes
                             launchSingleTop = true
-                            restoreState    = true
-                            popUpTo(bottomNavController.graph.startDestinationId) {
-                                saveState = true
+
+                            // Limpa todas as telas acumuladas até a rota que você clicou, inclusive ela mesma
+                            // Isso garante que você sempre "resete" para o início da aba clicada
+                            popUpTo(route) {
+                                inclusive = true
                             }
                         }
                     }

@@ -1,5 +1,6 @@
 package com.example.sonara.features.artista.candidaturaStatus.ui
 
+import android.R.attr.label
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -19,17 +20,20 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
+import androidx.compose.material3.pulltorefresh.PullToRefreshContainer
+import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -41,6 +45,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
@@ -50,14 +55,15 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
 import com.example.sonara.core.layout.ScreenContainer
-import com.example.sonara.core.ui.components.AppButton
 import com.example.sonara.core.ui.components.header.HeaderUiState
 import com.example.sonara.core.ui.components.header.HeaderUserSection
-import com.example.sonara.core.ui.components.header.HomeHeader
 import com.example.sonara.core.ui.theme.AppColors
 import com.example.sonara.core.ui.theme.DarkGradients
 import com.example.sonara.features.artista.candidaturaStatus.viewmodel.YourCandidacyViewModel
+import com.example.sonara.features.home.components.formatarData
+import com.example.sonara.features.home.components.formatarHora
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun YourCandidacyScreen(
     eventoId: Int,
@@ -70,10 +76,28 @@ fun YourCandidacyScreen(
     val uiState by viewModel.uiState.collectAsState()
     val context = LocalContext.current
     val gradients = DarkGradients
-    
+    val pullToRefreshState = rememberPullToRefreshState()
+
+    val statusRaw = uiState.eventoArtista?.status?.lowercase() ?: ""
+    val isFinalized = statusRaw in listOf("aprovado", "confirmado", "rejeitado", "recusado", "convite aceito", "convite recusado", "aceito")
+
     var cacheEsperado by remember { mutableStateOf("") }
     var sobreArtista by remember { mutableStateOf("") }
     var motivoInscricao by remember { mutableStateOf("") }
+
+    if (pullToRefreshState.isRefreshing) {
+        LaunchedEffect(true) {
+            viewModel.loadData(eventoId, eventoArtistaId, isRefreshing = true)
+        }
+    }
+
+    LaunchedEffect(uiState.isRefreshing) {
+        if (uiState.isRefreshing) {
+            pullToRefreshState.startRefresh()
+        } else {
+            pullToRefreshState.endRefresh()
+        }
+    }
 
     LaunchedEffect(eventoId, eventoArtistaId) {
         viewModel.loadData(eventoId, eventoArtistaId)
@@ -104,6 +128,7 @@ fun YourCandidacyScreen(
         modifier = Modifier
             .fillMaxSize()
             .background(brush = gradients.secondaryCard)
+            .nestedScroll(pullToRefreshState.nestedScrollConnection)
     ) {
         ScreenContainer(
             modifier = Modifier
@@ -160,8 +185,7 @@ fun YourCandidacyScreen(
                             Row(
                                 modifier = Modifier.fillMaxWidth(),
                                 horizontalArrangement = Arrangement.SpaceBetween,
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
+                                verticalAlignment = Alignment.CenterVertically) {
                                 Text(
                                     text = if (uiState.eventoArtista == null) "Nova Candidatura" else "Minha Candidatura",
                                     fontSize = 18.sp,
@@ -169,7 +193,7 @@ fun YourCandidacyScreen(
                                     color = AppColors.colorFontLogin
                                 )
                                 
-                                if (uiState.eventoArtista != null) {
+                                if (uiState.eventoArtista != null && !isFinalized) {
                                     IconButton(onClick = { viewModel.deleteCandidacy() }) {
                                         Icon(
                                             imageVector = Icons.Default.Close,
@@ -257,57 +281,75 @@ fun YourCandidacyScreen(
                         )
                         DividerItem()
 
+                        val isEditable = !isFinalized
+
                         CacheInputField(
                             label = "Seu Cachê Esperado:",
                             value = cacheEsperado,
                             onValueChange = { cacheEsperado = it },
-                            placeholder = "Digite aqui..."
+                            placeholder = "Digite aqui...",
+                            enabled = isEditable
                         )
                         
                         CacheInputField(
                             label = "Sobre Você:",
                             value = sobreArtista,
                             onValueChange = { sobreArtista = it },
-                            placeholder = "Fale um pouco sobre você..."
+                            placeholder = "Fale um pouco sobre você...",
+                            enabled = isEditable
                         )
 
                         CacheInputField(
                             label = "Motivo da Inscrição:",
                             value = motivoInscricao,
                             onValueChange = { motivoInscricao = it },
-                            placeholder = "Por que você quer participar?"
+                            placeholder = "Por que você quer participar?",
+                            enabled = isEditable
                         )
 
                         if (uiState.eventoArtista != null) {
                             DividerItem()
-                            InfoRow(label = "Status Atual:", value = uiState.eventoArtista?.status ?: "Pendente")
+
+                            val statusColor = when (statusRaw) {
+                                "aprovado", "confirmado", "convite aceito", "aceito" -> Color.Green
+                                "rejeitado", "recusado", "convite recusado" -> Color.Red
+                                else -> Color(0xFFFF8A50)
+                            }
+
+                            InfoRow(
+                                label = "Status Atual:", 
+                                value = uiState.eventoArtista?.status ?: "Pendente",
+                                valueColor = statusColor
+                            )
                             DividerItem()
                             InfoRow(label = "Cachê Ofertado:", value = "R$ ${uiState.eventoArtista?.cacheOfertado ?: "0.0"}")
                             DividerItem()
                             InfoRow(label = "Cachê Final:", value = "R$ ${uiState.eventoArtista?.cacheFinal ?: "0.0"}")
                             
-                            Spacer(modifier = Modifier.height(16.dp))
-                            
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.spacedBy(8.dp)
-                            ) {
-                                Button(
-                                    onClick = { viewModel.acceptInvitation() },
-                                    modifier = Modifier.weight(1f),
-                                    shape = RoundedCornerShape(8.dp),
-                                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF4CAF50))
-                                ) {
-                                    Text("Aceitar", color = Color.White)
-                                }
+                            if (statusRaw == "pendente") {
+                                Spacer(modifier = Modifier.height(16.dp))
                                 
-                                Button(
-                                    onClick = { viewModel.refuseInvitation() },
-                                    modifier = Modifier.weight(1f),
-                                    shape = RoundedCornerShape(8.dp),
-                                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFF44336))
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.spacedBy(8.dp)
                                 ) {
-                                    Text("Recusar", color = Color.White)
+                                    Button(
+                                        onClick = { viewModel.acceptInvitation() },
+                                        modifier = Modifier.weight(1f),
+                                        shape = RoundedCornerShape(8.dp),
+                                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF4CAF50))
+                                    ) {
+                                        Text("Aceitar", color = Color.White)
+                                    }
+                                    
+                                    Button(
+                                        onClick = { viewModel.refuseInvitation() },
+                                        modifier = Modifier.weight(1f),
+                                        shape = RoundedCornerShape(8.dp),
+                                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFF44336))
+                                    ) {
+                                        Text("Recusar", color = Color.White)
+                                    }
                                 }
                             }
                         }
@@ -328,7 +370,7 @@ fun YourCandidacyScreen(
                                     color = AppColors.colorFontLogin
                                 )
                                 Text(
-                                    text = uiState.evento?.data ?: "DD/MM/AAAA",
+                                    text = formatarData(uiState.evento?.data ?: "DD/MM/AAAA"),
                                     fontSize = 13.sp,
                                     color = Color.White
                                 )
@@ -344,7 +386,7 @@ fun YourCandidacyScreen(
                                     color = AppColors.colorFontLogin
                                 )
                                 Text(
-                                    text = uiState.evento?.horaInicio ?: "00:00",
+                                    text = formatarHora(uiState.evento?.horaInicio ?: "00:00"),
                                     fontSize = 13.sp,
                                     color = Color.White
                                 )
@@ -352,28 +394,25 @@ fun YourCandidacyScreen(
                         }
                     }
 
-                    Button(
-                        onClick = { 
-                            viewModel.submitCandidacy(
-                                eventoId = eventoId,
-                                cacheEsperado = cacheEsperado.toDoubleOrNull() ?: 0.0,
-                                sobreArtista = sobreArtista,
-                                motivoInscricao = motivoInscricao
+                    if (!isFinalized) {
+                        Button(
+                            onClick = { 
+                                viewModel.submitCandidacy(
+                                    eventoId = eventoId,
+                                    cacheEsperado = cacheEsperado.toDoubleOrNull() ?: 0.0,
+                                    sobreArtista = sobreArtista,
+                                    motivoInscricao = motivoInscricao
+                                )
+                            },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(16.dp),
+                            shape = RoundedCornerShape(8.dp),
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = AppColors.colorFontLogin,
+                                contentColor = Color.White
                             )
-                        },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(16.dp),
-                        enabled = !uiState.isLoading,
-                        shape = RoundedCornerShape(8.dp),
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = AppColors.colorFontLogin,
-                            contentColor = Color.White
-                        )
-                   ) {
-                        if (uiState.isLoading) {
-                            CircularProgressIndicator(modifier = Modifier.size(24.dp), color = Color.White)
-                        } else {
+                        ) {
                             Text(if (uiState.eventoArtista == null) "Inscrever-se" else "Atualizar")
                         }
                     }
@@ -383,11 +422,18 @@ fun YourCandidacyScreen(
                 Spacer(modifier = Modifier.height(45.dp))
             }
         }
+
+        PullToRefreshContainer(
+            modifier = Modifier.align(Alignment.TopCenter),
+            state = pullToRefreshState,
+            containerColor = Color(0xFF1A1A2E),
+            contentColor = Color(0xFFFF710C)
+        )
     }
 }
 
 @Composable
-fun InfoRow(label: String, value: String) {
+fun InfoRow(label: String, value: String, valueColor: Color = Color.White) {
     Column(
         modifier = Modifier.padding(vertical = 8.dp),
         verticalArrangement = Arrangement.spacedBy(4.dp)
@@ -402,7 +448,7 @@ fun InfoRow(label: String, value: String) {
             text = value,
             fontSize = 14.sp,
             fontWeight = FontWeight.Bold,
-            color = Color.White
+            color = valueColor
         )
     }
 }
@@ -423,8 +469,9 @@ fun CacheInputField(
     label: String,
     value: String,
     onValueChange: (String) -> Unit,
+    modifier: Modifier = Modifier,
     placeholder: String = "Digite aqui...",
-    modifier: Modifier = Modifier
+    enabled: Boolean = true
 ) {
     Column(
         modifier = modifier.padding(vertical = 8.dp),
@@ -448,6 +495,7 @@ fun CacheInputField(
             BasicTextField(
                 value = value,
                 onValueChange = onValueChange,
+                enabled = enabled,
                 singleLine = true,
                 textStyle = TextStyle(
                     fontSize = 14.sp,

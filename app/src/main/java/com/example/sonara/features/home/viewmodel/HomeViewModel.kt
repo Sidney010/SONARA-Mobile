@@ -62,9 +62,13 @@ class HomeViewModel @Inject constructor(
     // Carregamento de eventos
     // ─────────────────────────────────────────────────────────────────────────
 
-    fun loadEventos() {
+    fun loadEventos(isRefreshing: Boolean = false) {
         viewModelScope.launch {
-            _uiState.update { it.copy(isLoading = true, errorMessage = null) }
+            if (isRefreshing) {
+                _uiState.update { it.copy(isRefreshing = true, errorMessage = null) }
+            } else {
+                _uiState.update { it.copy(isLoading = true, errorMessage = null) }
+            }
 
             when (val result = listarEventosUseCase()) {
                 is AppResult.Success -> {
@@ -72,7 +76,8 @@ class HomeViewModel @Inject constructor(
                     _uiState.update {
                         it.copy(
                             eventosOriginais = eventos,
-                            isLoading        = false
+                            isLoading        = false,
+                            isRefreshing     = false
                         )
                     }
                     aplicarFiltroEBusca()
@@ -81,6 +86,7 @@ class HomeViewModel @Inject constructor(
                     _uiState.update {
                         it.copy(
                             isLoading    = false,
+                            isRefreshing = false,
                             errorMessage = result.exception.message ?: "Erro ao carregar eventos"
                         )
                     }

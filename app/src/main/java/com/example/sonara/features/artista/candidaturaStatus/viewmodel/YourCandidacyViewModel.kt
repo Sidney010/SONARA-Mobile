@@ -20,6 +20,7 @@ import javax.inject.Inject
 
 data class YourCandidacyUiState(
     val isLoading: Boolean = false,
+    val isRefreshing: Boolean = false,
     val evento: Evento? = null,
     val eventoArtista: EventoArtista? = null,
     val error: String? = null,
@@ -65,9 +66,13 @@ class YourCandidacyViewModel @Inject constructor(
         }
     }
 
-    fun loadData(eventoId: Int, eventoArtistaId: Int? = null) {
+    fun loadData(eventoId: Int, eventoArtistaId: Int? = null, isRefreshing: Boolean = false) {
         viewModelScope.launch {
-            _uiState.update { it.copy(isLoading = true, error = null, isSuccess = false, successMessage = null) }
+            if (isRefreshing) {
+                _uiState.update { it.copy(isRefreshing = true, error = null, isSuccess = false, successMessage = null) }
+            } else {
+                _uiState.update { it.copy(isLoading = true, error = null, isSuccess = false, successMessage = null) }
+            }
 
             val eventoResult = eventoRepository.buscarEventoPorId(eventoId)
             if (eventoResult is AppResult.Success) {
@@ -81,7 +86,7 @@ class YourCandidacyViewModel @Inject constructor(
                 }
             }
             
-            _uiState.update { it.copy(isLoading = false) }
+            _uiState.update { it.copy(isLoading = false, isRefreshing = false) }
         }
     }
 

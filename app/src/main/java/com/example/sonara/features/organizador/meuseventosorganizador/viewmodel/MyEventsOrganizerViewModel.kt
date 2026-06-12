@@ -20,10 +20,12 @@ import javax.inject.Inject
 data class MyEventsOrganizerUiState(
     val eventos: List<Evento> = emptyList(),
     val isLoading: Boolean = false,
+    val isRefreshing: Boolean = false,
     val errorMessage: String? = null,
     val userName: String = "Organizador",
     val userRole: String = "ORGANIZADOR",
     val userPhoto: String? = null,
+    val userId: Int? = null,
     val isLoggedIn: Boolean = false
 )
 
@@ -46,21 +48,27 @@ class MyEventsOrganizerViewModel @Inject constructor(
                 tokenManager.userId,
                 tokenManager.token
             ) { userId, token ->
+                val id = userId?.toIntOrNull()
                 _uiState.update {
                     it.copy(
-                        isLoggedIn = !token.isNullOrBlank()
+                        isLoggedIn = !token.isNullOrBlank(),
+                        userId = id
                     )
                 }
-                userId?.toIntOrNull()
+                id
             }.collect { userId ->
                 userId?.let { loadEventosDoPerfil(it) }
             }
         }
     }
 
-    private fun loadEventosDoPerfil(userId: Int) {
+    fun loadEventosDoPerfil(userId: Int, isRefreshing: Boolean = false) {
         viewModelScope.launch {
-            _uiState.update { it.copy(isLoading = true, errorMessage = null) }
+            if (isRefreshing) {
+                _uiState.update { it.copy(isRefreshing = true, errorMessage = null) }
+            } else {
+                _uiState.update { it.copy(isLoading = true, errorMessage = null) }
+            }
             when (val result = getUsuarioPerfilUseCase(userId)) {
                 is AppResult.Success -> {
                     val perfil = result.data
@@ -69,6 +77,7 @@ class MyEventsOrganizerViewModel @Inject constructor(
                     _uiState.update { it.copy(
                         eventos = eventosDomain,
                         isLoading = false,
+                        isRefreshing = false,
                         userName = perfil.nome ?: it.userName,
                         userPhoto = perfil.foto ?: it.userPhoto,
                         userRole = perfil.tipoUsuario ?: it.userRole
@@ -78,6 +87,7 @@ class MyEventsOrganizerViewModel @Inject constructor(
                     _uiState.update {
                         it.copy(
                             isLoading = false,
+                            isRefreshing = false,
                             errorMessage = result.exception.message ?: "Erro ao carregar eventos"
                         )
                     }

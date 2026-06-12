@@ -81,7 +81,7 @@ class SeeArtistsHouseShowViewModel @Inject constructor(
                 is AppResult.Error -> {
                     _uiState.update { 
                         it.copy(
-                            isLoading = false, 
+                            isLoading = false,
                             errorMessage = result.exception.message ?: "Erro ao carregar artistas" 
                         ) 
                     }

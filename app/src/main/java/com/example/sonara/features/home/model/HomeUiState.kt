@@ -19,5 +19,6 @@ data class HomeUiState(
 
     // ── Controle de UI ────────────────────────────────────────────────────────
     val isLoading: Boolean    = false,
+    val isRefreshing: Boolean = false,
     val errorMessage: String? = null
 )

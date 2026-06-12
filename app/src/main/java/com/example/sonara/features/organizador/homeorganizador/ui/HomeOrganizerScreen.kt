@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -17,15 +18,15 @@ import androidx.compose.foundation.lazy.items
 import com.example.sonara.features.home.components.SmallEventCard
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
+import androidx.compose.material3.*
+import androidx.compose.material3.pulltorefresh.PullToRefreshContainer
+import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -37,6 +38,7 @@ import com.example.sonara.core.ui.components.header.HomeHeader
 import com.example.sonara.core.ui.theme.AppColors
 import com.example.sonara.features.organizador.homeorganizador.viewmodel.HomeOrganizerViewModel
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeOrganizerScreen(
     modifier: Modifier = Modifier,
@@ -48,100 +50,121 @@ fun HomeOrganizerScreen(
     onNavigateToEventDetails: (Int) -> Unit = {}
 ) {
     val uiState by viewModel.uiState.collectAsState()
+    val pullToRefreshState = rememberPullToRefreshState()
 
+    if (pullToRefreshState.isRefreshing) {
+        LaunchedEffect(true) {
+            viewModel.loadEvents(isRefreshing = true)
+        }
+    }
 
-    ScreenContainer(
-        modifier = modifier.verticalScroll(rememberScrollState()),
-        verticalArrangement = Arrangement.Top,
-        verticalSpacing = 16.dp,
-        padding = PaddingValues(start = 12.dp, end = 12.dp, top = 40.dp, bottom = 130.dp)
-    ) {
-        // Header com dados reais da sessão
-        HomeHeader(
-            state = HeaderUiState(
-                userName = uiState.userName,
-                userRole = uiState.userRole,
-                avatarUrl = uiState.userPhoto,
-                isLoggedIn = true
-            ),
-            onLogoClick = {},
-            onAvatarClick = onNavigateToProfile,
-            onNotificationClick = {}
-        )
+    LaunchedEffect(uiState.isRefreshing) {
+        if (!uiState.isRefreshing) {
+            pullToRefreshState.endRefresh()
+        }
+    }
 
-        Card(
-            modifier = Modifier
-                .fillMaxWidth()
-                .wrapContentHeight(),
-            shape = RoundedCornerShape(16.dp),
-            colors = CardDefaults.cardColors(containerColor = AppColors.PrimaryColor.copy(0.5f))
+    Box(modifier = modifier.fillMaxSize().nestedScroll(pullToRefreshState.nestedScrollConnection)) {
+        ScreenContainer(
+            modifier = Modifier.verticalScroll(rememberScrollState()),
+            verticalArrangement = Arrangement.Top,
+            verticalSpacing = 16.dp,
+            padding = PaddingValues(start = 12.dp, end = 12.dp, top = 40.dp, bottom = 130.dp)
         ) {
-            Column(
+            // Header com dados reais da sessão
+            HomeHeader(
+                state = HeaderUiState(
+                    userName = uiState.userName,
+                    userRole = uiState.userRole,
+                    avatarUrl = uiState.userPhoto,
+                    isLoggedIn = true
+                ),
+                onLogoClick = {},
+                onAvatarClick = onNavigateToProfile,
+                onNotificationClick = {}
+            )
+
+            Card(
                 modifier = Modifier
-                    .padding(16.dp),
-                verticalArrangement = Arrangement.spacedBy(16.dp)
+                    .fillMaxWidth()
+                    .wrapContentHeight(),
+                shape = RoundedCornerShape(16.dp),
+                colors = CardDefaults.cardColors(containerColor = AppColors.PrimaryColor.copy(0.5f))
             ) {
-                // Saudação personalizada
-                val displayFirstName = uiState.userName.split(" ").firstOrNull() ?: "Organizador"
-                Text(
-                    text = "Olá $displayFirstName, o que vamos fazer hoje?",
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = AppColors.colorFontLogin
-                )
-
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(12.dp),
-                    verticalAlignment = Alignment.CenterVertically
+                Column(
+                    modifier = Modifier
+                        .padding(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
-                    OrganizerActionBox(
-                        text = "Criar Evento",
-                        modifier = Modifier.weight(1f),
-                        onClick = onNavigateToCreateEvent,
-                        colors = AppColors.colorFontLogin
-                    )
-
-                    OrganizerActionBox(
-                        text = "Contratar Artista",
-                        modifier = Modifier.weight(1f),
-                        onClick = onNavigateToHireArtist,
-                        colors = AppColors.colorFontLogin
-                    )
-                }
-
-                OrganizerActionBox(
-                    text = "Gerenciar Meus Eventos",
-                    modifier = Modifier.fillMaxWidth(),
-                    onClick = onNavigateToMyEvents,
-                    colors = AppColors.colorFontLogin
-                )
-
-                if (uiState.events.isNotEmpty()) {
+                    // Saudação personalizada
+                    val displayFirstName = uiState.userName.split(" ").firstOrNull() ?: "Organizador"
                     Text(
-                        text = "Eventos Próximos ",
-                        fontSize = 16.sp,
-                        fontWeight = FontWeight.SemiBold,
-                        color = AppColors.colorFontLogin,
-                        modifier = Modifier.padding(top = 8.dp)
+                        text = "Olá $displayFirstName, o que vamos fazer hoje?",
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = AppColors.colorFontLogin
                     )
 
-                    LazyRow(
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.spacedBy(12.dp),
-                        contentPadding = PaddingValues(bottom = 8.dp)
+                        verticalAlignment = Alignment.CenterVertically
                     ) {
-                        items(uiState.events) { evento ->
-                            SmallEventCard(
-                                evento = evento,
-                                width = 150.dp,
-                                isLoggedIn = true,
-                                onClick = { onNavigateToEventDetails(evento.id) }
-                            )
+                        OrganizerActionBox(
+                            text = "Criar Evento",
+                            modifier = Modifier.weight(1f),
+                            onClick = onNavigateToCreateEvent,
+                            colors = AppColors.colorFontLogin
+                        )
+
+                        OrganizerActionBox(
+                            text = "Contratar Artista",
+                            modifier = Modifier.weight(1f),
+                            onClick = onNavigateToHireArtist,
+                            colors = AppColors.colorFontLogin
+                        )
+                    }
+
+                    OrganizerActionBox(
+                        text = "Gerenciar Meus Eventos",
+                        modifier = Modifier.fillMaxWidth(),
+                        onClick = onNavigateToMyEvents,
+                        colors = AppColors.colorFontLogin
+                    )
+
+                    if (uiState.events.isNotEmpty()) {
+                        Text(
+                            text = "Eventos Próximos ",
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.SemiBold,
+                            color = AppColors.colorFontLogin,
+                            modifier = Modifier.padding(top = 8.dp)
+                        )
+
+                        LazyRow(
+                            horizontalArrangement = Arrangement.spacedBy(12.dp),
+                            contentPadding = PaddingValues(bottom = 8.dp)
+                        ) {
+                            items(uiState.events) { evento ->
+                                SmallEventCard(
+                                    evento = evento,
+                                    width = 150.dp,
+                                    isLoggedIn = true,
+                                    onClick = { onNavigateToEventDetails(evento.id) }
+                                )
+                            }
                         }
                     }
                 }
             }
         }
+
+        PullToRefreshContainer(
+            state = pullToRefreshState,
+            modifier = Modifier.align(Alignment.TopCenter),
+            contentColor = AppColors.colorFontLogin,
+            containerColor = Color.Transparent
+        )
     }
 }
 
