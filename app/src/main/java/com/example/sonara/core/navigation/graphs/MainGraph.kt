@@ -127,6 +127,8 @@ fun NavGraphBuilder.mainGraph(
                     val eaId = backStackEntry.arguments?.getString("eaId")?.toIntOrNull()
                     YourCandidacyScreen(
                         eventoId = eventId,
+                        onNavigateToProfile = { rootNavController.navigate(Routes.Profile.route) },
+                        onNavigateToLogin = { rootNavController.navigate(Routes.Login.route) },
                         eventoArtistaId = eaId,
                         onBack = { bottomNavController.popBackStack() }
                     )

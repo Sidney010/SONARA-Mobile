@@ -19,6 +19,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.Button
@@ -51,6 +52,7 @@ import coil.compose.AsyncImage
 import com.example.sonara.core.layout.ScreenContainer
 import com.example.sonara.core.ui.components.AppButton
 import com.example.sonara.core.ui.components.header.HeaderUiState
+import com.example.sonara.core.ui.components.header.HeaderUserSection
 import com.example.sonara.core.ui.components.header.HomeHeader
 import com.example.sonara.core.ui.theme.AppColors
 import com.example.sonara.core.ui.theme.DarkGradients
@@ -59,6 +61,8 @@ import com.example.sonara.features.artista.candidaturaStatus.viewmodel.YourCandi
 @Composable
 fun YourCandidacyScreen(
     eventoId: Int,
+    onNavigateToProfile: () -> Unit = {},
+    onNavigateToLogin: () -> Unit = {},
     eventoArtistaId: Int? = null,
     onBack: () -> Unit,
     viewModel: YourCandidacyViewModel = hiltViewModel()
@@ -109,17 +113,31 @@ fun YourCandidacyScreen(
             padding = PaddingValues(start = 12.dp, end = 12.dp, top = 40.dp, bottom = 40.dp)
         ) {
 
-            HomeHeader(
-                state = HeaderUiState(
-                    userName = uiState.userName,
-                    userRole = uiState.userRole,
-                    avatarUrl = uiState.userPhoto,
-                    isLoggedIn = uiState.isLoggedIn
-                ),
-                onLogoClick = onBack,
-                onAvatarClick = {},
-                onNotificationClick = {}
-            )
+            // ── Custom Detail Header with Back Arrow ─────────────────────────────
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                IconButton(onClick = onBack) {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                        contentDescription = "Voltar",
+                        tint = Color.White
+                    )
+                }
+
+                HeaderUserSection(
+                    state = HeaderUiState(
+                        userName = uiState.userName,
+                        userRole = uiState.userRole,
+                        avatarUrl = uiState.userPhoto,
+                        isLoggedIn = uiState.isLoggedIn
+                    ),
+                    onAvatarClick = {if (uiState.isLoggedIn) onNavigateToProfile() else onNavigateToLogin()},
+                    onNotificationClick = {}
+                )
+            }
 
             if (uiState.isLoading) {
                 CircularProgressIndicator(
@@ -216,8 +234,9 @@ fun YourCandidacyScreen(
                             ) {
                                 Text(
                                     text = uiState.evento?.descricao ?: "Sem descrição.",
-                                    fontSize = 15.sp,
-                                    color = AppColors.colorFontLogin
+                                    fontSize = 14.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    color = Color.White
                                 )
                             }
                         }
@@ -277,13 +296,14 @@ fun YourCandidacyScreen(
                             Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
                                 Text(
                                     text = "DATA",
-                                    fontSize = 13.sp,
-                                    color = Color.White.copy(alpha = 0.55f)
+                                    fontSize = 14.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    color = AppColors.colorFontLogin
                                 )
                                 Text(
                                     text = uiState.evento?.data ?: "DD/MM/AAAA",
-                                    fontSize = 14.sp,
-                                    color = Color.White.copy(alpha = 0.7f)
+                                    fontSize = 13.sp,
+                                    color = Color.White
                                 )
                             }
                             Column(
@@ -292,13 +312,14 @@ fun YourCandidacyScreen(
                             ) {
                                 Text(
                                     text = "HORA",
-                                    fontSize = 13.sp,
-                                    color = Color.White.copy(alpha = 0.55f)
+                                    fontSize = 14.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    color = AppColors.colorFontLogin
                                 )
                                 Text(
                                     text = uiState.evento?.horaInicio ?: "00:00",
-                                    fontSize = 14.sp,
-                                    color = Color.White.copy(alpha = 0.7f)
+                                    fontSize = 13.sp,
+                                    color = Color.White
                                 )
                             }
                         }
@@ -330,8 +351,9 @@ fun YourCandidacyScreen(
                         }
                     }
 
-                    Spacer(modifier = Modifier.height(45.dp))
+
                 }
+                Spacer(modifier = Modifier.height(45.dp))
             }
         }
     }
@@ -345,13 +367,15 @@ fun InfoRow(label: String, value: String) {
     ) {
         Text(
             text = label,
-            fontSize = 13.sp,
-            color = Color.White.copy(alpha = 0.55f)
+            fontSize = 14.sp,
+            fontWeight = FontWeight.Bold,
+            color = AppColors.colorFontLogin
         )
         Text(
             text = value,
             fontSize = 14.sp,
-            color = Color(0xFFFFAA70).copy(alpha = 0.6f)
+            fontWeight = FontWeight.Bold,
+            color = Color.White
         )
     }
 }
@@ -381,8 +405,9 @@ fun CacheInputField(
     ) {
         Text(
             text = label,
-            fontSize = 13.sp,
-            color = Color.White.copy(alpha = 0.55f)
+            fontSize = 14.sp,
+            fontWeight = FontWeight.Bold,
+            color = AppColors.colorFontLogin
         )
 
         Box(
@@ -399,7 +424,8 @@ fun CacheInputField(
                 singleLine = true,
                 textStyle = TextStyle(
                     fontSize = 14.sp,
-                    color = AppColors.colorFontLogin.copy(0.9f)
+                    fontWeight = FontWeight.Bold,
+                    color = Color.White
                 ),
                 cursorBrush = SolidColor(Color(0xFFFFAA70)),
                 modifier = Modifier
@@ -410,7 +436,8 @@ fun CacheInputField(
                         Text(
                             text = placeholder,
                             fontSize = 14.sp,
-                            color = Color(0xFFFFAA70).copy(alpha = 0.6f)
+                            fontWeight = FontWeight.Bold,
+                            color = Color.White
                         )
                     }
                     innerTextField()

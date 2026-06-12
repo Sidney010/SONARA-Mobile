@@ -94,7 +94,7 @@ fun ArtistProfileScreen(
                         Icon(
                             imageVector        = Icons.Outlined.ExitToApp,
                             contentDescription = "Sair",
-                            tint               = AppColors.SecondColor
+                            tint               = AppColors.colorFontLogin
                         )
                     }
                 },
@@ -118,10 +118,6 @@ fun ArtistProfileScreen(
                     color    = AppColors.PrimaryColor
                 )
 
-//                uiState.perfil != null -> ProfileContent(
-//                    perfil    = uiState.perfil!!,
-//                    isEditing = uiState.isEditing
-//                )
 
                 uiState.errorMessage != null -> Column(
                     modifier            = Modifier.align(Alignment.Center),

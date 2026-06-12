@@ -45,7 +45,6 @@ fun StartWelcomeScreen(
             onClick = onNavigateToLogin
         )
 
-
     }
 }
 
