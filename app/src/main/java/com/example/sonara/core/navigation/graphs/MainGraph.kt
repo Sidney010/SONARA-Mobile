@@ -131,6 +131,7 @@ fun NavGraphBuilder.mainGraph(
                         onBack = { bottomNavController.popBackStack() }
                     )
                 }
+                //tmnc
 
                 composable("about_event_user/{eventId}") { backStackEntry ->
                     val eventId = backStackEntry.arguments?.getString("eventId")?.toInt() ?: 0
