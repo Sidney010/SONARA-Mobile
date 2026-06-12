@@ -34,14 +34,14 @@ fun StartWelcomeScreen(
 
         EnterButton(
             title = "Anonimo",
-            icon = R.drawable.sonara_logo,
+            icon = R.drawable.d,
             onClick = onNavigateAnonymous
         )
 
 
         EnterButton(
             title = "Login",
-            icon = R.drawable.sonara_logo,
+            icon = R.drawable.c,
             onClick = onNavigateToLogin
         )
 

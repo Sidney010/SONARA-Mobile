@@ -150,9 +150,19 @@ interface SonaraApi {
         @Path("artistaId") artistaId: Int
     ): Response<ApiResponse<CandidaturaListDto>>
 
-    @POST("candidatura")
+    @POST("eventoArtista/candidatar/")
     suspend fun criarCandidatura(
         @Body request: CandidaturaCreateRequestDto
+    ): Response<ApiResponse<CandidaturaDto>>
+
+    @PUT("eventoArtista/aceitarConvite/{id}")
+    suspend fun aceitarConvite(
+        @Path("id") id: Int
+    ): Response<ApiResponse<CandidaturaDto>>
+
+    @PUT("eventoArtista/recusarConvite/{id}")
+    suspend fun recusarConvite(
+        @Path("id") id: Int
     ): Response<ApiResponse<CandidaturaDto>>
 
     @PUT("candidatura/{id}")

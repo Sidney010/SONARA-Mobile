@@ -8,4 +8,6 @@ interface EventoArtistaRepository {
     suspend fun criar(eventoArtista: EventoArtista): AppResult<EventoArtista>
     suspend fun atualizar(id: Int, eventoArtista: EventoArtista): AppResult<EventoArtista>
     suspend fun deletar(id: Int): AppResult<Unit>
+    suspend fun aceitarConvite(id: Int): AppResult<EventoArtista>
+    suspend fun recusarConvite(id: Int): AppResult<EventoArtista>
 }

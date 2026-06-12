@@ -9,5 +9,6 @@ data class EventoArtista(
     val cacheFinal: Double?,
     val contraProposta: Double?,
     val sobreArtista: String?,
-    val motivoInscricao: String?
+    val motivoInscricao: String?,
+    val status: String? = "Pendente"
 )

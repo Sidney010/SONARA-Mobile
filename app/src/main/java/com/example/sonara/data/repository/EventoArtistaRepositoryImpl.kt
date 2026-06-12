@@ -4,6 +4,7 @@ import com.example.sonara.core.common.AppResult
 import com.example.sonara.core.network.safeApiCall
 import com.example.sonara.core.network.safeApiCallSimple
 import com.example.sonara.data.mapper.toDomain
+import com.example.sonara.data.mapper.toCandidaturaRequestDto
 import com.example.sonara.data.mapper.toRequestDto
 import com.example.sonara.data.remote.api.SonaraApi
 import com.example.sonara.domain.model.EventoArtista
@@ -22,9 +23,9 @@ class EventoArtistaRepositoryImpl @Inject constructor(
     }
 
     override suspend fun criar(eventoArtista: EventoArtista): AppResult<EventoArtista> {
-        return safeApiCallSimple(
-            apiCall = { api.criarEventoArtista(eventoArtista.toRequestDto()) },
-            mapper = { it.response.eventoArtista.toDomain() }
+        return safeApiCall(
+            apiCall = { api.criarCandidatura(eventoArtista.toCandidaturaRequestDto()) },
+            mapper = { it.toDomain() }
         )
     }
 
@@ -46,5 +47,19 @@ class EventoArtistaRepositoryImpl @Inject constructor(
         } catch (e: Exception) {
             AppResult.Error(e)
         }
+    }
+
+    override suspend fun aceitarConvite(id: Int): AppResult<EventoArtista> {
+        return safeApiCall(
+            apiCall = { api.aceitarConvite(id) },
+            mapper = { it.toDomain() }
+        )
+    }
+
+    override suspend fun recusarConvite(id: Int): AppResult<EventoArtista> {
+        return safeApiCall(
+            apiCall = { api.recusarConvite(id) },
+            mapper = { it.toDomain() }
+        )
     }
 }

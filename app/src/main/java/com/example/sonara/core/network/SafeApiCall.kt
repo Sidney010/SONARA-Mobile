@@ -12,7 +12,10 @@ suspend fun <T, R> safeApiCall(
         if (response.isSuccessful) {
             val body = response.body()
             if (body != null && body.status) {
-                AppResult.Success(mapper(body.data))
+                AppResult.Success(
+                    data = mapper(body.data),
+                    message = body.message
+                )
             } else {
                 AppResult.Error(
                     Exception(body?.message ?: "Erro na resposta da API")

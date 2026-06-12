@@ -280,9 +280,36 @@ fun YourCandidacyScreen(
 
                         if (uiState.eventoArtista != null) {
                             DividerItem()
+                            InfoRow(label = "Status Atual:", value = uiState.eventoArtista?.status ?: "Pendente")
+                            DividerItem()
                             InfoRow(label = "Cachê Ofertado:", value = "R$ ${uiState.eventoArtista?.cacheOfertado ?: "0.0"}")
                             DividerItem()
                             InfoRow(label = "Cachê Final:", value = "R$ ${uiState.eventoArtista?.cacheFinal ?: "0.0"}")
+                            
+                            Spacer(modifier = Modifier.height(16.dp))
+                            
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                            ) {
+                                Button(
+                                    onClick = { viewModel.acceptInvitation() },
+                                    modifier = Modifier.weight(1f),
+                                    shape = RoundedCornerShape(8.dp),
+                                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF4CAF50))
+                                ) {
+                                    Text("Aceitar", color = Color.White)
+                                }
+                                
+                                Button(
+                                    onClick = { viewModel.refuseInvitation() },
+                                    modifier = Modifier.weight(1f),
+                                    shape = RoundedCornerShape(8.dp),
+                                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFF44336))
+                                ) {
+                                    Text("Recusar", color = Color.White)
+                                }
+                            }
                         }
 
                         DividerItem()

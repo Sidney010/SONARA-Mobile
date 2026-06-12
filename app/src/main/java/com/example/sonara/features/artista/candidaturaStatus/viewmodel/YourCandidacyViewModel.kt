@@ -136,12 +136,56 @@ class YourCandidacyViewModel @Inject constructor(
                             isLoading = false,
                             isSuccess = true, 
                             eventoArtista = result.data,
-                            successMessage = if (currentEA != null && currentEA.idEventoArtista != 0) "Candidatura atualizada com sucesso!" else "Candidatura enviada com sucesso!"
+                            successMessage = result.message ?: if (currentEA != null && currentEA.idEventoArtista != 0) "Candidatura atualizada com sucesso!" else "Candidatura enviada com sucesso!"
                         ) 
                     }
                 }
                 is AppResult.Error -> {
-                    _uiState.update { it.copy(isLoading = false, error = "Erro ao salvar candidatura: ${result.exception.message}") }
+                    _uiState.update { it.copy(isLoading = false, error = result.exception.message ?: "Erro ao salvar candidatura") }
+                }
+            }
+        }
+    }
+
+    fun acceptInvitation() {
+        val eaId = _uiState.value.eventoArtista?.idEventoArtista ?: return
+        viewModelScope.launch {
+            _uiState.update { it.copy(isLoading = true, error = null) }
+            when (val result = eventoArtistaRepository.aceitarConvite(eaId)) {
+                is AppResult.Success -> {
+                    _uiState.update {
+                        it.copy(
+                            isLoading = false,
+                            isSuccess = true,
+                            eventoArtista = result.data,
+                            successMessage = result.message ?: "Convite aceito com sucesso!"
+                        )
+                    }
+                }
+                is AppResult.Error -> {
+                    _uiState.update { it.copy(isLoading = false, error = result.exception.message ?: "Erro ao aceitar convite") }
+                }
+            }
+        }
+    }
+
+    fun refuseInvitation() {
+        val eaId = _uiState.value.eventoArtista?.idEventoArtista ?: return
+        viewModelScope.launch {
+            _uiState.update { it.copy(isLoading = true, error = null) }
+            when (val result = eventoArtistaRepository.recusarConvite(eaId)) {
+                is AppResult.Success -> {
+                    _uiState.update {
+                        it.copy(
+                            isLoading = false,
+                            isSuccess = true,
+                            eventoArtista = result.data,
+                            successMessage = result.message ?: "Convite recusado."
+                        )
+                    }
+                }
+                is AppResult.Error -> {
+                    _uiState.update { it.copy(isLoading = false, error = result.exception.message ?: "Erro ao recusar convite") }
                 }
             }
         }
