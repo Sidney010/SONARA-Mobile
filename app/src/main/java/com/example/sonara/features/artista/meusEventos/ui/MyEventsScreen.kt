@@ -1,39 +1,42 @@
 package com.example.sonara.features.artista.meusEventos.ui
 
-import android.widget.Toast
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material3.*
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Text
 import androidx.compose.material3.pulltorefresh.PullToRefreshContainer
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import coil.compose.AsyncImage
 import com.example.sonara.core.layout.ScreenContainer
 import com.example.sonara.core.ui.components.header.HeaderUiState
 import com.example.sonara.core.ui.components.header.HomeHeader
 import com.example.sonara.core.ui.components.modal.ConfirmModal
 import com.example.sonara.core.ui.theme.AppColors
-import com.example.sonara.core.ui.theme.DarkGradients
 import com.example.sonara.domain.model.usuarioperfil.UsuarioEventoPerfil
+import com.example.sonara.features.artista.meusEventos.components.EventoCardItem
 import com.example.sonara.features.artista.meusEventos.viewmodel.MyEventsViewModel
-import com.example.sonara.features.home.components.formatarData
-import com.example.sonara.features.home.components.formatarHora
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -143,120 +146,4 @@ fun MyEvents(
     }
 }
 
-@Composable
-fun EventoCardItem(
-    evento: UsuarioEventoPerfil,
-    onClick: () -> Unit,
-    onDelete: () -> Unit
-) {
-    val context = LocalContext.current
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable {
-                val status = evento.status?.lowercase()
-                if (status == "aprovado" || status == "confirmado" || status == "convite aceito") {
-                    Toast.makeText(
-                        context,
-                        "Eventos já confirmados não podem ser alterados",
-                        Toast.LENGTH_SHORT
-                    ).show()
-                } else {
-                    onClick()
-                }
-            },
-        shape = RoundedCornerShape(12.dp),
-        colors = CardDefaults.cardColors(containerColor = AppColors.colorCard.copy(0.4f))
-    ) {
-        Row(
-            modifier = Modifier
-                .padding(12.dp)
-                .fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Card(
-                modifier = Modifier
-                    .size(80.dp),
-                shape = RoundedCornerShape(8.dp)
-            ) {
-                val fotoUrl = evento.fotos?.firstOrNull()?.url
-                AsyncImage(
-                    model = fotoUrl,
-                    contentDescription = null,
-                    modifier = Modifier.fillMaxSize(),
-                    contentScale = ContentScale.Crop
-                )
-            }
 
-            Spacer(modifier = Modifier.width(16.dp))
-
-            Column(
-                modifier = Modifier.weight(1f),
-                verticalArrangement = Arrangement.spacedBy(4.dp)
-            ) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(
-                        text = evento.eventoNome ?: "Sem nome",
-                        fontSize = 16.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = Color.White,
-                        modifier = Modifier.weight(1f)
-                    )
-                    
-                    IconButton(onClick = {
-                        val status = evento.status?.lowercase()
-                        if (status == "aprovado" || status == "confirmado") {
-                            Toast.makeText(
-                                context,
-                                "Eventos já confirmados não podem ser alterados",
-                                Toast.LENGTH_SHORT
-                            ).show()
-                        } else {
-                            onDelete()
-                        }
-                    }) {
-                        Icon(
-                            imageVector = Icons.Default.Delete,
-                            contentDescription = "Remover",
-                            tint = if (evento.status?.lowercase() == "aprovado" || evento.status?.lowercase() == "confirmado" || evento.status?.lowercase() == "convite aceito")
-                                Color.Gray.copy(alpha = 0.5f) 
-                            else 
-                                Color.Red.copy(alpha = 0.7f),
-                            modifier = Modifier.size(20.dp)
-                        )
-                    }
-                }
-
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text(
-                        text = "${formatarData(evento.eventoData)} às ${formatarHora(evento.horaInicio)}",
-                        fontSize = 12.sp,
-                        color = Color.LightGray
-                    )
-                }
-
-                Text(
-                    text = evento.status ?: "Pendente",
-                    fontSize = 12.sp,
-                    color = when(evento.status?.lowercase()) {
-                        "aprovado", "confirmado","convite aceito" -> Color.Green
-                        "rejeitado", "recusado", "convite recusado" -> Color.Red
-                        else -> Color(0xFFFF8A50)
-                    },
-                    fontWeight = FontWeight.SemiBold
-                )
-
-                Text(
-                    text = evento.descricao ?: "",
-                    fontSize = 11.sp,
-                    color = Color.LightGray,
-                    maxLines = 2
-                )
-            }
-        }
-    }
-}

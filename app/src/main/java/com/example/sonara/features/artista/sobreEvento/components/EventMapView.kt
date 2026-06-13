@@ -1,4 +1,4 @@
-package com.example.sonara.features.artista.sobreEvento.ui.components
+package com.example.sonara.features.artista.sobreEvento.components
 
 import android.content.Context
 import androidx.compose.runtime.Composable

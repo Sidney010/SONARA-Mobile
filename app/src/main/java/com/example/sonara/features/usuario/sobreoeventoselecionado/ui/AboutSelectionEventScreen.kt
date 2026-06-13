@@ -7,7 +7,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -24,7 +23,7 @@ import com.example.sonara.core.layout.ScreenContainer
 import com.example.sonara.core.ui.components.header.HeaderUiState
 import com.example.sonara.core.ui.components.header.HeaderUserSection
 import com.example.sonara.core.ui.theme.DarkGradients
-import com.example.sonara.features.artista.sobreEvento.ui.components.EventMapView
+import com.example.sonara.features.artista.sobreEvento.components.EventMapView
 import com.example.sonara.features.home.components.ImageCarousel
 import com.example.sonara.features.home.components.formatarData
 import com.example.sonara.features.home.components.formatarHora

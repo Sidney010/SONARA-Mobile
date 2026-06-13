@@ -92,27 +92,40 @@ class YourCandidacyViewModel @Inject constructor(
 
     fun submitCandidacy(
         eventoId: Int,
-        cacheEsperado: Double,
+        cacheEsperadoStr: String,
         sobreArtista: String,
         motivoInscricao: String
     ) {
+        if (cacheEsperadoStr.isBlank() || sobreArtista.isBlank() || motivoInscricao.isBlank()) {
+            _uiState.update { it.copy(error = "Por favor, preencha todos os campos.") }
+            return
+        }
+
+        val cacheClean = cacheEsperadoStr.replace(Regex("[^0-9,]"), "").replace(",", ".")
+        val cacheDouble = cacheClean.toDoubleOrNull() ?: 0.0
+
+        if (cacheDouble <= 0.0) {
+            _uiState.update { it.copy(error = "O cachê esperado deve ser maior que zero.") }
+            return
+        }
+
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true, error = null) }
             val artistaIdStr = tokenManager.artistId.first()
             val artistaId = artistaIdStr?.toIntOrNull()
-            
+
             if (artistaId == null) {
                 _uiState.update { it.copy(isLoading = false, error = "ID do artista não encontrado. Faça login novamente.") }
                 return@launch
             }
-            
+
             val currentEA = _uiState.value.eventoArtista
             val result = if (currentEA != null && currentEA.idEventoArtista != 0) {
                 // Atualizar
                 eventoArtistaRepository.atualizar(
                     currentEA.idEventoArtista,
                     currentEA.copy(
-                        cacheEsperado = cacheEsperado,
+                        cacheEsperado = cacheDouble,
                         sobreArtista = sobreArtista,
                         motivoInscricao = motivoInscricao
                     )
@@ -124,7 +137,7 @@ class YourCandidacyViewModel @Inject constructor(
                         idEventoArtista = 0,
                         artistaId = artistaId,
                         eventoId = eventoId,
-                        cacheEsperado = cacheEsperado,
+                        cacheEsperado = cacheDouble,
                         cacheOfertado = null,
                         cacheFinal = null,
                         contraProposta = null,

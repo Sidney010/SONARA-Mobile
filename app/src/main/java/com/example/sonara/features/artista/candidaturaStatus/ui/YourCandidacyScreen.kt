@@ -1,6 +1,5 @@
 package com.example.sonara.features.artista.candidaturaStatus.ui
 
-import android.R.attr.label
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -17,12 +16,12 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Person
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -44,12 +43,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -59,9 +57,14 @@ import com.example.sonara.core.ui.components.header.HeaderUiState
 import com.example.sonara.core.ui.components.header.HeaderUserSection
 import com.example.sonara.core.ui.theme.AppColors
 import com.example.sonara.core.ui.theme.DarkGradients
+import com.example.sonara.features.artista.candidaturaStatus.components.CandidacyInputField
+import com.example.sonara.features.artista.candidaturaStatus.components.DividerItem
+import com.example.sonara.features.artista.candidaturaStatus.components.InfoRow
 import com.example.sonara.features.artista.candidaturaStatus.viewmodel.YourCandidacyViewModel
 import com.example.sonara.features.home.components.formatarData
 import com.example.sonara.features.home.components.formatarHora
+import java.text.NumberFormat
+import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -105,7 +108,10 @@ fun YourCandidacyScreen(
 
     LaunchedEffect(uiState.eventoArtista) {
         uiState.eventoArtista?.let {
-            cacheEsperado = it.cacheEsperado?.toString() ?: ""
+            cacheEsperado = it.cacheEsperado?.let { cache ->
+                NumberFormat.getCurrencyInstance(Locale("pt", "BR")).format(cache)
+                    .replace("R$", "").trim()
+            } ?: ""
             sobreArtista = it.sobreArtista ?: ""
             motivoInscricao = it.motivoInscricao ?: ""
         }
@@ -283,28 +289,49 @@ fun YourCandidacyScreen(
 
                         val isEditable = !isFinalized
 
-                        CacheInputField(
-                            label = "Seu Cachê Esperado:",
+                        CandidacyInputField(
+                            label = "Cachê Esperado:",
                             value = cacheEsperado,
-                            onValueChange = { cacheEsperado = it },
-                            placeholder = "Digite aqui...",
-                            enabled = isEditable
+                            onValueChange = { input ->
+                                if (isEditable) {
+                                    val cleaned = input.replace(Regex("[^\\d]"), "")
+                                    if (cleaned.isEmpty()) {
+                                        cacheEsperado = ""
+                                    } else {
+                                        val parsed = cleaned.toDouble() / 100
+                                        cacheEsperado = NumberFormat.getCurrencyInstance(Locale("pt", "BR"))
+                                            .format(parsed)
+                                            .replace("R$", "")
+                                            .trim()
+                                    }
+                                }
+                            },
+                            placeholder = "0,00",
+                            enabled = isEditable,
+                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                            prefix = "R$ "
                         )
                         
-                        CacheInputField(
-                            label = "Sobre Você:",
+                        CandidacyInputField(
+                            label = "Sobre o Artista:",
                             value = sobreArtista,
-                            onValueChange = { sobreArtista = it },
+                            onValueChange = { if (isEditable && it.length <= 500) sobreArtista = it },
                             placeholder = "Fale um pouco sobre você...",
-                            enabled = isEditable
+                            enabled = isEditable,
+                            maxChar = 500,
+                            singleLine = false,
+                            minLines = 3
                         )
 
-                        CacheInputField(
+                        CandidacyInputField(
                             label = "Motivo da Inscrição:",
                             value = motivoInscricao,
-                            onValueChange = { motivoInscricao = it },
+                            onValueChange = { if (isEditable && it.length <= 500) motivoInscricao = it },
                             placeholder = "Por que você quer participar?",
-                            enabled = isEditable
+                            enabled = isEditable,
+                            maxChar = 500,
+                            singleLine = false,
+                            minLines = 3
                         )
 
                         if (uiState.eventoArtista != null) {
@@ -399,7 +426,7 @@ fun YourCandidacyScreen(
                             onClick = { 
                                 viewModel.submitCandidacy(
                                     eventoId = eventoId,
-                                    cacheEsperado = cacheEsperado.toDoubleOrNull() ?: 0.0,
+                                    cacheEsperadoStr = cacheEsperado,
                                     sobreArtista = sobreArtista,
                                     motivoInscricao = motivoInscricao
                                 )
@@ -432,92 +459,8 @@ fun YourCandidacyScreen(
     }
 }
 
-@Composable
-fun InfoRow(label: String, value: String, valueColor: Color = Color.White) {
-    Column(
-        modifier = Modifier.padding(vertical = 8.dp),
-        verticalArrangement = Arrangement.spacedBy(4.dp)
-    ) {
-        Text(
-            text = label,
-            fontSize = 14.sp,
-            fontWeight = FontWeight.Bold,
-            color = AppColors.colorFontLogin
-        )
-        Text(
-            text = value,
-            fontSize = 14.sp,
-            fontWeight = FontWeight.Bold,
-            color = valueColor
-        )
-    }
-}
-
-@Composable
-fun DividerItem() {
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(1.dp)
-            .background(Color.White.copy(alpha = 0.12f))
-    )
-}
 
 
-@Composable
-fun CacheInputField(
-    label: String,
-    value: String,
-    onValueChange: (String) -> Unit,
-    modifier: Modifier = Modifier,
-    placeholder: String = "Digite aqui...",
-    enabled: Boolean = true
-) {
-    Column(
-        modifier = modifier.padding(vertical = 8.dp),
-        verticalArrangement = Arrangement.spacedBy(4.dp)
-    ) {
-        Text(
-            text = label,
-            fontSize = 14.sp,
-            fontWeight = FontWeight.Bold,
-            color = AppColors.colorFontLogin
-        )
 
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(
-                    Color.LightGray.copy(alpha = 0.08f),
-                    shape = RoundedCornerShape(8.dp)
-                )
-        ) {
-            BasicTextField(
-                value = value,
-                onValueChange = onValueChange,
-                enabled = enabled,
-                singleLine = true,
-                textStyle = TextStyle(
-                    fontSize = 14.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Color.White
-                ),
-                cursorBrush = SolidColor(Color(0xFFFFAA70)),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 10.dp, vertical = 8.dp),
-                decorationBox = { innerTextField ->
-                    if (value.isEmpty()) {
-                        Text(
-                            text = placeholder,
-                            fontSize = 14.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = Color.White
-                        )
-                    }
-                    innerTextField()
-                }
-            )
-        }
-    }
-}
+
+
