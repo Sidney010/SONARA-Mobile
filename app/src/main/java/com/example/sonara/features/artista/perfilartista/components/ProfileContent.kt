@@ -222,6 +222,7 @@ private fun ProfileHeader(perfil: UsuarioPerfil) {
                     modifier = Modifier
                         .size(100.dp)
                         .clip(CircleShape)
+                        .background(Color.DarkGray)
                 )
             } else {
                 Box(

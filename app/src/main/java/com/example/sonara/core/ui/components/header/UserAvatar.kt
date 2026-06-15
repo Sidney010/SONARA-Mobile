@@ -9,6 +9,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
@@ -22,41 +23,31 @@ fun UserAvatar(
     modifier: Modifier = Modifier,
     onClick: () -> Unit
 ) {
-    val photoUrl: String? = avatarUrl
-
     Box(
         modifier = modifier
             .size(HeaderDimens.AvatarContainerSize)
             .clickable { onClick() },
-
         contentAlignment = Alignment.Center
     ) {
-
         Box(
             modifier = Modifier
                 .fillMaxSize(HeaderDimens.AvatarSizeFraction)
-                .background(
-                    color = Color.LightGray,
-                    shape = CircleShape
-                ),
-
+                .clip(CircleShape)
+                .background(Color.LightGray),
             contentAlignment = Alignment.Center
         ) {
-
             if (avatarUrl == null) {
-
                 AvatarPlaceholder()
-
             } else {
-
-                AsyncImage(                         // Coil
-                    model = photoUrl,
+                AsyncImage(
+                    model = avatarUrl,
                     contentDescription = "Avatar",
                     contentScale = ContentScale.Crop,
                     placeholder = painterResource(R.drawable.ic_launcher_foreground),
-                    error       = painterResource(R.drawable.ic_launcher_foreground),
-                    modifier = modifier
-                        .size(40.dp)
+                    error = painterResource(R.drawable.ic_launcher_foreground),
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .clip(CircleShape)
                 )
             }
         }
