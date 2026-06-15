@@ -155,7 +155,17 @@ class MyEventsViewModel @Inject constructor(
         }
     }
 
-    fun cancelCandidacy(idEventoArtista: Int) {
+    fun cancelCandidacy(idEventoArtista: Int, status: String?) {
+        val statusLower = status?.lowercase() ?: ""
+        val isApproved = listOf("aprovado", "confirmado", "convite aceito", "aceito").any {
+            statusLower.contains(it)
+        }
+        
+        if (isApproved) {
+            _uiState.update { it.copy(errorMessage = "Não é possível cancelar uma candidatura já aprovada ou confirmada.") }
+            return
+        }
+
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true) }
             when (val result = eventoArtistaRepository.deletar(idEventoArtista)) {

@@ -45,8 +45,11 @@ fun EventoCardItem(
         modifier = Modifier
             .fillMaxWidth()
             .clickable {
-                val status = evento.status?.lowercase()
-                if (status == "aprovado" || status == "confirmado" || status == "convite aceito") {
+                val status = evento.status?.lowercase() ?: ""
+                val isApproved = listOf("aprovado", "confirmado", "convite aceito", "aceito").any {
+                    status.contains(it)
+                }
+                if (isApproved) {
                     Toast.makeText(
                         context,
                         "Eventos já confirmados não podem ser alterados",
@@ -99,8 +102,11 @@ fun EventoCardItem(
                     )
 
                     IconButton(onClick = {
-                        val status = evento.status?.lowercase()
-                        if (status == "aprovado" || status == "confirmado") {
+                        val status = evento.status?.lowercase() ?: ""
+                        val isApproved = listOf("aprovado", "confirmado", "convite aceito", "aceito").any {
+                            status.contains(it)
+                        }
+                        if (isApproved) {
                             Toast.makeText(
                                 context,
                                 "Eventos já confirmados não podem ser alterados",
@@ -110,10 +116,14 @@ fun EventoCardItem(
                             onDelete()
                         }
                     }) {
+                        val status = evento.status?.lowercase() ?: ""
+                        val isApproved = listOf("aprovado", "confirmado", "convite aceito", "aceito").any {
+                            status.contains(it)
+                        }
                         Icon(
                             imageVector = Icons.Default.Delete,
                             contentDescription = "Remover",
-                            tint = if (evento.status?.lowercase() == "aprovado" || evento.status?.lowercase() == "confirmado" || evento.status?.lowercase() == "convite aceito")
+                            tint = if (isApproved)
                                 Color.Gray.copy(alpha = 0.5f)
                             else
                                 Color.Red.copy(alpha = 0.7f),

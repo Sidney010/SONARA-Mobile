@@ -74,9 +74,9 @@ fun MyEventsContent(
     onClearFilters: () -> Unit = {},
     onEventClick: (Int, Int?) -> Unit = { _, _ -> },
     onDeleteEvent: (UsuarioEventoPerfil) -> Unit = {},
-    onNavigateToHome:    () -> Unit = {},
+    onNavigateToHome: () -> Unit = {},
     onNavigateToProfile: () -> Unit = {},
-    onNavigateToLogin:   () -> Unit = {},
+    onNavigateToLogin: () -> Unit = {},
     isRefreshing: Boolean = false,
     onRefresh: () -> Unit = {}
 ) {
@@ -94,17 +94,17 @@ fun MyEventsContent(
         }
     }
 
-    val filterColors = OutlinedTextFieldDefaults.colors(
-        focusedBorderColor = Color.White,
-        unfocusedBorderColor = Color.White,
-        focusedTextColor = Color.White,
-        unfocusedTextColor = Color.White,
-        focusedLabelColor = Color.White,
-        unfocusedLabelColor = Color.White,
-        cursorColor = Color.White,
-        focusedContainerColor = Color.Transparent,
-        unfocusedContainerColor = Color.Transparent
-    )
+//    val filterColors = OutlinedTextFieldDefaults.colors(
+//        focusedBorderColor = Color.White,
+//        unfocusedBorderColor = Color.White,
+//        focusedTextColor = Color.White,
+//        unfocusedTextColor = Color.White,
+//        focusedLabelColor = Color.White,
+//        unfocusedLabelColor = Color.White,
+//        cursorColor = Color.White,
+//        focusedContainerColor = Color.Transparent,
+//        unfocusedContainerColor = Color.Transparent
+//    )
 
     // Picker States
 //    var showDatePicker by remember { mutableStateOf(false) }
@@ -351,7 +351,11 @@ fun MyEvents(
             confirmText = "Sim, cancelar",
             cancelText = "Não",
             onConfirm = {
-                eventToDelete?.idEventoArtista?.let { viewModel.cancelCandidacy(it) }
+                eventToDelete?.let { event ->
+                    event.idEventoArtista?.let { id ->
+                        viewModel.cancelCandidacy(id, event.status)
+                    }
+                }
                 eventToDelete = null
             },
             onDismiss = { eventToDelete = null }
@@ -365,7 +369,6 @@ fun MyEvents(
         onNavigateToHome = onNavigateToHome,
         onStatusChange = { viewModel.setStatusFilter(it.ifBlank { null }) },
         onDateChange = { viewModel.setDateFilter(it.ifBlank { null }) },
-
         onTimeChange = { viewModel.setTimeFilter(it.ifBlank { null }) },
         onClearFilters = { viewModel.clearFilters() },
         onEventClick = onEventClick,
