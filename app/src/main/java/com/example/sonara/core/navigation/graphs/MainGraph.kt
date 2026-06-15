@@ -16,6 +16,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.example.sonara.core.animation.NavigationAnimations
 import com.example.sonara.core.navigation.Routes
 import com.example.sonara.core.ui.components.navigation.BottomNavigationBar
 import com.example.sonara.core.ui.components.navigation.BottomNavigationState
@@ -72,7 +73,13 @@ fun NavGraphBuilder.mainGraph(
                 navController    = bottomNavController,
                 startDestination = Routes.Home.route,
             ) {
-                composable(Routes.Home.route) {
+                composable(
+                    route = Routes.Home.route,
+                    enterTransition = { NavigationAnimations.enter() },
+                    exitTransition = { NavigationAnimations.exit() },
+                    popEnterTransition = { NavigationAnimations.popEnter() },
+                    popExitTransition = { NavigationAnimations.popExit() }
+                ) {
                     val uiState by viewModel.uiState.collectAsState()
 
                     if (uiState.userRole == "Organizador" || uiState.userRole == "ORGANIZADOR") {
@@ -178,7 +185,13 @@ fun NavGraphBuilder.mainGraph(
                     }
                 }
 
-                composable(Routes.Events.route) {
+                composable(
+                    route = Routes.Events.route,
+                    enterTransition = { NavigationAnimations.enter() },
+                    exitTransition = { NavigationAnimations.exit() },
+                    popEnterTransition = { NavigationAnimations.popEnter() },
+                    popExitTransition = { NavigationAnimations.popExit() }
+                ) {
                     val viewModel: HomeViewModel = hiltViewModel()
                     val uiState by viewModel.uiState.collectAsState()
 
