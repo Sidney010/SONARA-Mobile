@@ -193,6 +193,17 @@ fun NavGraphBuilder.mainGraph(
                         com.example.sonara.features.artista.meusEventos.ui.MyEvents(
                             onEventClick = { eventId, eaId ->
                                 bottomNavController.navigate("your_candidacy/$eventId?eaId=$eaId")
+                            },
+                            onNavigateToHome    = {
+                                bottomNavController.navigate(Routes.Home.route) {
+                                    launchSingleTop = true
+                                }
+                            },
+                            onNavigateToProfile = {
+                                rootNavController.navigate(Routes.Profile.route)
+                            },
+                            onNavigateToLogin   = {
+                                rootNavController.navigate(Routes.Login.route)
                             }
                         )
                     } else {

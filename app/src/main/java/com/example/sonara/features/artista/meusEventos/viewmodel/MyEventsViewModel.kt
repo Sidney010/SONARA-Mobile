@@ -17,7 +17,11 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 data class MyEventsUiState(
-    val eventos: List<UsuarioEventoPerfil> = emptyList(),
+    val allEventos: List<UsuarioEventoPerfil> = emptyList(),
+    val filteredEventos: List<UsuarioEventoPerfil> = emptyList(),
+    val statusFilter: String? = null,
+    val dateFilter: String? = null,
+    val timeFilter: String? = null,
     val isLoading: Boolean = false,
     val isRefreshing: Boolean = false,
     val errorMessage: String? = null,
@@ -40,6 +44,54 @@ class MyEventsViewModel @Inject constructor(
 
     init {
         observeSessionAndLoadEvents()
+    }
+
+    private fun applyFilters() {
+        _uiState.update { state ->
+            val filtered = state.allEventos.filter { evento ->
+                val status = evento.status ?: ""
+                val matchStatus = when (state.statusFilter) {
+                    "Aprovado" -> listOf("Convite aceito", "Confirmado", "Aceito", "Aprovado").any {
+                        status.contains(it, ignoreCase = true)
+                    }
+                    "Recusado" -> listOf("Convite recusado", "Cancelado", "Reprovado").any {
+                        status.contains(it, ignoreCase = true)
+                    }
+                    "Pendente" -> listOf("Pendente", "Aguardando").any {
+                        status.contains(it, ignoreCase = true)
+                    }
+                    null -> true
+                    else -> status.contains(state.statusFilter, ignoreCase = true)
+                }
+                val matchDate = state.dateFilter == null || evento.eventoData?.contains(state.dateFilter) == true
+                
+                val horaInicio = evento.horaInicio ?: ""
+                val matchTime = state.timeFilter == null || horaInicio.contains(state.timeFilter) == true
+
+                matchStatus && matchDate && matchTime
+            }
+            state.copy(filteredEventos = filtered)
+        }
+    }
+
+    fun setStatusFilter(status: String?) {
+        _uiState.update { it.copy(statusFilter = status) }
+        applyFilters()
+    }
+
+    fun setDateFilter(date: String?) {
+        _uiState.update { it.copy(dateFilter = date) }
+        applyFilters()
+    }
+
+    fun setTimeFilter(time: String?) {
+        _uiState.update { it.copy(timeFilter = time) }
+        applyFilters()
+    }
+
+    fun clearFilters() {
+        _uiState.update { it.copy(statusFilter = null, dateFilter = null, timeFilter = null) }
+        applyFilters()
     }
 
     private fun observeSessionAndLoadEvents() {
@@ -86,7 +138,8 @@ class MyEventsViewModel @Inject constructor(
                     }
 
                     val candidaturas = perfil.artista?.eventos?.filterNotNull() ?: emptyList()
-                    _uiState.update { it.copy(eventos = candidaturas, isLoading = false, isRefreshing = false) }
+                    _uiState.update { it.copy(allEventos = candidaturas, isLoading = false, isRefreshing = false) }
+                    applyFilters()
                 }
                 is AppResult.Error -> {
                     _uiState.update {

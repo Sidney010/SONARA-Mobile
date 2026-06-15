@@ -34,8 +34,17 @@ import java.util.Locale
 fun formatarData(isoDate: String?): String {
     if (isoDate.isNullOrBlank()) return "Data a confirmar"
     return runCatching {
-        val zdt = ZonedDateTime.parse(isoDate)
-        zdt.format(DateTimeFormatter.ofPattern("dd/MM/yyyy", Locale("pt", "BR")))
+        if (isoDate.contains("T")) {
+            val zdt = ZonedDateTime.parse(isoDate)
+            zdt.format(DateTimeFormatter.ofPattern("dd/MM/yyyy", Locale("pt", "BR")))
+        } else {
+            val parts = isoDate.split("-")
+            if (parts.size == 3) {
+                "${parts[2]}/${parts[1]}/${parts[0]}"
+            } else {
+                isoDate
+            }
+        }
     }.getOrElse { isoDate.take(10) }
 }
 
