@@ -158,7 +158,7 @@ fun MyEventsContent(
         modifier = Modifier.nestedScroll(pullToRefreshState.nestedScrollConnection),
         verticalArrangement = Arrangement.Top,
         verticalSpacing = 16.dp,
-        padding = PaddingValues(16.dp, 40.dp)
+        padding = PaddingValues(12.dp, 40.dp)
     ) {
         HomeHeader(
             state = HeaderUiState(
@@ -174,7 +174,7 @@ fun MyEventsContent(
 
         Box(modifier = Modifier.fillMaxSize()) {
             Column(
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth().padding(horizontal = 6.dp)
             ) {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
