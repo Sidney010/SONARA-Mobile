@@ -9,12 +9,12 @@ plugins {
 
 android {
     namespace = "com.example.sonara"
-    compileSdk = 34 // RETORNADO PARA 34: Compatibilidade total com o AGP 8.5.2
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "com.example.sonara"
         minSdk = 26
-        targetSdk = 34 // RETORNADO PARA 34
+        targetSdk = 35
         versionCode = 1
         versionName = "1.0"
 
@@ -98,6 +98,7 @@ dependencies {
 
     // Hilt (Injeção de dependência) - CORRIGIDO: Removido o foundation intruso daqui
     implementation(libs.hilt.android)
+    implementation(libs.androidx.compose.runtime)
     kapt(libs.hilt.compiler)
     implementation(libs.androidx.hilt.navigation.compose)
 

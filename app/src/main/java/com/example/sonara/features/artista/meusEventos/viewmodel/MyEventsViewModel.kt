@@ -77,7 +77,15 @@ class MyEventsViewModel @Inject constructor(
             }
             when (val result = buscarUsuarioPorIdUseCase(userId)) {
                 is AppResult.Success -> {
-                    val candidaturas = result.data.artista?.eventos?.filterNotNull() ?: emptyList()
+                    val perfil = result.data
+                    val nomeArtistico = perfil.artista?.nomeArtistico
+                    
+                    // Sincroniza o nome artístico com o TokenManager para o header
+                    if (perfil.tipoUsuario == "Artista" && !nomeArtistico.isNullOrBlank()) {
+                        tokenManager.updateUserName(nomeArtistico)
+                    }
+
+                    val candidaturas = perfil.artista?.eventos?.filterNotNull() ?: emptyList()
                     _uiState.update { it.copy(eventos = candidaturas, isLoading = false, isRefreshing = false) }
                 }
                 is AppResult.Error -> {

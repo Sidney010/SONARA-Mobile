@@ -63,6 +63,12 @@ class ArtistProfileViewModel @Inject constructor(
             when (val result = buscarUsuarioPorIdUseCase(userId)) {
                 is AppResult.Success -> {
                     val perfil = result.data
+                    
+                    // Sincroniza o nome artístico no TokenManager para o header
+                    if (perfil.tipoUsuario == "Artista" && !perfil.artista?.nomeArtistico.isNullOrBlank()) {
+                        tokenManager.updateUserName(perfil.artista!!.nomeArtistico!!)
+                    }
+
                     val drafts = perfil.redesSociais.map { rs ->
                         RedeSocialDraft(
                             id = rs.id,

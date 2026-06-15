@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.sonara.core.auth.TokenManager
 import com.example.sonara.core.common.AppResult
 import com.example.sonara.domain.model.Evento
+import com.example.sonara.domain.usecase.BuscarUsuarioPorIdUseCase
 import com.example.sonara.domain.usecase.ListarEventosUseCase
 import com.example.sonara.features.home.model.EventoFiltro
 import com.example.sonara.features.home.model.HomeUiState
@@ -13,6 +14,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -20,6 +22,7 @@ import javax.inject.Inject
 @HiltViewModel
 class HomeViewModel @Inject constructor(
     private val listarEventosUseCase: ListarEventosUseCase,
+    private val buscarUsuarioPorIdUseCase: BuscarUsuarioPorIdUseCase,
     private val tokenManager: TokenManager
 ) : ViewModel() {
 
@@ -29,6 +32,24 @@ class HomeViewModel @Inject constructor(
     init {
         observeSession()
         loadEventos()
+        syncArtistName()
+    }
+
+    private fun syncArtistName() {
+        viewModelScope.launch {
+            val userId = tokenManager.getUserId() ?: return@launch
+            val type = tokenManager.userType.first()
+            if (type == "Artista") {
+                when (val result = buscarUsuarioPorIdUseCase(userId)) {
+                    is AppResult.Success -> {
+                        result.data.artista?.nomeArtistico?.let { artistName ->
+                            tokenManager.updateUserName(artistName)
+                        }
+                    }
+                    else -> {}
+                }
+            }
+        }
     }
 
     // ─────────────────────────────────────────────────────────────────────────

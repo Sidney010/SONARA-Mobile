@@ -5,7 +5,7 @@ data class UsuarioLogin(
     val nome: String,
     val email: String,
     val foto: String? = null,
-    val tipoUsuario: String, // "Artista" ou "Organizador" ou "Usuario"
+    val tipoUsuario: String, // "Artista" ou "Organizador" ou "Usuario
     val idArtista: Int?,
     val idOrganizador: Int?
 )

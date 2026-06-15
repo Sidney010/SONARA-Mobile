@@ -98,6 +98,12 @@ class TokenManager @Inject constructor(
         context.authDataStore.edit { it.clear() }
     }
 
+    suspend fun updateUserName(newName: String) {
+        context.authDataStore.edit { prefs ->
+            prefs[USER_NAME_KEY] = newName
+        }
+    }
+
     suspend fun getToken(): String? = token.first()
 
     suspend fun getUserId(): Int? = userId.first()?.toIntOrNull()
